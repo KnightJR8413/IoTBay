@@ -1,3 +1,21 @@
+// Function to toggle the visibility of the search bar
+function toggleSearchBar() {
+    var searchBar = document.getElementById('search-bar');
+    // Check if the "show" class is already applied
+    if (searchBar.classList.contains('show')) {
+        searchBar.classList.remove('show'); // Hide the search bar
+    } else {
+        searchBar.classList.add('show'); // Show the search bar
+    }
+}
+
+// Function to simulate the search action (this can be extended with real search functionality)
+function searchProduct() {
+    var query = document.getElementById('search-input').value;
+    alert("Searching for: " + query);
+    toggleSearchBar(); // Close the search bar after search
+}
+
 // Wait for the DOM to fully load
 document.addEventListener("DOMContentLoaded", function () {
     console.log("IoTBay Landing Page Loaded");

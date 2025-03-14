@@ -7,23 +7,33 @@
     <link rel="stylesheet" href="CSS/styles.css">
 </head>
 <body>
-    <header>
-        <div class="navbar">
-            <div class="logo">
-                <img src="images/logo.png" width="125px">
-            </div>
-            <nav>  
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#products">Products</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                    <li><a href="login.html" class="btn">Login</a></li>
-                </ul>
-            </nav>
+    <div class="navbar">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logo.png" width="125px" alt="IoTBay Logo">
+            </a>
         </div>
-    </header>
-    
+        <nav>  
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="icon-buttons">
+            <button class="icon-btn" onclick="location.href='search.html';">
+                <img src="images/search.png" alt="search" class="icon-img">
+            </button>
+            <button class="icon-btn" onclick="location.href='login.html';">
+                <img src="images/login.png" alt="login" class="icon-img">
+            </button>                
+            <button class="icon-btn" onclick="location.href='shoppingcart.html';">
+                <img src="images/cart.png" alt="shopping cart" class="icon-img">
+            </button>
+        </div>
+    </div>
+
     <main>
         <div class="LoginForm_login_form_container__xKssY">
             <form class="LoginForm_login_form__NDkUT">
