@@ -1,11 +1,12 @@
 /* General Styles */
 body {
     font-family: Arial, sans-serif;
+    height: 100vh;
     margin: 0;
     padding: 0;
-    /* background-color: #d3e1f3; */
     background-image: linear-gradient( #d4e2f4 0%, #edf3fb 100%);
-
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .navbar {
