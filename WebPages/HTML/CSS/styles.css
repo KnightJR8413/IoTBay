@@ -4,7 +4,7 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    background-image: linear-gradient( #d4e2f4 0%, #ffffff 100%);
+    background-image: linear-gradient( #d4e2f4e4 0%, #ffffff 100%);
     background-size: cover;
     background-repeat: no-repeat;
 }
