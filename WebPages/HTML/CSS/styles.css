@@ -16,12 +16,9 @@ body {
     position: relative;
 }
 
-.navbar .logo {
-    margin-right: 20px;  
-}
 
 .navbar .logo img {
-    width: 180px;
+    width: 190px;
     height: 100px;
 }
 
@@ -39,15 +36,14 @@ nav ul {
     display: flex;
 }
 
-nav ul li {
-    margin-left: 20px;
-}
+/* nav ul li {
+} */
 
 nav ul li a {
     text-decoration: none;
     color: #3a4163;
     font-weight: bold;
-    padding: 5px;
+    padding: 18px;
     transition: color 0.3s ease;
     font-size: 20px;
 }
@@ -63,6 +59,7 @@ nav ul li a:hover {
     display: inline-block;
     border-radius: 7px;
     transition: opacity 0.3s ease-in-out;
+    padding: 10px;
 }
 
 .icon-img {
