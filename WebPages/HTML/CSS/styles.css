@@ -17,7 +17,8 @@ body {
 }
 
 .navbar .logo img {
-    width: 125px;
+    width: 180px;
+    height: 100px;
 }
 
 nav {
