@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoTBay - Home</title>
+    <title>Contact Us - IoTBay</title>
     <link rel="stylesheet" href="CSS/styles.css">
 </head>
 <body>
@@ -39,15 +39,28 @@
         <button onclick="toggleSearchBar()">Close</button>
     </div>
 
-    <script src="script.js"></script>
-</body>
-</html>
+    <section class="hero">
+        <h1>Contact IoTBay</h1>
+        <p>Get in touch with us for any queries or support</p>
+    </section>
 
     <main>
-        <section class="hero">
-            <h1>Welcome to IoTBay</h1>
-            <p>Your one-stop shop for IoT devices</p>
-            <a href="products.html" class="btn">Shop Now</a>
+        <section class="contact-container">
+            <h2>Contact Us</h2>
+            <p>If you have any questions, feel free to reach out to us.</p>
+            
+            <div class="contact-info">
+                <p><strong>Email:</strong> support@iotbay.com</p>
+                <p><strong>Phone:</strong> +61 420 691 337</p>
+                <p><strong>Address:</strong> UTS Building 11 Broadway, Ultimo NSW 2007</p>
+            </div>
+
+            <form action="#" method="POST" class="contact-form">
+                <input type="text" id="name" name="name" placeholder="Your Name" required>
+                <input type="email" id="email" name="email" placeholder="Your Email" required>
+                <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
         </section>
     </main>
 
