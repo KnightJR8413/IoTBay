@@ -345,11 +345,54 @@ footer {
 
 /* 
 classes to make
-login-form
-login-form-input-div
-login-form-input-box
+login-form --
+register-form --
+forgotpass-form --
+login-form-input-div --
+login-form-input-box 
 login-reset-register-links-div
-login-button
-login-button-div
+login-button --
+login-button-div --
 */
 
+form.login-form, .register-form, .forgotpass-form {
+    border: 3px solid #f1f1f1;
+    padding: 16px;
+}
+
+input[type=text],
+input[type=password] {
+    width: 50%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+button.login-button {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease-in-out;
+}
+
+button:hover.login-button {
+    background-color: #218838;
+}
+
+.login-form-input-div {
+    padding: 16px;
+}
+
+.login-button-div {
+    padding: 16px;
+}
+
+.login-links {
+    color: hotpink;
+}
