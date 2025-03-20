@@ -118,7 +118,90 @@ nav ul li a:hover {
     background-color: #3a4163;
 }
 
+.carousel-container {
+    overflow: hidden;
+    position: relative;
+}
+  
+.carousel {
+    display: flex;
+    transition: transform 0.5s ease;
+}
 
+/* Ensure consistent slide size */
+.carousel-slide {
+    flex: 0 0 100%; /* Ensure each slide takes full width */
+  box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Set equal height for all slides */
+.carousel-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f4f4f4;
+    border-radius: 20px;
+    padding: 40px;
+    width: 80%;
+    min-height: 300px; /* Ensure all slides have the same height */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure text and image have equal heights */
+.text-content,
+.product-image {
+    flex: 1;
+    max-height: 100%;
+}
+
+/* Limit text width */
+.text-content {
+    width: 50%;
+}
+
+.text-content h2,
+.text-content p {
+  color: #000000;
+}
+/* Make product images responsive and consistent */
+.product-image {
+    width: 40%;
+    max-width: 300px;
+    border-radius: 10px;
+    object-fit: contain; /* Ensures images fit within the given space */
+}
+
+/* Dots Navigation */
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    margin: 0 5px;
+    background-color: #8f97bb;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dot.active {
+    background-color: #3a4163;
+}
+
+
+/* Footer */
+footer {
+    background-color: #f8f9fa;
+    padding: 15px;
+    margin-top: 20px;
+}
 /* Hero Section */
 .hero {
     text-align: center;
