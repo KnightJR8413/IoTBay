@@ -144,7 +144,7 @@ nav ul li a:hover {
     justify-content: space-between;
     background: #f4f4f4;
     border-radius: 20px;
-    padding: 40px;
+    padding: 60px 40px;
     width: 80%;
     min-height: 300px; /* Ensure all slides have the same height */
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -160,19 +160,51 @@ nav ul li a:hover {
 /* Limit text width */
 .text-content {
     width: 50%;
+    color: black;
 }
 
-.text-content h2,
+.text-content h2 {
+    font-size: 2.8rem;
+    line-height: 1.2;
+    margin-bottom: 30px;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.product-line {
+    font-size: 2.2rem;
+    margin-top: 10px;
+    color: black;
+    font-weight: 700;
+}
+
 .text-content p {
   color: #000000;
 }
 /* Make product images responsive and consistent */
 .product-image {
-    width: 40%;
-    max-width: 300px;
+    width: 50%;
+    max-width: 350px;
     border-radius: 10px;
     object-fit: contain; /* Ensures images fit within the given space */
 }
+
+.btn {
+    background: linear-gradient(45deg, #ED1C24, #000000);
+    color: white!important;
+    padding: 15px 35px;
+    border-radius: 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    transition: transform 0.3s ease;
+}
+
+/* .btn:hover {
+} */
 
 /* Dots Navigation */
 .carousel-dots {
