@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome - IoTBay</title>
+    <title>Contact Us - IoTBay</title>
     <link rel="stylesheet" href="CSS/styles.css">
 </head>
-<body class="welcome-page">
+<body>
     <div class="navbar">
         <div class="logo">
             <a href="index.html">
@@ -40,23 +40,41 @@
     </div>
 
     <section class="hero">
-        <h1>Welcome to IoTBay!</h1>
-        <p id="welcome-message">Welcome, <span id="username">User</span>!</p>
-        <p>A confirmation email has been sent to your registered email address.</p>
-        <a href="products.html" class="btn">Browse Products</a>
+        <h1>About us</h1>
+        <p>Who we are and what we do</p>
     </section>
-    <div style="height: 400px;"></div>
-    <footer>
-        <div class="footer-newsletter">
-            <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
-            <div class="newsletter-form">
-                <form>
-                    <input type="email" placeholder="Only an email away..." required>
-                    <button type="submit">Sign me up!</button>
-                </form>
+
+    <main>
+
+        <div class='about-parent'>
+            <div class='about-child-img'>
+                <img src="images/ausMap.png" width="500px" alt="Map of Australia with logo">
+            </div>
+            <div class='about-child'>
+                <div class="about-info">
+                    <h2>One of Australia's leading IT retailers</h2>
+
+                    <p>
+                        IoTBay is a Sydney-based digital marketplace dedicated to providing cutting-edge IoT devices to our consumers. 
+                        Our mission is to make smart technology accessible to businesses and individuals, offering a seamless shopping experience through our innovative online platform.
+                        <br>
+                        <br>
+                        With a focus on quality, convenience, and reliability, we provide a diverse range of IoT solutions tailored to various needs. 
+                        <br>
+                        Our platform ensures smooth device management, secure order processing, and efficient delivery, making the process of IoT adoption easier than ever. 
+                        <br>
+                        <br>
+                        <i>At IoTBay, we are committed to driving the <br>future of connected technology</i>
+                    </p>
+                    
+                </div>
             </div>
         </div>
-    
+
+
+    </main>
+
+    <footer>
         <div class="footer-links">
             <div class="footer-column">
                 <h3>ABOUT</h3>
@@ -88,36 +106,19 @@
                     <li><a href="#">Privacy & Cookies</a></li>
                 </ul>
             </div>
-
-            <div class="footer-column">
-                <h3>Need advice?</h3>
-                <p>Speak to our friendly staff</p>
-                <a href="contact.html" class="contact-button">Contact Us</a>
-            </div>
         </div>
-
+    
+        <div class="footer-contact">
+            <h3>Need advice?</h3>
+            <p>Speak to our friendly staff</p>
+            <a href="contact.html" class="contact-button">Contact Us</a>
+        </div>
+    
         <div class="footer-copyright">
             <p>&copy; 2025 IoTBay. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Add these 2 elements here -->
-    <div class="subscription-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h3>Thank you for subscribing!</h3>
-            <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
-        </div>
-    </div>
-    <div class="modal-backdrop"></div>
-
-    <script src="JAVA/script.js"></script>
-    </footer>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let firstName = sessionStorage.getItem("firstName");
-            document.getElementById("username").textContent = firstName;
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
