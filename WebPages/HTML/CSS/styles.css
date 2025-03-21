@@ -651,25 +651,35 @@ footer {
     background: linear-gradient(135deg, #5aa8d6 0%, #d4e2f4 100%);
 }
 
+.products-container {
+    display: grid;
+    grid-template-columns: 10% 90%;
+}
+
 .sidebar {
     margin: 0;
-    padding: 0px;
-    width: 200px;
-    position: sticky;
+    padding: 3px;
+    width: 100%;
+    position: static;
     height: 100%;
     overflow: auto;
+    text-decoration: none;
+    color: #3a4163;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    font-size: 17px;
 }
 
 .sidebar a {
     display: block;
-    background-color: #CBE3EF;
     color: #3a4163;
     padding: 16px;
     text-decoration: none;
 }
 
 .sidebar a.active {
-    color: black;
+    color: white;
+    /* add stuff to this once we actually have stuff to sort*/
 }
 
 .sidebar a:hover:not(.active) {
