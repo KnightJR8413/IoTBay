@@ -356,8 +356,8 @@ login-button-div --
 */
 
 form.login-form, .register-form, .forgotpass-form {
-    border: 3px solid #f1f1f1;
-    padding: 16px;
+    /*border: 3px solid #f1f1f1;*/
+    padding: 8px;
 }
 
 input[type=text],
