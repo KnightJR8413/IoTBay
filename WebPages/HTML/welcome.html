@@ -6,12 +6,6 @@
     <title>Welcome - IoTBay</title>
     <link rel="stylesheet" href="CSS/styles.css">
 </head>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        let username = sessionStorage.getItem("username") || "User"; 
-        document.getElementById("username").textContent = username;
-    });
-</script>
 <body>
     <div class="navbar">
         <div class="logo">
@@ -55,5 +49,11 @@
     <footer>
         <p>&copy; 2025 IoTBay. All rights reserved.</p>
     </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let firstName = sessionStorage.getItem("firstName");
+            document.getElementById("username").textContent = firstName;
+        });
+    </script>
 </body>
 </html>
