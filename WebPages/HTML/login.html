@@ -55,7 +55,7 @@
                     <a class="login-links" href="forgotpass.html">Forgot Password?</a>
                 </div>
                 <div class="login-button-div">
-                    <button type="submit" class="login-button" style="width: 293px; height: 40px;">Login</button>
+                    <button type="button" class="login-button" style="width: 293px; height: 40px;" onclick="window.location.href='welcome.html'">Login</button>
                 </div>  
             </form>
             <button class="login-button" onclick='location.href="register.html";'>Don't have an account register here</button>
@@ -63,9 +63,63 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 IoTBay. All rights reserved.</p>
+        <div class="footer-links">
+            <div class="footer-column">
+                <h3>ABOUT</h3>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="#">Store Locations</a></li>
+                    <li><a href="#">Payment Methods</a></li>
+                    <li><a href="#">Shipping Methods</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>HELP</h3>
+                <ul>
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">Warranty & Returns</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Omitie Services</a></li>
+                    <li><a href="#">Site Map</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>OTHER</h3>
+                <ul>
+                    <li><a href="#">Announcements</a></li>
+                    <li><a href="#">Merchandise</a></li>
+                    <li><a href="#">Careers at IoTBay</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy & Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+    
+        <div class="footer-contact">
+            <h3>Need advice?</h3>
+            <p>Speak to our friendly staff</p>
+            <a href="contact.html" class="contact-button">Contact Us</a>
+        </div>
+    
+        <div class="footer-copyright">
+            <p>&copy; 2025 IoTBay. All rights reserved.</p>
+        </div>
     </footer>
 
     <script src="script.js"></script>
+    <script>
+        function loginUser(event) {
+            event.preventDefault();
+    
+            let email = document.getElementById("email").value;
+    
+            sessionStorage.setItem("userEmail", email);
+    
+            window.location.href = "welcome.html";
+        }
+    </script>
+    </body>
+    </html>
 </body>
 </html>

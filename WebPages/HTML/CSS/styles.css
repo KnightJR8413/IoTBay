@@ -603,6 +603,78 @@ footer {
     background-color: #218838;
 }
 
+/*PRODUCTS PAGE STUFF*/
+.products{
+    box-sizing: border-box;
+}
+
+.prodColumn {
+    float: left;
+    width: 20%;
+    padding: 0;
+}
+
+.prodRow {
+    margin: 15px -5px;
+}
+
+.prodRow::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.card {
+    box-shadow: 0 4px 100px 0 rgba(0, 13, 60, 0.2);
+    max-width: 75%;
+    margin: auto;
+    text-align: center;
+  }
+  
+  .price {
+    color: #3a4163;
+    font-size: 22px;
+  }
+  
+  .card button {
+    border: none;
+    outline: 0;
+    padding: 12px;
+    background-color: #3a4163;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+
+    text-decoration: none;
+    color: #CBE3EF;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    font-size: 20px;
+  }
+  
+  .card button:hover {
+    opacity: 0.7;
+  }
+
+@media screen and (max-width: 600px) {
+    .prodColumn {
+        width: 100%;
+        display: block;
+        margin-bottom: 20px;
+    }
+}
+/*END OF PRODUCTS PAGE STUFF*/
+
+/* 
+classes to make
+login-form
+login-form-input-div
+login-form-input-box
+login-reset-register-links-div
+login-button
+login-button-div
+*/
 form.login-form, .register-form, .forgotpass-form {
     /*border: 3px solid #f1f1f1;*/
     padding: 8px;
@@ -647,4 +719,8 @@ color: #0000ee;
 
 .login-links:visited {
 color: #551a8b;
+}
+
+p.text {
+    text-align: center;
 }
