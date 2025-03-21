@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - IoTBay</title>
+    <link rel="stylesheet" href="CSS/styles.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logo.png" width="125px" alt="IoTBay Logo">
+            </a>
+        </div>
+        <nav>  
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="contact.html">Contact</a></li>                
+            </ul>
+        </nav>
+        <div class="icon-buttons">
+            <button class="icon-btn" onclick="toggleSearchBar();">
+                <img src="images/search.png" alt="search" class="icon-img">
+            </button>
+            <button class="icon-btn" onclick="location.href='login.html';">
+                <img src="images/login.png" alt="login" class="icon-img">
+            </button>                
+            <button class="icon-btn" onclick="location.href='shoppingcart.html';">
+                <img src="images/cart.png" alt="shopping cart" class="icon-img">
+            </button>
+        </div>
+    </div>
+    <div id="search-bar" class="search-bar">
+        <input type="text" placeholder="Search products..." id="search-input">
+        <button onclick="searchProduct()">Search</button>
+        <button onclick="toggleSearchBar()">Close</button>
+    </div>
+
+    <section class="hero">
+        <h1>About us</h1>
+        <p>Who we are and what we do</p>
+    </section>
+
+    <main>
+
+        <div class='about-parent'>
+            <div class='about-child-img'>
+                <img src="images/ausMap.png" width="500px" alt="Map of Australia with logo">
+            </div>
+            <div class='about-child'>
+                <div class="about-info">
+                    <h2>One of Australia's leading IT retailers</h2>
+
+                    <p>
+                        IoTBay is a Sydney-based digital marketplace dedicated to providing cutting-edge IoT devices to our consumers. 
+                        Our mission is to make smart technology accessible to businesses and individuals, offering a seamless shopping experience through our innovative online platform.
+                        <br>
+                        <br>
+                        With a focus on quality, convenience, and reliability, we provide a diverse range of IoT solutions tailored to various needs. 
+                        Our platform ensures smooth device management, secure order processing, and efficient delivery, making IoT adoption easier than ever. 
+                        At IoTBay, we are committed to driving the future of connected technology.
+                    </p>
+                    
+                </div>
+            </div>
+        </div>
+
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 IoTBay. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
