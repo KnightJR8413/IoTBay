@@ -16,6 +16,53 @@ function searchProduct() {
     toggleSearchBar(); // Close the search bar after search
 }
 
+// Newsletter Subscription
+document.addEventListener('DOMContentLoaded', function() {
+    const newsletterForm = document.querySelector('.newsletter-form');
+    const emailInput = newsletterForm.querySelector('input[type="email"]');
+    const modal = document.querySelector('.subscription-modal');
+    const backdrop = document.querySelector('.modal-backdrop');
+    const closeModal = document.querySelector('.close-modal');
+    const subscribedEmail = document.querySelector('.subscribed-email');
+
+    newsletterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Basic email validation
+        const email = emailInput.value;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if(email && emailPattern.test(email)) {
+            // Show modal with email
+            subscribedEmail.textContent = email;
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+            
+            // Clear input
+            emailInput.value = '';
+            
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                modal.classList.remove('show');
+                backdrop.classList.remove('show');
+            }, 5000);
+        } else {
+            alert('Please enter a valid email address');
+        }
+    });
+
+    // Close modal handlers
+    closeModal.addEventListener('click', () => {
+        modal.classList.remove('show');
+        backdrop.classList.remove('show');
+    });
+
+    backdrop.addEventListener('click', () => {
+        modal.classList.remove('show');
+        backdrop.classList.remove('show');
+    });
+});
+
 // Wait for the DOM to fully load
 document.addEventListener("DOMContentLoaded", function () {
     console.log("IoTBay Landing Page Loaded");
