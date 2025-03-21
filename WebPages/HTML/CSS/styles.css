@@ -598,3 +598,7 @@ color: #0000ee;
 .login-links:visited {
 color: #551a8b;
 }
+
+p.text {
+    text-align: center;
+}
