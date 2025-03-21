@@ -4,32 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - IoTBay</title>
-    <link rel="stylesheet" href="HTML/CSS/styles.css">
+    <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
 </head>
 <body>
     <div class="navbar">
         <div class="logo">
-            <a href="index.html">
-                <img src="HTML/images/logo.png" width="125px" alt="IoTBay Logo">
+            <a href="/index">
+                <img src="{{ url_for('serve_images', filename='logo.png')}}" width="125px" alt="IoTBay Logo">
             </a>
         </div>
         <nav>  
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="products.html">Products</a></li>
-                <li><a href="contact.html">Contact</a></li>                
+                <li><a href="/index">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/contact">Contact</a></li>                
             </ul>
         </nav>
         <div class="icon-buttons">
             <button class="icon-btn" onclick="toggleSearchBar();">
-                <img src="HTML/images/search.png" alt="search" class="icon-img">
+                <img src="{{ url_for('serve_images', filename='search.png')}}" alt="search" class="icon-img">
             </button>
-            <button class="icon-btn" onclick="location.href='login.html';">
-                <img src="HTML/images/login.png" alt="login" class="icon-img">
+            <button class="icon-btn" onclick="location.href='/login';">
+                <img src="{{ url_for('serve_images', filename='login.png')}}" alt="login" class="icon-img">
             </button>                
-            <button class="icon-btn" onclick="location.href='shoppingcart.html';">
-                <img src="HTML/images/cart.png" alt="shopping cart" class="icon-img">
+            <button class="icon-btn" onclick="location.href='/shoppingcart';">
+                <img src="{{ url_for('serve_images', filename='cart.png')}}" alt="shopping cart" class="icon-img">
             </button>
         </div>
     </div>
@@ -52,13 +52,13 @@
                     <input class="login-form-input-box" type="password" name="password" autocomplete="current-password" placeholder="Password" value="">
                 </div>
                 <div class="login-reset-register-links-div">
-                    <a class="login-links" href="forgotpass.html">Forgot Password?</a>
+                    <a class="login-links" href="/forgotpass">Forgot Password?</a>
                 </div>
                 <div class="login-button-div">
-                    <button type="button" class="login-button" style="width: 293px; height: 40px;" onclick="window.location.href='welcome.html'">Login</button>
+                    <button type="button" class="login-button" style="width: 293px; height: 40px;" onclick="window.location.href='/welcome'">Login</button>
                 </div>  
             </form>
-            <button class="login-button" onclick='location.href="register.html";'>Don't have an account register here</button>
+            <button class="login-button" onclick='location.href="/register";'>Don't have an account register here</button>
         </section>
     </main>
 
@@ -67,8 +67,8 @@
             <div class="footer-column">
                 <h3>ABOUT</h3>
                 <ul>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
                     <li><a href="#">Store Locations</a></li>
                     <li><a href="#">Payment Methods</a></li>
                     <li><a href="#">Shipping Methods</a></li>
@@ -99,7 +99,7 @@
         <div class="footer-contact">
             <h3>Need advice?</h3>
             <p>Speak to our friendly staff</p>
-            <a href="contact.html" class="contact-button">Contact Us</a>
+            <a href="/contact" class="contact-button">Contact Us</a>
         </div>
     
         <div class="footer-copyright">
@@ -116,7 +116,7 @@
     
             sessionStorage.setItem("userEmail", email);
     
-            window.location.href = "welcome.html";
+            window.location.href = "/welcome";
         }
     </script>
     </body>

@@ -1,6 +1,6 @@
-# to use press run then got to your ip:5000
-# to get your ip you can see when you start the script where is says running on http://your IP
-# this also hosts on local host as well as online
+# to use press run then got to localhost:5000 or 127.0.0.1:5000
+# this exclusively hosts on local host and cannot be accessed from another computer through your IP
+
 
 from flask import Flask, send_from_directory, render_template
 
@@ -34,4 +34,4 @@ def home():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
