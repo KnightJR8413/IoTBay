@@ -191,9 +191,9 @@ nav ul li a:hover {
     object-fit: contain; /* Ensures images fit within the given space */
 }
 
-.btn {
-    background: linear-gradient(45deg, #ED1C24, #000000);
-    color: white!important;
+/* .btn {
+    background: #007BFF;
+    color: #007BFF;
     padding: 15px 35px;
     border-radius: 30px;
     font-weight: 600;
@@ -201,8 +201,26 @@ nav ul li a:hover {
     letter-spacing: 1px;
     border: none;
     transition: transform 0.3s ease;
+} */
+
+.shop-btn {
+    font-size: 1.2rem;
+    background: #007BFF;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.3s ease;
 }
 
+.stop-btn:hover {
+    background: #0056b3;
+}
 /* .btn:hover {
 } */
 
@@ -298,6 +316,23 @@ nav ul li a:hover {
 }
 
 .buy-btn:hover {
+    background: #0056b3;
+}
+
+.colour-btn {
+    font-size: 1.2rem;
+    background: #007BFF;
+    color: white;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: transform 0.3s ease;
+}
+
+.colour:hover {
     background: #0056b3;
 }
 
