@@ -654,6 +654,7 @@ footer {
 .products-container {
     display: grid;
     grid-template-columns: 10% 90%;
+    background: linear-gradient(135deg, #3a4163 0%, #d4e2f4 100%);
 }
 
 .sidebar {
@@ -672,7 +673,7 @@ footer {
 
 .sidebar a {
     display: block;
-    color: #3a4163;
+    color: #EDF3FB;
     padding: 16px;
     text-decoration: none;
 }
@@ -683,7 +684,7 @@ footer {
 }
 
 .sidebar a:hover:not(.active) {
-    background-color: #3a4163;
+    background-color: #293053;
     color: #CBE3EF;
 }
 
