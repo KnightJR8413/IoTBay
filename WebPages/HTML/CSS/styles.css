@@ -444,6 +444,56 @@ footer {
     font-size: 0.9rem;
 }
 
+/* Newsletter Modal Styles */
+.subscription-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.subscription-modal.show,
+.modal-backdrop.show {
+    display: block;
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.subscription-modal h3 {
+    color: #0066cc;
+    margin-bottom: 1rem;
+}
+
+.subscription-modal p {
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
 /* Hero Section */
 .hero {
     text-align: center;
