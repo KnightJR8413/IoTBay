@@ -645,17 +645,13 @@ footer {
 
 .sidebar {
     margin: 0;
-    padding: 0;
+    padding: 0px;
     width: 200px;
-    position: fixed;   
+    position: sticky;
     height: 100%;
     overflow: auto;
-    display: inline-block;
 }
 
-.container {
-    height: 100%;
-}
 .sidebar a {
     display: block;
     background-color: #CBE3EF;
@@ -677,8 +673,7 @@ footer {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
-    padding-left: 210px;
-    padding-right: 10px;
+    padding: 10px;
     justify-content: center;
 }
 /*END OF PRODUCTS PAGE STUFF*/
