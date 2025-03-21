@@ -553,18 +553,6 @@ footer {
     background-color: #218838;
 }
 
-/* 
-classes to make
-login-form --
-register-form --
-forgotpass-form --
-login-form-input-div --
-login-form-input-box 
-login-reset-register-links-div
-login-button --
-login-button-div --
-*/
-
 form.login-form, .register-form, .forgotpass-form {
     /*border: 3px solid #f1f1f1;*/
     padding: 8px;
@@ -604,5 +592,9 @@ button:hover.login-button {
 }
 
 .login-links {
-    color: hotpink;
+color: #0000ee;
+}
+
+.login-links:visited {
+color: #551a8b;
 }
