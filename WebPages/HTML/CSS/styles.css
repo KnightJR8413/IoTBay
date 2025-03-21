@@ -227,13 +227,223 @@ nav ul li a:hover {
     background-color: #3a4163;
 }
 
+.popular-products {
+    padding: 40px;
+    text-align: center;
+}
+
+.popular-products h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    justify-content: center;
+}
+
+.product-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-card img {
+    width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.product-card h3 {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.product-card p {
+    font-size: 0.9rem;
+    color: gray;
+    margin-bottom: 10px;
+}
+
+.rating {
+    color: #FF9900;
+    font-weight: bold;
+}
+
+.price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.buy-btn {
+    background: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.buy-btn:hover {
+    background: #0056b3;
+}
 
 /* Footer */
+/* Footer Styles */
 footer {
-    background-color: #f8f9fa;
-    padding: 15px;
-    margin-top: 20px;
+    background-color: #2d2d2d;
+    color: white;
 }
+
+.footer-reviews {
+    background-color: #f8f9fa;
+    color: #333;
+    padding: 2rem 10%;
+}
+
+.view-all-reviews {
+    display: block;
+    text-align: center;
+    margin: 1rem 0;
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.review-item {
+    margin: 2rem 0;
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.stars {
+    color: #ffd700;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.review-author {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.footer-newsletter {
+    background-color: #0066cc;
+    color: white;
+    padding: 2rem 10%;
+    text-align: center;
+}
+
+.newsletter-form {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.newsletter-form input {
+    padding: 0.8rem;
+    width: 300px;
+    border: none;
+    border-radius: 4px;
+}
+
+.newsletter-form button {
+    padding: 0.8rem 2rem;
+    background-color: white;
+    color: #0066cc;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: space-around;
+    padding: 3rem 10%;
+    background-color: #3d3d3d;
+}
+
+.footer-column {
+    flex: 1;
+    max-width: 250px;
+}
+
+.footer-column h3 {
+    color: white;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-column li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-column a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.footer-column a:hover {
+    color: white;
+}
+
+.footer-contact {
+    text-align: center;
+    padding: 3rem 10%;
+    background-color: #2d2d2d;
+}
+
+.footer-contact h3 {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.footer-contact p {
+    color: #ccc;
+    margin-bottom: 1.5rem;
+}
+
+.contact-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background-color: #0066cc;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.footer-copyright {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: #1d1d1d;
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
 /* Hero Section */
 .hero {
     text-align: center;
