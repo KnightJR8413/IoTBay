@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - IoTBay</title>
+    <link rel="stylesheet" href="CSS/styles.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logo.png" width="125px" alt="IoTBay Logo">
+            </a>
+        </div>
+        <nav>  
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="contact.html">Contact</a></li>                
+            </ul>
+        </nav>
+        <div class="icon-buttons">
+            <button class="icon-btn" onclick="toggleSearchBar();">
+                <img src="images/search.png" alt="search" class="icon-img">
+            </button>
+            <button class="icon-btn" onclick="location.href='login.html';">
+                <img src="images/login.png" alt="login" class="icon-img">
+            </button>                
+            <button class="icon-btn" onclick="location.href='shoppingcart.html';">
+                <img src="images/cart.png" alt="shopping cart" class="icon-img">
+            </button>
+        </div>
+    </div>
+
+    <div id="search-bar" class="search-bar">
+        <input type="text" placeholder="Search products..." id="search-input">
+        <button onclick="searchProduct()">Search</button>
+        <button onclick="toggleSearchBar()">Close</button>
+    </div>
+
+    <script src="JAVA/script.js"></script>
+    <div class="products">    
+        <div class="prodRow">
+            <div class="prodColumn">
+                <div class="card">
+                    <img class="prodImg" src="images/ring cam.png" alt="Ring Camera" style="width:100%">
+                    <h1>Ring Camera</h1>
+                    <p class="price">$64.99</p>
+                    <p>Ring Doorbell Camera</p>
+                    <p><button>Add to Cart</button></p>
+                </div>
+            </div>
+            <div class="prodColumn">
+                <div class="card">
+                    <img class="prodImg" src="images/sensor light.png" alt="Denim Jeans" style="width:100%">
+                    <h1>Infrared Sensor Light</h1>
+                    <p class="price">$24.99</p>
+                    <p>Automatically turns on if its too dark</p>
+                    <p><button>Add to Cart</button></p>
+                </div>
+            </div>
+            <div class="prodColumn">
+                <div class="card">
+                    <img class="prodImg" src="images/ring cam.png" alt="Ring Camera" style="width:100%">
+                    <h1>Ring Camera</h1>
+                    <p class="price">$64.99</p>
+                    <p>Ring Doorbell Camera</p>
+                    <p><button>Add to Cart</button></p>
+                </div>
+            </div>
+            <div class="prodColumn">
+                <div class="card">
+                    <img class="prodImg" src="images/sensor light.png" alt="Denim Jeans" style="width:100%">
+                    <h1>Infrared Sensor Light</h1>
+                    <p class="price">$24.99</p>
+                    <p>Automatically turns on if its too dark</p>
+                    <p><button>Add to Cart</button></p>
+                </div>
+            </div>
+            <div class="prodColumn">
+                <div class="card">
+                    <img class="prodImg" src="images/ring cam.png" alt="Ring Camera" style="width:100%">
+                    <h1>Ring Camera</h1>
+                    <p class="price">$64.99</p>
+                    <p>Ring Doorbell Camera</p>
+                    <p><button>Add to Cart</button></p>
+                </div>
+            </div>
+        </div>
+        <div class="prodRow">
+            <div class="prodColumn">
+                <div class="card">
+                    <img class="prodImg" src="images/ring cam.png" alt="Ring Camera" style="width:100%">
+                    <h1>Ring Camera</h1>
+                    <p class="price">$64.99</p>
+                    <p>Ring Doorbell Camera</p>
+                    <p><button>Add to Cart</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 IoTBay. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
