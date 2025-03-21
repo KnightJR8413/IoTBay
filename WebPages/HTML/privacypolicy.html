@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - IoTBay</title>
+    <link rel="stylesheet" href="CSS/styles.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logo.png" width="125px" alt="IoTBay Logo">
+            </a>
+        </div>
+        <nav>  
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="contact.html">Contact</a></li>                
+            </ul>
+        </nav>
+        <div class="icon-buttons">
+            <button class="icon-btn" onclick="toggleSearchBar();">
+                <img src="images/search.png" alt="search" class="icon-img">
+            </button>
+            <button class="icon-btn" onclick="location.href='login.html';">
+                <img src="images/login.png" alt="login" class="icon-img">
+            </button>                
+            <button class="icon-btn" onclick="location.href='shoppingcart.html';">
+                <img src="images/cart.png" alt="shopping cart" class="icon-img">
+            </button>
+        </div>
+    </div>
+    <div id="search-bar" class="search-bar">
+        <input type="text" placeholder="Search products..." id="search-input">
+        <button onclick="searchProduct()">Search</button>
+        <button onclick="toggleSearchBar()">Close</button>
+    </div>
+
+    <section class="hero">
+        <h1>Privacy Policy</h1>
+        <p>Our Privacy Policy</p>
+    </section>
+    <main>
+        <p>placeholder page so links work</p>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 IoTBay. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
