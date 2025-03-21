@@ -631,32 +631,42 @@ footer {
 }
 
 .contact-form button {
-    background-color: #28a745;
+    background-color: #007BFF;
     color: white;
-    padding: 12px 20px;
+    padding: 15px 25px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
+    font-weight: bold;
     transition: background 0.3s ease-in-out;
 }
 
 .contact-form button:hover {
-    background-color: #218838;
+    background-color: #0056b3;
 }
 
 /*PRODUCTS PAGE STUFF*/
+.products-hero {
+    background: linear-gradient(135deg, #5aa8d6 0%, #d4e2f4 100%);
+}
+
 .sidebar {
     margin: 0;
     padding: 0;
     width: 200px;
-    position: fixed;
+    position: fixed;   
     height: 100%;
     overflow: auto;
+    display: inline-block;
 }
 
+.container {
+    height: 100%;
+}
 .sidebar a {
     display: block;
+    background-color: #CBE3EF;
     color: #3a4163;
     padding: 16px;
     text-decoration: none;
@@ -671,29 +681,13 @@ footer {
     color: #CBE3EF;
 }
 
-div.content {
-    margin-left: 200px;
-    padding: 1px 16px;
-    height: 1000px;
-}
-
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
-    padding-left: 200px;
+    padding-left: 210px;
     padding-right: 10px;
     justify-content: center;
-}
-
-@media screen and (max-width: 700px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-    }
-    .sidebar a {float: left;}
-    div.content {margin-left: 0;}
 }
 /*END OF PRODUCTS PAGE STUFF*/
 
