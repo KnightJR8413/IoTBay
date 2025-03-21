@@ -46,9 +46,9 @@
     <main>
         <section class="contact-container">
             <h2>Register</h2>
-            <form action="#" method="POST" class="register-form">
+            <form action="#" method="POST" onsubmit="registerUser(event)">
                 <div class="login-form-input-div">
-                    <input class="login-form-input-box" type="text" name="name" autocomplete="" placeholder="Firstname" value="">
+                    <input class="login-form-input-box" type="text" id="first-name" name="first-name" autocomplete="" placeholder="Firstname" required>
                     <input class="login-form-input-box" type="text" name="name" autocomplete="" placeholder="Surname" value="">
                     <input class="login-form-input-box" type="text" name="email" autocomplete="email" placeholder="Email" value="">
                     <input class="login-form-input-box" type="password" name="password" autocomplete="current-password" placeholder="Password" value="">
@@ -110,5 +110,21 @@
     </footer>
 
     <script src="script.js"></script>
+    <script>
+        function registerUser(event) {
+            event.preventDefault();
+    
+            let firstName = document.getElementById("first-name").value;
+            let email = document.getElementById("email").value;
+    
+        
+            sessionStorage.setItem("firstName", firstName);
+            sessionStorage.setItem("userEmail", email);
+    
+            
+            window.location.href = "welcome.html";
+        }
+    </script>
+    
 </body>
 </html>
