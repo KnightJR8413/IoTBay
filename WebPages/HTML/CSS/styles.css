@@ -604,65 +604,54 @@ footer {
 }
 
 /*PRODUCTS PAGE STUFF*/
-.products{
-    box-sizing: border-box;
-}
-
-.prodColumn {
-    float: left;
-    width: 20%;
+.sidebar {
+    margin: 0;
     padding: 0;
+    width: 200px;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
 }
 
-.prodRow {
-    margin: 15px -5px;
-}
-
-.prodRow::after {
-    content: "";
-    display: table;
-    clear: both;
-}
-
-.card {
-    box-shadow: 0 4px 100px 0 rgba(0, 13, 60, 0.2);
-    max-width: 75%;
-    margin: auto;
-    text-align: center;
-  }
-  
-  .price {
+.sidebar a {
+    display: block;
     color: #3a4163;
-    font-size: 22px;
-  }
-  
-  .card button {
-    border: none;
-    outline: 0;
-    padding: 12px;
-    background-color: #3a4163;
-    text-align: center;
-    cursor: pointer;
-    width: 100%;
-    font-size: 18px;
-
+    padding: 16px;
     text-decoration: none;
-    color: #CBE3EF;
-    font-weight: bold;
-    transition: color 0.3s ease;
-    font-size: 20px;
-  }
-  
-  .card button:hover {
-    opacity: 0.7;
-  }
+}
 
-@media screen and (max-width: 600px) {
-    .prodColumn {
+.sidebar a.active {
+    color: black;
+}
+
+.sidebar a:hover:not(.active) {
+    background-color: #3a4163;
+    color: #CBE3EF;
+}
+
+div.content {
+    margin-left: 200px;
+    padding: 1px 16px;
+    height: 1000px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding-left: 200px;
+    padding-right: 10px;
+    justify-content: center;
+}
+
+@media screen and (max-width: 700px) {
+    .sidebar {
         width: 100%;
-        display: block;
-        margin-bottom: 20px;
+        height: auto;
+        position: relative;
     }
+    .sidebar a {float: left;}
+    div.content {margin-left: 0;}
 }
 /*END OF PRODUCTS PAGE STUFF*/
 
