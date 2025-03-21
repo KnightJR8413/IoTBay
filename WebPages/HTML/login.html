@@ -108,5 +108,18 @@
     </footer>
 
     <script src="script.js"></script>
+    <script>
+        function loginUser(event) {
+            event.preventDefault();
+    
+            let email = document.getElementById("email").value;
+    
+            sessionStorage.setItem("userEmail", email);
+    
+            window.location.href = "welcome.html";
+        }
+    </script>
+    </body>
+    </html>
 </body>
 </html>
