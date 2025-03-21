@@ -666,6 +666,49 @@ footer {
 }
 /*END OF PRODUCTS PAGE STUFF*/
 
+.about-info {
+    font-size: 17px;
+    margin: 50px auto;
+    color: #3a4163;
+}
+
+.about-info h2 {
+    color: #3a4163;
+    font-size: 1.6rem;
+}
+
+
+
+.about-parent {
+    margin: 1rem;
+    padding: 2rem 2rem;
+    text-align: center;
+  }
+.about-child {
+    display: inline-block;
+    vertical-align: middle;
+
+    width: 500px;
+    margin: 50px auto;
+    padding: 45px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .about-child-img {
+    display: inline-block;
+    vertical-align: middle;
+
+    width: 500px;
+    margin: 50px auto;
+    padding: 50px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+
 /* 
 classes to make
 login-form
