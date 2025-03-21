@@ -46,9 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 modal.classList.remove('show');
                 backdrop.classList.remove('show');
             }, 5000);
-        } else {
-            alert('Please enter a valid email address');
-        }
+        } 
+        // else {
+        //     alert('Please enter a valid email address');
+        // }
     });
 
     // Close modal handlers
