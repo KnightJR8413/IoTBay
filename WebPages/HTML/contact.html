@@ -65,6 +65,16 @@
     </main>
 
     <footer>
+        <div class="footer-newsletter">
+            <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
+            <div class="newsletter-form">
+                <form>
+                    <input type="email" placeholder="Only an email away..." required>
+                    <button type="submit">Sign me up!</button>
+                </form>
+            </div>
+        </div>
+    
         <div class="footer-links">
             <div class="footer-column">
                 <h3>ABOUT</h3>
@@ -96,19 +106,29 @@
                     <li><a href="#">Privacy & Cookies</a></li>
                 </ul>
             </div>
+
+            <div class="footer-column">
+                <h3>Need advice?</h3>
+                <p>Speak to our friendly staff</p>
+                <a href="contact.html" class="contact-button">Contact Us</a>
+            </div>
         </div>
-    
-        <div class="footer-contact">
-            <h3>Need advice?</h3>
-            <p>Speak to our friendly staff</p>
-            <a href="contact.html" class="contact-button">Contact Us</a>
-        </div>
-    
+
         <div class="footer-copyright">
             <p>&copy; 2025 IoTBay. All rights reserved.</p>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- Add these 2 elements here -->
+    <div class="subscription-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Thank you for subscribing!</h3>
+            <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
+        </div>
+    </div>
+    <div class="modal-backdrop"></div>
+
+    <script src="JAVA/script.js"></script>
 </body>
 </html>
