@@ -3,8 +3,10 @@
 # this also hosts on local host as well as online
 
 from flask import Flask, send_from_directory, render_template
+from flask_cors import CORS
 
 app = Flask(__name__, template_folder='WebPages/HTML')
+CORS(app)
 
 # Dynamic route to serve any page (e.g. /login, /about, /contact)
 @app.route("/<page_name>")
