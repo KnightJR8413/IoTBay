@@ -27,7 +27,7 @@ def serve_images(filename):
 # Serve JS files
 @app.route("/JAVA/<path:filename>")
 def serve_js(filename):
-    return send_from_directory("WebPages/HTML/JAVA", filename)
+    return send_from_directory("WebPages/HTML/scripts", filename)
 
 @app.route("/")
 def home():
