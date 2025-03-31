@@ -28,7 +28,9 @@ Before you begin, ensure you have the following installed:
     * navigate to root project folder
     * create virtual environment (first time, optional)
     ``` bash
-    python3 -m venv venv 
+    py -m venv venv #windows
+    python -m venv venv #any system where python3 is default
+    python3 -m venv venv #systems where python3 is installed alongside python2
     .\venv\Scripts\activate  # Windows
     source venv/bin/activate  # Mac/Linux
     ```
@@ -50,7 +52,9 @@ Before you begin, ensure you have the following installed:
     * navigate to root project folder
     * run webserver.py
     ```bash
-    py webserver.py
+    py webserver.py #windows
+    python webserver.py #any system where python3 is default
+    python3 webserver.py #systems where python3 is installed alongside python2
     ```
 
 ### Access the apllication
@@ -72,7 +76,7 @@ The backend server runs on port 3000 by default.
 POST /register: Registers a new user.
 POST /login: Logs a user in and returns a JWT token.
 GET /check-session: checks if a user is logged in
-/logout: currently not used but is there if needed for future application
+POST /logout: currently not used but is there if needed for future application
 
 ## API
 ### Authentication
@@ -86,7 +90,7 @@ GET /check-session: checks if a user is logged in
 
 ### How to Run the website (Currently)
 #### Mac
-*Note: python3 in command could also be 'py' or 'python'*
+*Note: python3 in command could also be or 'python'*
 1. open terminal
 2. run the command python3 -m venv venv
 3. run source venv/bin/activate
