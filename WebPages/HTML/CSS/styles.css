@@ -741,7 +741,7 @@ footer {
 
 
 /* 
-classes to make
+classes
 login-form
 login-form-input-div
 login-form-input-box
@@ -754,6 +754,7 @@ form.login-form, .register-form, .forgotpass-form {
     padding: 8px;
 }
 
+input[type=email],
 input[type=text],
 input[type=password] {
     width: 50%;

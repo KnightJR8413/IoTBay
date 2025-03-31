@@ -46,16 +46,17 @@
     <main>
         <section class="contact-container">
             <h2>Login</h2>
-            <form action="#" method="POST" class="login-form">
+            <p id="responseMessage"></p>
+            <form action="#" method="POST" class="login-form" id="loginForm">
                 <div class="login-form-input-div">
-                    <input class="login-form-input-box" type="text" name="email" autocomplete="email" placeholder="Email" value="">
-                    <input class="login-form-input-box" type="password" name="password" autocomplete="current-password" placeholder="Password" value="">
+                    <input class="login-form-input-box" type="email" id="email" name="email" autocomplete="email" placeholder="Email" value="" required>
+                    <input class="login-form-input-box" type="password" id="password" name="password" autocomplete="current-password" placeholder="Password" value="" required>
                 </div>
                 <div class="login-reset-register-links-div">
                     <a class="login-links" href="/forgotpass">Forgot Password?</a>
                 </div>
                 <div class="login-button-div">
-                    <button type="button" class="login-button" style="width: 293px; height: 40px;" onclick="window.location.href='/welcome'">Login</button>
+                    <button type="submit" class="login-button" style="width: 293px; height: 40px;">Login</button>
                 </div>  
             </form>
             <button class="login-button" onclick='location.href="/register";'>Don't have an account register here</button>
@@ -107,18 +108,9 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
-    <script>
-        function loginUser(event) {
-            event.preventDefault();
-    
-            let email = document.getElementById("email").value;
-    
-            sessionStorage.setItem("userEmail", email);
-    
-            window.location.href = "/welcome";
-        }
-    </script>
+    <script defer src="{{ url_for('serve_js', filename='frontend.js')}}"></script>
+    <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
+
     </body>
     </html>
 </body>

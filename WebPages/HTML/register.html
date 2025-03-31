@@ -46,21 +46,22 @@
     <main>
         <section class="contact-container">
             <h2>Register</h2>
-            <form action="#" method="POST" onsubmit="registerUser(event)">
+            <form action="#" method="POST" id="registerForm">
+                <p id="responseMessage"></p>
                 <div class="login-form-input-div">
-                    <input class="login-form-input-box" type="text" id="first-name" name="first-name" autocomplete="" placeholder="Firstname" required>
-                    <input class="login-form-input-box" type="text" name="name" autocomplete="" placeholder="Surname" value="">
-                    <input class="login-form-input-box" type="text" name="email" autocomplete="email" placeholder="Email" value="">
-                    <input class="login-form-input-box" type="password" name="password" autocomplete="current-password" placeholder="Password" value="">
+                    <input class="login-form-input-box" type="email" id="email" name="email" autocomplete="email" placeholder="Email" value="" required>
+                    <input class="login-form-input-box" type="text" id="first_name" name="first_name" autocomplete="" placeholder="Firstname" required>
+                    <input class="login-form-input-box" type="text" id="surname" name="surname" autocomplete="" placeholder="Surname" value="" required>
+                    <input class="login-form-input-box" type="password" id="password" name="password" autocomplete="current-password" placeholder="Password" value="" required><br><br>
+                    <input type="checkbox" id="marketing" name="marketing"> I agree to receive marketing emails and special offers</input> 
                 </div>
                 <div class="login-reset-register-links-div">
-                    <input type="checkbox"> I agree to receive marketing emails and special offers</input>
                     <a class="login-links" href="/login">Already have an account? Log in here</a>
-                </div>
+                </div> 
                 <div class="login-button-div">
-                    <button type="button" class="login-button" style="width: 167px; height: 40px;" onclick="window.location.href='/welcome'">Register</button></div>
-            </form>
-            <p>By signing up you agree to our <a class="login-links" href="/termconditions">terms and conditions</a> and <a class="login-links" href="/privacypolicy">privacy policy</a></p>
+                    <button type="submit" class="login-button" style="width: 293px; height: 40px;">Register</button></div>
+                </form>
+                <p>By signing up you agree to our <a class="login-links" href="/termconditions">terms and conditions</a> and <a class="login-links" href="/privacypolicy">privacy policy</a></p>
         </section>
     </main>
 
@@ -108,23 +109,8 @@
             <p>&copy; 2025 IoTBay. All rights reserved.</p>
         </div>
     </footer>
-
+    <script defer src="{{ url_for('serve_js', filename='frontend.js')}}"></script>
     <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
-    <script>
-        function registerUser(event) {
-            event.preventDefault();
-    
-            let firstName = document.getElementById("first-name").value;
-            let email = document.getElementById("email").value;
-    
-        
-            sessionStorage.setItem("firstName", firstName);
-            sessionStorage.setItem("userEmail", email);
-    
-            
-            window.location.href = "/welcome";
-        }
-    </script>
     
 </body>
 </html>
