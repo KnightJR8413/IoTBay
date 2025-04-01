@@ -47,7 +47,43 @@
 <!--HEADER COPY END HERE-->
 
 <main>
-<section class="hero"></section>
+<section class="hero">
+    <body class="logout-page">
+        <div class="logout-container">
+            <h1>Logging out...</h1>
+            <img src="{{ url_for('serve_images', filename='loading.gif') }}" alt="Loading..." width="50" height="50">
+            <p>You have successfully logged out and will be redirected to the homepage</p>
+            <div class="loader"></div> <!-- Optional: Add a loading spinner -->
+        </div>
+    
+        <script>
+            document.addEventListener("DOMContentLoaded", async function() {
+                try {
+                    // Call the logout function on the backend
+                    const response = await fetch("http://localhost:3000/logout", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+    
+                    const data = await response.json();
+                    if (response.ok) {
+                        // Remove token from localStorage (client-side session termination)
+                        localStorage.removeItem("token");
+    
+                        // Redirect to the landing page (or home page)
+                        window.location.href = "/index"; // Adjust the URL as needed
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                } catch (error) {
+                    console.error("Error logging out:", error);
+                    alert("There was an issue logging you out. Please try again.");
+                }
+            });
+        </script>
+</section>
 </main>
 
 <!--FOOTER COPY Start HERE-->
