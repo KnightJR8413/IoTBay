@@ -46,18 +46,63 @@
 </html>
 <!--HEADER COPY END HERE-->
 
-<main>
 <section class="hero">
-    <body class="logout-page">
-        <div class="logout-container">
-            <h1>Logging out...</h1>
-            <img src="{{ url_for('serve_images', filename='loading.gif') }}" alt="Loading..." width="50" height="50">
-            <p>You have successfully logged out and will be redirected to the homepage</p>
-            <!-- TODO: add wait for like 2-3 seconds the call logoutUser() -->
-            <div class="loader"></div> <!-- Optional: Add a loading spinner -->
+    <div class="account-container">
+        <h1>Welcome to Your Account</h1>
+
+        <!-- Display user details -->
+        <div class="user-details">
+            <p><strong>First Name:</strong> <span id="first-name">John</span></p>
+            <p><strong>Email:</strong> <span id="user-email">john.doe@example.com</span></p>
         </div>
+
+        <!-- Logout Button -->
+        <button onclick="logoutUser();">Log Out</button>
+    </div>
+
+    <script>
+        // Function to log the user out
+        function logoutUser() {
+            // Clear user session (client-side)
+            localStorage.removeItem("token");
+
+            // Redirect to the homepage (or login page)
+            window.location.href = "/index"; // Adjust this to your landing page or login page
+        }
+
+        // Fetch user data from server if needed
+        document.addEventListener("DOMContentLoaded", async function() {
+            try {
+                // Fetch user details (e.g., via a /get-user endpoint if necessary)
+                const response = await fetch('http://localhost:3000/user-details', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}` // Send token if needed
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    // Display user data
+                    document.getElementById("first-name").textContent = data.first_name;
+                    document.getElementById("user-email").textContent = data.email;
+                } else {
+                    alert("Error fetching user data.");
+                }
+            } 
+            catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        });
+    </script>
 </section>
-</main>
+</html>
+
+
+
+
+
+
 
 <!--FOOTER COPY Start HERE-->
 <div class="footer-newsletter">
@@ -121,14 +166,7 @@
 <div class="modal-backdrop"></div>
 
 <!--FOOTER COPY END HERE-->
-<script src="{{ url_for('serve_js', filename='frontend.js')}}"></script>
 
-<script>
-    // Redirect user to homepage after 5 seconds
-    setTimeout(function() {
-        window.location.href = "/index";  // Redirect to homepage (or adjust to your desired URL)
-    }, 3000); // 5000 milliseconds = 5 seconds
-</script>
-
+    <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
 </body>
 </html>
