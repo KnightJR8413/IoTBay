@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Check login status on page load
-    checkLoginStatus();
+    // checkLoginStatus();
 });
 
 // Check if user is logged in
@@ -113,9 +113,14 @@ function logoutUser() {
 
         console.log(data.message);
   
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('token');
   
-        window.location.href = '/login';
+        // const messageDiv = document.getElementById('logoutMessage');
+        // messageDiv.innerText = "You have successfully logged out and will be redirected to the homepage!";
+        // messageDiv.style.color = "green"; // Optional, to show success in green color
+        // messageDiv.style.fontSize = "20px"; // Optional, to make the text larger
+
+        window.location.href = '/';
       })
       .catch(error => {
         console.error('Error logging out:', error);

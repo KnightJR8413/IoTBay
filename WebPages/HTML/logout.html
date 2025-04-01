@@ -53,12 +53,18 @@
             <h1>Logging out...</h1>
             <img src="{{ url_for('serve_images', filename='loading.gif') }}" alt="Loading..." width="50" height="50">
             <p>You have successfully logged out and will be redirected to the homepage</p>
-            <!-- TODO: add wait for like 2-3 seconds the call logoutUser() -->
             <div class="loader"></div> <!-- Optional: Add a loading spinner -->
         </div>
 </section>
 </main>
-
+<script src="{{ url_for('serve_js', filename='frontend.js')}}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(function() {
+            logoutUser();
+        }, 3000);
+    });
+</script>
 <!--FOOTER COPY Start HERE-->
 <div class="footer-newsletter">
     <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>

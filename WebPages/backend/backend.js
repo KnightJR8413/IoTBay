@@ -96,7 +96,8 @@ app.get("/check-session", authenticateToken, (req, res) => {
 });
 
 // Check Login Status (for session persistence)
-app.post("/logout", (res) => {
+app.post("/logout", (req, res) => {
+    console.log('Logout request received');
     res.json({ message: "Logout successful. Clear token on client-side." });
 });
 
