@@ -26,7 +26,7 @@
             <button class="icon-btn" onclick="toggleSearchBar();">
                 <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
             </button>
-            <button class="icon-btn" onclick="location.href='/login';">
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
                 <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
             </button>                
             <button class="icon-btn" onclick="location.href='/shoppingcart';">
@@ -114,5 +114,6 @@
 <!--FOOTER COPY END HERE-->
 
 <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
+<script src="{{ url_for('serve_js', filename='frontend.js')}}"></script>
 </body>
 </html>

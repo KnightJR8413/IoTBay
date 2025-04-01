@@ -100,3 +100,46 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+// loginbtn functionality, directs to login/welcome
+function checkLoginAndRedirect() {
+    const token = localStorage.getItem('token');  // Retrieve the token from localStorage
+    
+    // Check if token exists (logged in)
+    if (!token) {
+        // If not logged in, redirect to login page
+        window.location.href = '/login';  // Change this URL to match your login page
+    } else {
+        // Token exists, so let's decode it to verify or show user details
+        const payload = JSON.parse(atob(token.split('.')[1]));  // Decode the JWT payload
+
+        // Optionally, you can check the token's expiration here
+        const expirationTime = payload.exp * 1000; // Expiration time in milliseconds
+        const currentTime = Date.now();
+        
+        if (currentTime >= expirationTime) {
+            // Token is expired, redirect to login page
+            localStorage.removeItem('token'); // Clean up the expired token
+            window.location.href = '/login';
+        } else {
+            // Token is valid, redirect to welcome page
+            window.location.href = '/welcome';  // Change this URL to match your welcome page
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        // window.location.href = '/login';  // Redirect to login if no token
+        alert.apply("nope");
+        return;
+    }
+
+    // Decode token to get user info
+    const payload = JSON.parse(atob(token.split('.')[1]));  // Decode JWT payload
+    console.log(payload);
+
+    document.getElementById('first_name').innerText = payload.first_name;  // Display name
+});

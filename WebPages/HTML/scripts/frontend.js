@@ -88,7 +88,7 @@ function loginUser(email, password){
     .then(response => response.json())
     .then(data => {
         if (data.token) {
-            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('token', data.token);
             alert("logged in");
             window.location.href = '/welcome';
         } else {

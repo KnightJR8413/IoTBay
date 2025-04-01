@@ -26,7 +26,7 @@
             <button class="icon-btn" onclick="toggleSearchBar();">
                 <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
             </button>
-            <button class="icon-btn" onclick="location.href='/login';">
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
                 <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
             </button>                
             <button class="icon-btn" onclick="location.href='/shoppingcart';">
@@ -48,7 +48,7 @@
 
     <section class="hero">
         <h1>Welcome to IoTBay!</h1>
-        <p id="welcome-message">Welcome, <span id="username">User</span>!</p>
+        <p id="welcome-message">Welcome, <span id="first_name">User</span>!</p>
         <p>A confirmation email has been sent to your registered email address.</p>
         <a href="/products" class="btn">Browse Products</a>
     </section>
@@ -117,13 +117,6 @@
 
 <!--FOOTER COPY END HERE-->
 
-    <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
-    </footer>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let firstName = sessionStorage.getItem("firstName");
-            document.getElementById("username").textContent = firstName;
-        });
-    </script>
+</footer>
 </body>
 </html>
