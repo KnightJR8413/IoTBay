@@ -19,13 +19,13 @@ Before you begin, ensure you have the following installed:
 * SQLite (for the database)
 
 ### Install Dependencies
+*Note: all these commands should be run in the root project directory*
 1. install Node.js dependencies
     * install Node.js dependencies
     ```bash
     npm install
     ```
 2. install python dependencies
-    * navigate to root project folder
     * create virtual environment (first time, optional)
     ``` bash
     py -m venv venv #windows
