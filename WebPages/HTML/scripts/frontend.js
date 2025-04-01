@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (response.ok) {
                     responseMessage.style.color = 'green';
                     responseMessage.textContent = data.message;
-                    // window.location.href = "dashboard.html"; // Redirect to login page
+                    loginUser(formData.email, formData.password);
                 } else {
                     responseMessage.style.color = 'red';
                     responseMessage.textContent = data.message;
@@ -41,32 +41,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (loginForm) {
         loginForm.addEventListener("submit", async function (event) {
             event.preventDefault();
-
-            const formData = {
-                email: document.getElementById("email").value,
-                password: document.getElementById("password").value
-            };
-
-            try {
-                const response = await fetch("http://localhost:3000/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    localStorage.setItem("token", data.token); // Store JWT in localStorage
-                    alert("Login successful!");
-                    // window.location.href = "dashboard.html"; // Redirect to dashboard
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Failed to fetch. Is the backend running?");
-            }
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+        loginUser (email, password);
         });
     }
 
@@ -100,6 +77,28 @@ async function checkLoginStatus() {
         console.error("Error checking login status:", error);
     }
 }
+
+
+function loginUser(email, password){ 
+    fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.token) {
+            localStorage.setItem('authToken', data.token);
+            alert("logged in");
+            //window.location.href = '/dashboard';
+        } else {
+            alert(data.error || 'Login failed');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+};
+
+
 
 // Logout user (Clear token)
 function logoutUser() {

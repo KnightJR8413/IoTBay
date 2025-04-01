@@ -9,6 +9,14 @@ const cors = require("cors");
 const app = express();
 const port = 3000;
 
+// Loads secret key and makes sure it exists
+const SECRET_KEY = process.env.SECRET_KEY;
+if (!SECRET_KEY) {
+    console.error("Error: SECRET_KEY is not defined in .env file!");
+    process.exit(1);
+}
+
+
 // Middleware
 app.use(bodyParser.json()); // finding in forms
 app.use(cors()); // allowing request through
@@ -60,7 +68,7 @@ app.post('/login', (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password.' });
         }
 
-        const token = jwt.sign({ userId: row.id, email: row.email }, process.env.SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: row.id, email: row.email }, SECRET_KEY, { expiresIn: '1h' });
         res.status(200).json({ message: 'Login successful!', token });
     });
 });
