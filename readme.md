@@ -48,6 +48,9 @@ Before you begin, ensure you have the following installed:
     ```bash
     node backend.js
     ```
+    Or
+    node Webpages/backend/backend.js
+    
 2. start frontend
     * navigate to root project folder
     * run webserver.py
