@@ -1,16 +1,17 @@
+<!--HEADER COPY START HERE-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - IoTBay</title>
+    <title>IoTBay - Home</title>
     <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
 </head>
 <body>
     <div class="navbar">
         <div class="logo">
             <a href="/index">
-                <img src="{{ url_for('serve_images', filename='logo.png')}}" width="125px" alt="IoTBay Logo">
+                <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
             </a>
         </div>
         <nav>  
@@ -23,21 +24,27 @@
         </nav>
         <div class="icon-buttons">
             <button class="icon-btn" onclick="toggleSearchBar();">
-                <img src="{{ url_for('serve_images', filename='search.png')}}" alt="search" class="icon-img">
+                <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
             </button>
             <button class="icon-btn" onclick="location.href='/login';">
-                <img src="{{ url_for('serve_images', filename='login.png')}}" alt="login" class="icon-img">
+                <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
             </button>                
             <button class="icon-btn" onclick="location.href='/shoppingcart';">
-                <img src="{{ url_for('serve_images', filename='cart.png')}}" alt="shopping cart" class="icon-img">
+                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shopping cart" class="icon-img">
             </button>
         </div>
     </div>
+
     <div id="search-bar" class="search-bar">
         <input type="text" placeholder="Search products..." id="search-input">
         <button onclick="searchProduct()">Search</button>
         <button onclick="toggleSearchBar()">Close</button>
     </div>
+
+    <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+</body>
+</html>
+<!--HEADER COPY END HERE-->
 
     <section class="hero">
         <h1>Contact IoTBay</h1>
@@ -64,70 +71,68 @@
         </section>
     </main>
 
-    <footer>
-        <div class="footer-newsletter">
-            <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
-            <div class="newsletter-form">
-                <form>
-                    <input type="email" placeholder="Only an email away..." required>
-                    <button type="submit">Sign me up!</button>
-                </form>
-            </div>
-        </div>
-    
-        <div class="footer-links">
-            <div class="footer-column">
-                <h3>ABOUT</h3>
-                <ul>
-                    <li><a href="/about">About Us</a></li>
-                    <li><a href="/contact">Contact Us</a></li>
-                    <li><a href="#">Store Locations</a></li>
-                    <li><a href="#">Payment Methods</a></li>
-                    <li><a href="#">Shipping Methods</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>HELP</h3>
-                <ul>
-                    <li><a href="#">Support</a></li>
-                    <li><a href="#">Warranty & Returns</a></li>
-                    <li><a href="#">Services</a></li>
-                    <li><a href="#">Omitie Services</a></li>
-                    <li><a href="#">Site Map</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>OTHER</h3>
-                <ul>
-                    <li><a href="#">Announcements</a></li>
-                    <li><a href="#">Merchandise</a></li>
-                    <li><a href="#">Careers at IoTBay</a></li>
-                    <li><a href="#">Terms & Conditions</a></li>
-                    <li><a href="#">Privacy & Cookies</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-column">
-                <h3>Need advice?</h3>
-                <p>Speak to our friendly staff</p>
-                <a href="/contact" class="contact-button">Contact Us</a>
-            </div>
-        </div>
-
-        <div class="footer-copyright">
-            <p>&copy; 2025 IoTBay. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Add these 2 elements here -->
-    <div class="subscription-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h3>Thank you for subscribing!</h3>
-            <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
-        </div>
+ <!--FOOTER COPY Start HERE-->
+ <div class="footer-newsletter">
+    <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
+    <div class="newsletter-form">
+        <form>
+            <input type="email" placeholder="Only an email away..." required>
+            <button type="submit">Sign me up!</button>
+        </form>
     </div>
-    <div class="modal-backdrop"></div>
+</div>
+
+<div class="footer-links">
+    <div class="footer-column">
+        <h3>ABOUT</h3>
+        <ul>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="#">Payment Methods</a></li>
+            <li><a href="#">Shipping Methods</a></li>
+        </ul>
+    </div>
+    <div class="footer-column">
+        <h3>HELP</h3>
+        <ul>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Support</a></li>
+            <li><a href="#">Warranty & Returns</a></li>
+            <li><a href="#">Services</a></li>
+        </ul>
+    </div>
+    <div class="footer-column">
+        <h3>OTHER</h3>
+        <ul>
+            <li><a href="#">Announcements</a></li>
+            <li><a href="#">Careers at IoTBay</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Privacy & Cookies</a></li>
+        </ul>
+    </div>
+
+    <div class="footer-column">
+        <h3>Need advice?</h3>
+        <p>Speak to our friendly staff</p>
+        <a href="/contact" class="contact-button">Contact Us</a>
+    </div>
+</div>
+
+<div class="footer-copyright">
+    <p> Copyright &copy; 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
+</div>
+</footer>
+
+<div class="subscription-modal">
+<div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h3>Thank you for subscribing!</h3>
+    <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
+</div>
+</div>
+<div class="modal-backdrop"></div>
+
+<!--FOOTER COPY END HERE-->
 
     <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
 </body>
