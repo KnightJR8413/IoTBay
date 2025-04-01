@@ -90,7 +90,7 @@ function loginUser(email, password){
         if (data.token) {
             localStorage.setItem('authToken', data.token);
             alert("logged in");
-            //window.location.href = '/dashboard';
+            window.location.href = '/welcome';
         } else {
             alert(data.error || 'Login failed');
         }
