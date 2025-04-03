@@ -89,7 +89,6 @@ function loginUser(email, password){
     .then(data => {
         if (data.token) {
             localStorage.setItem('token', data.token);
-            alert("logged in");
             window.location.href = '/welcome';
         } else {
             alert(data.error || 'Login failed');

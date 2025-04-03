@@ -50,26 +50,67 @@
 
 <section class="hero">
     <div class="account-container">
-        <h1>Your Account</h1>
-
-        <!-- Display user details -->
-        <img src="images/login.png" alt="Profile Image" class="profile-pic">
-
-        <div class="user-details">   
-            <p><strong>First Name:</strong> <span id="first_name">John</span></p>
-            <p><strong>Email:</strong> <span id="user_email">john.doe@example.com</span></p>
+        <div class="account-header">
+            <h1>My Account</h1>
+                <!-- <h2>Details</h2> -->
         </div>
 
-        <div class="account-btns">
-            <!-- can add funcitonality to these buttons later if needed-->
-            <a href="/changeDetails" onclick="changeDetails();" class="btn">Edit Details</a>
-            <a href="/currentOrders" onclick="currentOrders();" class="btn">Current Orders</a>
-            <!-- Logout Button -->
-            <a href="/logout" onclick="logoutUser();" class="btn">Log Out</a>
+        <div class="account-layout">
+            <!-- Left Navigation -->
+            <nav class="account-nav">
+                <ul>
+                    <li><a href="#"><i class="icon-heart"></i>Details</a></li>
+                    <li><a href="#"><i class="icon-package"></i>Orders</a></li>
+                    <li><a href="#"><i class="icon-eye"></i>Payment Methods</a></li>
+                    <li><a href="#"><i class="icon-eye"></i>Recently Viewed</a></li>
+                    <li><a href="/logout" onclick="logoutUser();" class="logout-link"><i class="icon-log-out"></i>Log Out</a></li>
+                </ul>
+            </nav>
+
+        <!-- Profile Details Section -->
+        <div class="profile-details">
+            <div class="profile-info-box">
+                <div class="info-header">
+                    <h2>Profile Information</h2>
+                </div>
+                
+                <div class="info-content">
+                    <div class="info-row">
+                        <span class="info-label">First Name:</span>
+                        <span class="info-value" id="first_name">User</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Last Name:</span>
+                        <span class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="user_email">Email</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Address:</span>
+                        <span class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Contact Number:</span>
+                        <span class="info-value"></span>
+                    </div>
+                                      
+                    <!-- Additional Spacing Elements -->
+                    <div class="spacer"></div>
+                    <div class="spacer"></div>
+                </div>
+                
+                <div class="info-actions">
+                    <button class="edit-btn">Edit</button>
+                    <!-- <a href="/changeDetails" onclick="changeDetails();" class="btn">Edit Details</a> -->
+                </div>
+            </div>
         </div>
-    </div>    
-    
-</div>
+    </div>
+</section>
+
     <script>
         // Function to log the user out
         function logoutUser() {
@@ -106,34 +147,7 @@
         });
         </script>
 </section>
-
-<div class="past-purchases">
-    <h2>Past purchases</h2>
-
-    <div class="products-grid">    
-
-        <div class="product-card">
-            <img src="{{ url_for('serve_images', filename='ring cam.png')}}" alt="Ring Camera" style="width:100%">
-            <p>1x Ring Doorbell Camera</p>
-            <div class="price">$64.99</div>
-            <button class="buy-btn">Bought on 11/03/2025</button></p>
-        </div>
-        
-        <div class="product-card">
-            <img src="{{ url_for('serve_images', filename='sensor light.png')}}" alt="Sensor Light" style="width:100%">
-            <p>2x Infrared Sensor Light</p>
-            <div class="price">$80</div>
-            <button class="buy-btn">Bought on 08/03/2025</button></p>
-        </div>
-    </div>
-</div>
-
 </html>
-
-
-
-
-
 
 
 <!--FOOTER COPY Start HERE-->

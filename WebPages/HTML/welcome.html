@@ -45,12 +45,13 @@
 </body>
 </html>
 <!--HEADER COPY END HERE-->
+
 <script src="{{ url_for('serve_js', filename='welcome.js') }}"></script>
 
     <section class="hero">
         <h1>Welcome to IoTBay!</h1>
         <p id="welcome-message">Welcome, <span id="first_name">User</span>!</p>
-        <p>A confirmation email has been sent to your registered email address.</p>
+        <p>A confirmation email has been sent to your email address: <span id="user_email">Email</span></p>
         <a href="/products" class="btn">Browse Products</a>
 
     </section>
