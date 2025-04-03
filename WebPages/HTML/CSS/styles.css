@@ -799,3 +799,33 @@ color: #551a8b;
 p.text {
     text-align: center;
 }
+
+/* Accounts page */
+.profile-pic {
+    width: 12%;
+    border-radius: 100%;
+    background-color: #CBE3EF;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.account-btns {
+    padding-bottom: 30px;
+}
+
+.past-purchases {
+    width: 100%;
+    background-image: linear-gradient( #e6f1ff 0%, #ffffff 100%);
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.past-purchases h2 {
+    color: #3a4163;
+    font-size: 2rem;
+    text-align: left;
+    padding-left: 20px;
+}
+
+
+/* end of Accounts page */

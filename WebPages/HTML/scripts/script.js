@@ -123,7 +123,7 @@ function checkLoginAndRedirect() {
             window.location.href = '/login';
         } else {
             // Token is valid, redirect to welcome page
-            window.location.href = '/welcome';  // Change this URL to match your welcome page
+            window.location.href = '/account';  // Change this URL to match your welcome page
         }
     }
 }

@@ -48,18 +48,26 @@
 
 <section class="hero">
     <div class="account-container">
-        <h1>Welcome to Your Account</h1>
+        <h1>Your Account</h1>
 
         <!-- Display user details -->
-        <div class="user-details">
+        <img src="images/login.png" alt="Profile Image" class="profile-pic">
+
+        <div class="user-details">   
             <p><strong>First Name:</strong> <span id="first-name">John</span></p>
             <p><strong>Email:</strong> <span id="user-email">john.doe@example.com</span></p>
         </div>
 
-        <!-- Logout Button -->
-        <button onclick="logoutUser();">Log Out</button>
-    </div>
-
+        <div class="account-btns">
+            <!-- can add funcitonality to these buttons later if needed-->
+            <a href="/changeDetails" onclick="changeDetails();" class="btn">Edit Details</a>
+            <a href="/currentOrders" onclick="currentOrders();" class="btn">Current Orders</a>
+            <!-- Logout Button -->
+            <a href="/logout" onclick="logoutUser();" class="btn">Log Out</a>
+        </div>
+    </div>    
+    
+</div>
     <script>
         // Function to log the user out
         function logoutUser() {
@@ -94,8 +102,30 @@
                 console.error("Error fetching user data:", error);
             }
         });
-    </script>
+        </script>
 </section>
+
+<div class="past-purchases">
+    <h2>Past purchases</h2>
+
+    <div class="products-grid">    
+
+        <div class="product-card">
+            <img src="{{ url_for('serve_images', filename='ring cam.png')}}" alt="Ring Camera" style="width:100%">
+            <p>1x Ring Doorbell Camera</p>
+            <div class="price">$64.99</div>
+            <button class="buy-btn">Bought on 11/03/2025</button></p>
+        </div>
+        
+        <div class="product-card">
+            <img src="{{ url_for('serve_images', filename='sensor light.png')}}" alt="Sensor Light" style="width:100%">
+            <p>2x Infrared Sensor Light</p>
+            <div class="price">$80</div>
+            <button class="buy-btn">Bought on 08/03/2025</button></p>
+        </div>
+    </div>
+</div>
+
 </html>
 
 
