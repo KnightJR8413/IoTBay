@@ -68,7 +68,7 @@ app.post('/login', (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password.' });
         }
 
-        const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name }, SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name, last_name: row.surname }, SECRET_KEY, { expiresIn: '1h' });
         res.status(200).json({ message: 'Login successful!', token });
     });
 });
