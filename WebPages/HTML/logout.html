@@ -60,11 +60,9 @@
 </main>
 <script src="{{ url_for('serve_js', filename='frontend.js')}}"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        setTimeout(function() {
-            logoutUser();
-        }, 3000);
-    });
+    setTimeout(function() {
+        window.location.href = "/index";
+    }, 3000);
 </script>
 
 <!--FOOTER COPY Start HERE-->
