@@ -11,4 +11,5 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(payload);
 
     document.getElementById('first_name').innerText = payload.first_name;  // Display name
+    document.getElementById('user_email').innerText = payload.email;  // Display name
 });
