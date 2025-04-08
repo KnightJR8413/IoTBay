@@ -697,48 +697,153 @@ footer {
 }
 /*END OF PRODUCTS PAGE STUFF*/
 
-.about-info {
-    font-size: 17px;
-    margin: 50px auto;
-    color: #3a4163;
-}
-
-.about-info h2 {
-    color: #3a4163;
-    font-size: 1.6rem;
-}
-
-
-
+/*About page stuff*/
 .about-parent {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
     margin: 1rem;
-    padding: 2rem 2rem;
-    text-align: center;
-  }
+    padding: 2rem;
+    gap: 1px;
+}
+
 .about-child {
     display: inline-block;
     vertical-align: middle;
 
-    width: 500px;
-    margin: 50px auto;
+    max-width: 500px;
+    margin: 10px auto;
     padding: 45px;
+    padding-top: 70px;
+    padding-bottom: 70px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+  .about-child h2 {
+    color: #3a4163;
+    font-size: 1.75rem;
+}
+
+.about-info {
+    font-size: 17px;
+    margin-top: 50px auto;
+    color: #53576b;
+}
+
+
+.about-child-img {
+display: inline-block;
+vertical-align: middle;
+
+margin: 10px auto;
+padding: 40px;
+}
+/*end of about page stuff*/
+
+
+/*T and C page stuff*/
+.TnC-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-  }
 
-  .about-child-img {
-    display: inline-block;
-    vertical-align: middle;
+    font-size: 18px;
+    margin-bottom: 50px;
+    color: #3a4163;
+}
 
-    width: 500px;
-    margin: 50px auto;
-    padding: 50px;
-    border-radius: 8px;
+.TnC-container h2 {
+    color: #3a4163;
+    font-size: 1.4rem;
+    padding-left: 80px;
+    padding-right: 80px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.TnC-info {
+    font-size: 16px;
+    padding-left: 100px;
+    padding-right: 100px;
     text-align: center;
-  }
+    padding-bottom: 10px;
+}
 
+.TnC-info h3 {
+    margin-bottom: -10px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.TnC-info p {
+    padding-bottom: 15px;
+}
+
+/*End of T and C page stuff*/
+
+/*Privacy Policy Page stuff */
+.Privacy-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 50px;
+    color: #3a4163;
+}
+
+.Privacy-container h2 {
+    color: #3a4163;
+    font-size: 1.5rem;
+    padding-left: 80px;
+    padding-right: 80px;
+    padding-top: 20px;
+    padding-bottom: 1px;
+}
+
+.Privacy-info {
+    font-size: 16px;
+    padding-left: 95px;
+    padding-right: 95px;
+    text-align: center;
+    padding-bottom: 30px;
+}
+
+.Privacy-info p {
+    padding-bottom: 20px;
+    margin: 0; 
+}
+
+.Privacy-info-b {
+    font-size: 15px;
+    padding-left: 150px;
+    padding-right: 150px;
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+.Privacy-info-b p {
+    padding-bottom: 20px;
+    margin: 0; 
+}
+
+.Privacy-info-b h3 {
+    margin-bottom: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+/*End of privacy page stuff*/
 
 /* 
 classes
