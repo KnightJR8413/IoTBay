@@ -1,4 +1,13 @@
--- TODO USER LOGS 
+-- TODO USER LOGS
+    -- CREATE TABLE, USERID, DATE, TYPE
+-- TODO view registraiton details
+-- TODO LIST user logs
+-- TODO change registration deatils
+-- TODO USER CANNOT change access logs
+-- TODO cancel registeration 
+    -- create endpoint that deletes selected user ID based on email or ID, add button on profile page
+-- TODO USER CANNOT delete access logs 
+
 
 CREATE TABLE if NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,7 +30,7 @@ CREATE TABLE if NOT EXISTS customer (
     address_id INTEGER,
     FOREIGN KEY (id) REFERENCES users(id),
     FOREIGN KEY (address_id) REFERENCES address(id)
-)
+);
 
 CREATE TABLE if NOT EXISTS staff (
     id INTEGER PRIMARY KEY,
@@ -30,8 +39,15 @@ CREATE TABLE if NOT EXISTS staff (
     surname TEXT NOT NULL,
     password_hash TEXT NOT NULL,
     FOREIGN KEY (id) REFERENCES users(id)
-)
+);
 
+CREATE TABLE if NOT EXISTS user_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(id)
+);
 
 
 CREATE TABLE if NOT EXISTS products (
@@ -80,12 +96,12 @@ CREATE TABLE if NOT EXISTS address (
 CREATE TABLE if NOT EXISTS payment (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     customer_id INTEGER NOT NULL,
-    card_no INTEGER NOT NULL,
-    cvc INTEGER NOT NULL,
+    card_no TEXT NOT NULL, -- Symetirically encrypted
+    cvc TEXT NOT NULL, -- Symetirically encrypted
     name TEXT NOT NULL,
-    expiry_date INTEGER NOT NULL,
+    expiry_date TEXT NOT NULL, -- Symetirically encrypted
     FOREIGN KEY (customer_id) REFERENCES customer(id)
-)
+);
 
 CREATE TABLE if NOT EXISTS orders (
     id PRIMARY KEY AUTOINCREMENT,
@@ -118,4 +134,4 @@ CREATE TABLE if NOT EXISTS cart (
     FOREIGN KEY (order_no) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (discount_code) REFERENCES discount_codes(code)
-)
+);
