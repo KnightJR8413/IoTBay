@@ -1,15 +1,32 @@
 CREATE TABLE if NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
-    address_id INTEGER,
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_type TEXT NOT NULL
+);
+
+CREATE TABLE if NOT EXISTS customer (
+    id INTEGER PRIMARY KEY,
+    phone_no VARCHAR(10),
     first_name TEXT NOT NULL,
     surname TEXT NOT NULL,
-    password_hash TEXT NOT NULL, -- Store hashed passwords
+    password_hash TEXT NOT NULL,
     marketing BOOLEAN DEFAULT FALSE,
-    phone_no VARCHAR(10),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    address_id INTEGER,
+    FOREIGN KEY (id) REFERENCES users(id),
     FOREIGN KEY (address_id) REFERENCES address(id)
-);
+)
+
+CREATE TABLE if NOT EXISTS staff (
+    id INTEGER PRIMARY KEY,
+    phone_no VARCHAR(10),
+    first_name TEXT NOT NULL,
+    surname TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    FOREIGN KEY (id) REFERENCES users(id)
+)
+
+
 
 CREATE TABLE if NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,24 +71,45 @@ CREATE TABLE if NOT EXISTS address (
     postcode INTEGER NOT NULL
 );
 
+CREATE TABLE if NOT EXISTS payment (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER NOT NULL,
+    card_no INTEGER NOT NULL,
+    cvc INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    expiry_date INTEGER NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customer(id)
+)
 
+CREATE TABLE if NOT EXISTS orders (
+    id PRIMARY KEY AUTOINCREMENT,
+    customer_id NOT NULL,
+    shipping_address NOT NULL,
+    billing address NOT NULL,
+    payment_id NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customer(id),
+    FOREIGN KEY (shipping_address) REFERENCES address(id),
+    FOREIGN KEY (billing_address) REFERENCES address(id),
+    FOREIGN KEY (payment_id) REFERENCES payment(id)
+);
 
+CREATE TABLE if NOT EXISTS discount_codes (
+    code PRIMARY KEY NOT NULL,
+    effect INTEGER NOT NULL,
+    start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
 
-
-
-
-
-
-
-
-
--- CREATE TABLE orders (
---     id INTEGER PRIMARY KEY AUTOINCREMENT,
---     user_id INTEGER,
---     product_id INTEGER,
---     quantity INTEGER NOT NULL,
---     total_price REAL NOT NULL,
---     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     FOREIGN KEY (user_id) REFERENCES users(id),
---     FOREIGN KEY (product_id) REFERENCES products(id)
--- );
+CREATE TABLE if NOT EXISTS cart (
+    customer_id INTEGER NOT NULL,
+    order_no INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    no_items INTEGER DEFAULT 1,
+    discount_code INTEGER,
+    PRIMARY KEY (customer_id, order_no, product_id),
+    FOREIGN KEY (customer_id) REFERENCES customer(id),
+    FOREIGN KEY (order_no) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (discount_code) REFERENCES discount_codes(code)
+)
