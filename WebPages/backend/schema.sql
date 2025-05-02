@@ -1,8 +1,14 @@
+-- TODO USER LOGS 
+
 CREATE TABLE if NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user_type TEXT NOT NULL
+    first_name TEXT NOT NULL, -- temp fix
+    surname TEXT NOT NULL, -- temp fix
+    password_hash TEXT NOT NULL, -- temp fix
+    marketing BOOLEAN DEFAULT FALSE, -- temp fix
+    user_type TEXT -- NOT NULL
 );
 
 CREATE TABLE if NOT EXISTS customer (
