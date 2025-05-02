@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Decode token to get user info
     const payload = JSON.parse(atob(token.split('.')[1]));  // Decode JWT payload
-    console.log(payload);
 
     document.getElementById('first_name').innerText = payload.first_name;  // Display name
     document.getElementById('user_email').innerText = payload.email;  // Display name

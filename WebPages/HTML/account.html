@@ -112,15 +112,6 @@
 </section>
 
     <script>
-        // Function to log the user out
-        function logoutUser() {
-            // Clear user session (client-side)
-            localStorage.removeItem("token");
-
-            // Redirect to the homepage (or login page)
-            window.location.href = "/index"; // Adjust this to your landing page or login page
-        }
-
         // Fetch user data from server if needed
         document.addEventListener("DOMContentLoaded", async function() {
             try {

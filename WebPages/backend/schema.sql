@@ -1,5 +1,5 @@
 -- TODO USER LOGS
-    -- CREATE TABLE, USERID, DATE, TYPE
+    -- edit endpoints
 -- TODO view registraiton details
 -- TODO LIST user logs
 -- TODO change registration deatils
@@ -19,7 +19,7 @@ CREATE TABLE if NOT EXISTS users (
     marketing BOOLEAN DEFAULT FALSE, -- temp fix
     user_type TEXT -- NOT NULL
 );
-
+-- INSERT INTO users (email = 'ben.j.mackaway@student.uts.edu.au', first_name = 'a', surname = 'a', password_hash = '$2b$10$BgcJxg62ZIL6tBLv09YZ9uokmEwoBWhCP7qqx3pTSBJlgOiAZRPm');
 CREATE TABLE if NOT EXISTS customer (
     id INTEGER PRIMARY KEY,
     phone_no VARCHAR(10),
@@ -34,7 +34,7 @@ CREATE TABLE if NOT EXISTS customer (
 
 CREATE TABLE if NOT EXISTS staff (
     id INTEGER PRIMARY KEY,
-    phone_no VARCHAR(10),
+    phone_no VARCHAR(10) NOT NULL,
     first_name TEXT NOT NULL,
     surname TEXT NOT NULL,
     password_hash TEXT NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE if NOT EXISTS staff (
 
 CREATE TABLE if NOT EXISTS user_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER DEFAULT 0,
     type TEXT NOT NULL,
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user(id)
@@ -74,8 +74,8 @@ CREATE TABLE if NOT EXISTS tags (
 );
 
 CREATE TABLE if NOT EXISTS product_tags (
-    product_id,
-    tag_id,
+    product_id INTERGER NOT NULL,
+    tag_id INTERGER NOT NULL,
     PRIMARY KEY (product_id, tag_id),
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (tag_id) REFERENCES tags(id)
@@ -104,11 +104,11 @@ CREATE TABLE if NOT EXISTS payment (
 );
 
 CREATE TABLE if NOT EXISTS orders (
-    id PRIMARY KEY AUTOINCREMENT,
-    customer_id NOT NULL,
-    shipping_address NOT NULL,
-    billing address NOT NULL,
-    payment_id NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTERGER  NOT NULL,
+    shipping_address INTERGER  NOT NULL,
+    billing_address INTERGER  NOT NULL,
+    payment_id INTERGER NOT NULL,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES customer(id),
     FOREIGN KEY (shipping_address) REFERENCES address(id),
@@ -117,7 +117,7 @@ CREATE TABLE if NOT EXISTS orders (
 );
 
 CREATE TABLE if NOT EXISTS discount_codes (
-    code PRIMARY KEY NOT NULL,
+    code TEXT PRIMARY KEY NOT NULL,
     effect INTEGER NOT NULL,
     start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL

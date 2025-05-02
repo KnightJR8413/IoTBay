@@ -45,9 +45,9 @@ app.post('/register', (req, res) => {
                 if (err) {
                     return res.status(500).json({ message: 'Error registering user: ' + err.message });
                 }
-
                 res.status(200).json({ message: 'User registered successfully!' });
             });
+            logAction(email, 'register');
     });
 });
 
@@ -58,6 +58,8 @@ app.post('/login', (req, res) => {
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required." });
     }
+
+    logAction(email, 'login');
 
     db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
         if (err) {
@@ -97,7 +99,8 @@ app.get("/check-session", authenticateToken, (req, res) => {
 
 // Check Login Status (for session persistence)
 app.post("/logout", (req, res) => {
-    console.log('Logout request received');
+    const {email} = req.body;
+    logAction(email, 'logout');
     res.json({ message: "Logout successful. Clear token on client-side." });
 });
 
@@ -105,3 +108,16 @@ app.post("/logout", (req, res) => {
 app.listen(port, () => {
     console.log(`Backend server is running on http://localhost:${port}`);
 });
+
+function logAction(email, type) {
+    db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error: ' + err.message });
+        }
+        if (row) {
+            const id = row.id;
+            db.run("INSERT INTO user_logs (user_id, type) VALUES (?, ?)",[id, type]);
+        }
+    });
+    console.log(type + ' logged in database');
+}
