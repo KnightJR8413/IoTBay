@@ -1,2 +1,6 @@
+# These would be uncommented in a proper release, they are commented for demonstration purposes
+
 # /WebPages/backend/database.sqlite
-/node_modules
+# .env
+node_modules
+venv

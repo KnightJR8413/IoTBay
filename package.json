@@ -1,0 +1,30 @@
+{
+  "name": "iotbay",
+  "version": "1.0.0",
+  "description": "This is a poject from the University of Technology Sydney for the subject Introduction to Software Development\r It is a basic webpage that users can log in to, buy hardware items online and then are shipped\r It is currently WIP and is no where near complete",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KnightJR8413/IoTBay.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KnightJR8413/IoTBay/issues"
+  },
+  "homepage": "https://github.com/KnightJR8413/IoTBay#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.7"
+  }
+}

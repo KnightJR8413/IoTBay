@@ -1,51 +1,107 @@
-require('dotenv').config();
+require('dotenv').config({ path: "../../.env" });
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
 const bodyParser = require('body-parser');
-const db = require('./database');  // Import your SQLite database setup
+const db = require('./database');
+const cors = require("cors");
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:5000' })); // Allow Flask (Frontend)
-app.use(bodyParser.json());  // Parse JSON data
+const port = 3000;
 
-const SECRET_KEY = "your_secret_key";  // Use environment variable for production
+// Loads secret key and makes sure it exists
+const SECRET_KEY = process.env.SECRET_KEY;
+if (!SECRET_KEY) {
+    console.error("Error: SECRET_KEY is not defined in .env file!");
+    process.exit(1);
+}
 
-// User registration endpoint
+
+// Middleware
+app.use(bodyParser.json()); // finding in forms
+app.use(cors()); // allowing request through
+
+// User registration
 app.post('/register', (req, res) => {
-    const { username, email, password } = req.body;
+    const { email, first_name, surname, password, marketing } = req.body;
+
+    if (!email || !first_name || !surname || !password) {
+        return res.status(400).json({ message: 'All fields are required!' });
+    }
+
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    db.run(`INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)`,
-        [username, email, hashedPassword], function (err) {
-        if (err) return res.status(400).json({ error: err.message });
-        res.json({ message: "User registered successfully" });
+    db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error: ' + err.message });
+        }
+
+        if (row) {
+            return res.status(400).json({ message: 'Email already exists.' });
+        }
+
+        db.run("INSERT INTO users (email, first_name, surname, password_hash, marketing) VALUES (?, ?, ?, ?, ?)",
+            [email, first_name, surname, hashedPassword, marketing], function(err) {
+                if (err) {
+                    return res.status(500).json({ message: 'Error registering user: ' + err.message });
+                }
+
+                res.status(200).json({ message: 'User registered successfully!' });
+            });
     });
 });
 
-// User login endpoint
+// User login
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
-    db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
-        if (err || !user) return res.status(401).json({ message: "User not found" });
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required." });
+    }
 
-        if (!bcrypt.compareSync(password, user.password_hash))
-            return res.status(401).json({ message: "Invalid password" });
+    db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error: ' + err.message });
+        }
 
-        const token = jwt.sign({ userId: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
-        res.json({ message: "Login successful", token });
+        if (!row || !bcrypt.compareSync(password, row.password_hash)) {
+            return res.status(401).json({ message: 'Invalid email or password.' });
+        }
+
+        const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name, last_name: row.surname }, SECRET_KEY, { expiresIn: '1h' });
+        res.status(200).json({ message: 'Login successful!', token });
     });
 });
 
-// Get all products
-app.get('/products', (req, res) => {
-    db.all("SELECT * FROM products", [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized: No token provided." });
+    }
+
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: "Token is invalid or expired." });
+        }
+        req.user = user;
+        next();
     });
+}
+
+// Check Login Status (for session persistence)
+app.get("/check-session", authenticateToken, (req, res) => {
+    res.json({ user: req.user.email });
 });
 
-// Start backend server
-app.listen(3000, () => console.log("Backend running on http://localhost:3000"));
+// Check Login Status (for session persistence)
+app.post("/logout", (req, res) => {
+    console.log('Logout request received');
+    res.json({ message: "Logout successful. Clear token on client-side." });
+});
+
+// Start server
+app.listen(port, () => {
+    console.log(`Backend server is running on http://localhost:${port}`);
+});
