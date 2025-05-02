@@ -28,6 +28,12 @@ app.post('/register', (req, res) => {
     if (!email || !first_name || !surname || !password) {
         return res.status(400).json({ message: 'All fields are required!' });
     }
+    console.log(marketing);
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)){
+        return res.status(400).json({ message: 'Please enter a valid email'});
+    }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -47,7 +53,16 @@ app.post('/register', (req, res) => {
                 }
                 res.status(200).json({ message: 'User registered successfully!' });
             });
-            logAction(email, 'register');
+
+        db.get("SELECT * FROM marketing WHERE email = ?", [email], (err,row) => {
+            if (err) {
+                return res.status(500).json({ message: 'Database error: ' + err.message });
+            }
+            if (row) {
+                db.run("DELETE FROM marketing WHERE email = ?", [email]);
+            }
+        });
+        logAction(email, 'register');
     });
 });
 
@@ -72,6 +87,38 @@ app.post('/login', (req, res) => {
 
         const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name, last_name: row.surname }, SECRET_KEY, { expiresIn: '1h' });
         res.status(200).json({ message: 'Login successful!', token });
+    });
+});
+
+app.post('/newsletter', (req,res) => {
+    const { email } = req.body;
+    db.get("SELECT * FROM marketing WHERE email = ?", [email], (err,row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error: ' + err.message });
+        }
+
+        if (row) {
+            return res.status(401).json({ message: 'Email already on mailing list'})
+        }
+        db.get("SELECT * FROM users WHERE email = ?", [email], (err, rowU) => {
+            if (err) {
+                return res.status(500).json({ message: 'Database error: ' + err.message });
+            }
+            if (rowU) {
+                if (rowU.marketing === 'off') {
+                    db.run("UPDATE users SET marketing WHERE email = ?", [email]);
+                    logAction(email, 'newletter');
+                    res.status(200).json({ message: email + ' marketing preferences have be changed'});
+                } else if (rowU.marketing === 'on') {
+                    logAction(email, 'newletter');
+                    res.status(401).json({ message: 'Email on mailing list'});
+                } 
+            } else {
+                db.run("INSERT INTO marketing (email) VALUES (?)", [email]);
+                logAction(email, 'newletter');
+                res.status(200).json({ message: email + ' added to mailing list'});
+            }
+        });
     });
 });
 

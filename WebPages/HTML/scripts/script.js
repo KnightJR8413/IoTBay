@@ -32,7 +32,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const email = emailInput.value;
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         
+        
         if(email && emailPattern.test(email)) {
+            fetch('http://localhost:3000/newsletter', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json',},
+                body: JSON.stringify({email})
+            }).then(response => response.json())
+            .then(data => {
+      
+              console.log(data.message);
+        
+              localStorage.removeItem('token');
+      
+            })
+            .catch(error => {
+              console.error('Error logging out:', error);
+            });
             // Show modal with email
             subscribedEmail.textContent = email;
             modal.classList.add('show');

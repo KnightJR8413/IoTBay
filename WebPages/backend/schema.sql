@@ -16,10 +16,10 @@ CREATE TABLE if NOT EXISTS users (
     first_name TEXT NOT NULL, -- temp fix
     surname TEXT NOT NULL, -- temp fix
     password_hash TEXT NOT NULL, -- temp fix
-    marketing BOOLEAN DEFAULT FALSE, -- temp fix
+    marketing BOOLEAN DEFAULT 'off', -- temp fix
     user_type TEXT -- NOT NULL
 );
--- INSERT INTO users (email = 'ben.j.mackaway@student.uts.edu.au', first_name = 'a', surname = 'a', password_hash = '$2b$10$BgcJxg62ZIL6tBLv09YZ9uokmEwoBWhCP7qqx3pTSBJlgOiAZRPm');
+
 CREATE TABLE if NOT EXISTS customer (
     id INTEGER PRIMARY KEY,
     phone_no VARCHAR(10),
@@ -39,6 +39,11 @@ CREATE TABLE if NOT EXISTS staff (
     surname TEXT NOT NULL,
     password_hash TEXT NOT NULL,
     FOREIGN KEY (id) REFERENCES users(id)
+);
+
+CREATE TABLE if NOT EXISTS marketing (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL
 );
 
 CREATE TABLE if NOT EXISTS user_logs (
