@@ -1,5 +1,3 @@
--- TODO USER LOGS
-    -- edit endpoints
 -- TODO view registraiton details
 -- TODO LIST user logs
 -- TODO change registration deatils
