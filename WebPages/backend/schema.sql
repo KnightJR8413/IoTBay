@@ -1,12 +1,3 @@
--- TODO view registraiton details
--- TODO LIST user logs
--- TODO change registration deatils
--- TODO USER CANNOT change access logs
--- TODO cancel registeration 
-    -- create endpoint that deletes selected user ID based on email or ID, add button on profile page
--- TODO USER CANNOT delete access logs 
-
-
 CREATE TABLE if NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -21,9 +12,9 @@ CREATE TABLE if NOT EXISTS users (
 CREATE TABLE if NOT EXISTS customer (
     id INTEGER PRIMARY KEY,
     phone_no VARCHAR(10),
-    first_name TEXT NOT NULL,
-    surname TEXT NOT NULL,
-    password_hash TEXT NOT NULL,
+    first_name TEXT,
+    surname TEXT,
+    password_hash TEXT,
     marketing BOOLEAN DEFAULT 'off',
     address_id INTEGER,
     FOREIGN KEY (id) REFERENCES users(id),
@@ -32,10 +23,10 @@ CREATE TABLE if NOT EXISTS customer (
 
 CREATE TABLE if NOT EXISTS staff (
     id INTEGER PRIMARY KEY,
-    phone_no VARCHAR(10) NOT NULL,
+    phone_no VARCHAR(10),
     first_name TEXT NOT NULL,
     surname TEXT NOT NULL,
-    password_hash TEXT NOT NULL,
+    password_hash TEXT,
     FOREIGN KEY (id) REFERENCES users(id)
 );
 

@@ -1,0 +1,18 @@
+[ ] Staff sign up
+[ ] Admin account
+
+[ ] view registraiton details
+        create user-details endpoint, returns user deatils requested
+[ ] change registration deatils
+        Edit DATABASE entry
+        Delete Token
+        Create new token
+[ ] cancel registeration 
+        create endpoint that set everything to null based on email or ID, add button on profile page
+        logout user imediately 
+        keep access logs 
+[ ] LIST user logs
+        logs endpoint that returns list of logs 
+        logs page 
+[*] USER CANNOT change access logs
+[*] USER CANNOT delete access logs 
