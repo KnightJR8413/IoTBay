@@ -104,13 +104,61 @@
                 </div>
                 
                 <div class="info-actions">
-                    <button class="edit-btn">Edit</button>
+                    <button id="editBtn" class="edit-btn" data-mode="view">Edit</button>
                     <!-- <a href="/changeDetails" onclick="changeDetails();" class="btn">Edit Details</a> -->
                 </div>
             </div>
+            <script>
+                const editBtn = document.getElementById('editBtn');
+              
+                editBtn.addEventListener('click', () => {
+                  const mode = editBtn.dataset.mode;
+              
+                  // EDIT MODE: swap spans → inputs
+                  if (mode === 'view') {
+                    editBtn.textContent = 'Update';
+                    editBtn.dataset.mode = 'edit';
+              
+                    document.querySelectorAll('.info-row .info-value')
+                      .forEach(span => {
+                        const value = span.textContent.trim();
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = value;
+                        input.className = 'info-input';
+                        // Optional: give name attributes so you can serialize later
+                        input.name = span.id || '';  // e.g. first_name, last_name, etc.
+                        span.parentNode.replaceChild(input, span);
+                      });
+                  }
+              
+                  // UPDATE MODE: swap inputs → spans
+                  else {
+                    // collect the new values if you need to POST them
+                    const payload = {};
+              
+                    document.querySelectorAll('.info-row input.info-input')
+                      .forEach(input => {
+                        const span = document.createElement('span');
+                        span.className = 'info-value';
+                        span.id = input.name;        // preserve the id
+                        span.textContent = input.value;
+                        payload[input.name] = input.value;
+                        input.parentNode.replaceChild(span, input);
+                      });
+              
+                    // TODO: send `payload` up to your server here via fetch/AJAX
+              
+                    editBtn.textContent = 'Edit';
+                    editBtn.dataset.mode = 'view';
+                  }
+                });
+              </script>
+              
         </div>
     </div>
 </section>
+<div style="height: 150px;"></div>
 </main>
 
     <script>

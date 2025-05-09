@@ -997,7 +997,7 @@ p.text {
     border-radius: 8px;
     padding: 30px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    max-width: 1300px;
+    max-width: 1460px;
 }
 
 .info-header {
@@ -1049,6 +1049,13 @@ p.text {
     border-top: 1px solid #eee;
 }
 
+.info-input {
+    font-size: 16px;
+    padding: 4px 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
 .edit-btn {
     background: #007bff;
     color: white;
