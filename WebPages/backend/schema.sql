@@ -9,13 +9,13 @@
 
 CREATE TABLE if NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    first_name TEXT, -- temp fix
-    surname TEXT, -- temp fix
-    password_hash TEXT, -- temp fix
-    marketing BOOLEAN DEFAULT 'off', -- temp fix
-    user_type TEXT -- NOT NULL
+    email TEXT,
+    user_type TEXT
+    -- first_name TEXT, -- temp fix
+    -- surname TEXT, -- temp fix
+    -- password_hash TEXT, -- temp fix
+    -- marketing BOOLEAN DEFAULT 'off', -- temp fix
 );
 
 CREATE TABLE if NOT EXISTS customer (
@@ -24,7 +24,7 @@ CREATE TABLE if NOT EXISTS customer (
     first_name TEXT NOT NULL,
     surname TEXT NOT NULL,
     password_hash TEXT NOT NULL,
-    marketing BOOLEAN DEFAULT FALSE,
+    marketing BOOLEAN DEFAULT 'off',
     address_id INTEGER,
     FOREIGN KEY (id) REFERENCES users(id),
     FOREIGN KEY (address_id) REFERENCES address(id)
@@ -136,15 +136,3 @@ CREATE TABLE if NOT EXISTS cart (
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (discount_code) REFERENCES discount_codes(code)
 );
-
-INSERT INTO products (name, price, stock, supplier, brand, model, release_year, specifications, size, image_url) values ("A", 1, 1, "A", "A", "A", 1, "A", "A", "URL");
-
--- name TEXT 
--- price REAL 
--- stock INTEGER 
--- supplier TEXT 
--- brand TEXT 
--- model TEXT 
--- release_year INTEGER 
--- specifications TEXT 
--- size TEXT 

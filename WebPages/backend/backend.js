@@ -21,14 +21,13 @@ if (!SECRET_KEY) {
 app.use(bodyParser.json()); // finding in forms
 app.use(cors()); // allowing request through
 
-// User registration
+// Customer registration
 app.post('/register', (req, res) => {
     const { email, first_name, surname, password, marketing } = req.body;
 
     if (!email || !first_name || !surname || !password) {
         return res.status(400).json({ message: 'All fields are required!' });
     }
-    console.log(marketing);
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailPattern.test(email)){
@@ -46,13 +45,34 @@ app.post('/register', (req, res) => {
             return res.status(400).json({ message: 'Email already exists.' });
         }
 
-        db.run("INSERT INTO users (email, first_name, surname, password_hash, marketing) VALUES (?, ?, ?, ?, ?)",
-            [email, first_name, surname, hashedPassword, marketing], function(err) {
+        db.run("INSERT INTO users (email, user_type"+/*, first_name, surname, password_hash, marketing*/") VALUES (?, ?)",
+            [email, ''/*, first_name, surname, hashedPassword, marketing*/], function(err) {
                 if (err) {
+                    logAction(email, 'unsuccessful register');
                     return res.status(500).json({ message: 'Error registering user: ' + err.message });
                 }
+                let id;
+                db.run("SELECT last_insert_rowid()", (err3, row) => {
+                    if (err3) {
+                        logAction(email, 'unsuccessful register');
+                        return res.status(500).json({ message: 'Database error: ' + err.message });
+                    }
+                    if (row) {
+                        id = row;
+                    }
+                });
+                db.run("INSERT INTO customer (id, first_name, surname, password_hash, marketing) values (?,?,?,?,?)",
+                    [id, first_name, surname, hashedPassword, marketing], function (err2) {
+                        if (err2){
+                            logAction(email, 'unsuccessful register');
+                            return res.status(500).json({ message: 'Error registering user: ' + err2.message });
+                        }
+                    }
+                )
                 res.status(200).json({ message: 'User registered successfully!' });
+                logAction(email, 'successful register');
             });
+
 
         db.get("SELECT * FROM marketing WHERE email = ?", [email], (err,row) => {
             if (err) {
@@ -62,11 +82,10 @@ app.post('/register', (req, res) => {
                 db.run("DELETE FROM marketing WHERE email = ?", [email]);
             }
         });
-        logAction(email, 'register');
     });
 });
 
-// User login
+// Customer login
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
@@ -74,19 +93,21 @@ app.post('/login', (req, res) => {
         return res.status(400).json({ message: "Email and password are required." });
     }
 
-    logAction(email, 'login');
-
-    db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
+    
+    db.get("SELECT * FROM customer INNER JOIN users ON users.id = customer.id WHERE email = ?", [email], (err, row) => {
         if (err) {
+            logAction(email, 'error logging in');
             return res.status(500).json({ message: 'Database error: ' + err.message });
         }
-
+        
         if (!row || !bcrypt.compareSync(password, row.password_hash)) {
+            logAction(email, 'Unsuccessful login');
             return res.status(401).json({ message: 'Invalid email or password.' });
         }
-
+        
         const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name, last_name: row.surname }, SECRET_KEY, { expiresIn: '1h' });
         res.status(200).json({ message: 'Login successful!', token });
+        logAction(email, 'successful login');
     });
 });
 
