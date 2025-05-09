@@ -4,9 +4,15 @@
 
 from flask import Flask, send_from_directory, render_template
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__, template_folder='WebPages/HTML')
+
 CORS(app)
+app.secret_key = os.getenv("SECRET_KEY")
 
 # Dynamic route to serve any page (e.g. /login, /about, /contact)
 @app.route("/<page_name>")
@@ -27,7 +33,7 @@ def serve_images(filename):
     return send_from_directory("WebPages/HTML/images", filename)
 
 # Serve JS files
-@app.route("/JAVA/<path:filename>")
+@app.route("/scripts/<path:filename>")
 def serve_js(filename):
     return send_from_directory("WebPages/HTML/scripts", filename)
 

@@ -1,16 +1,17 @@
+<!--HEADER COPY START HERE-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - IoTBay</title>
+    <title>IoTBay - Home</title>
     <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
 </head>
 <body>
     <div class="navbar">
         <div class="logo">
             <a href="/index">
-                <img src="{{ url_for('serve_images', filename='logo.png')}}" width="125px" alt="IoTBay Logo">
+                <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
             </a>
         </div>
         <nav>  
@@ -23,29 +24,65 @@
         </nav>
         <div class="icon-buttons">
             <button class="icon-btn" onclick="toggleSearchBar();">
-                <img src="{{ url_for('serve_images', filename='search.png')}}" alt="search" class="icon-img">
+                <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
             </button>
-            <button class="icon-btn" onclick="location.href='/login';">
-                <img src="{{ url_for('serve_images', filename='login.png')}}" alt="login" class="icon-img">
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
+                <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
             </button>                
             <button class="icon-btn" onclick="location.href='/shoppingcart';">
-                <img src="{{ url_for('serve_images', filename='cart.png')}}" alt="shopping cart" class="icon-img">
+                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shopping cart" class="icon-img">
             </button>
         </div>
     </div>
+
     <div id="search-bar" class="search-bar">
         <input type="text" placeholder="Search products..." id="search-input">
         <button onclick="searchProduct()">Search</button>
         <button onclick="toggleSearchBar()">Close</button>
     </div>
 
+    <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+</body>
+</html>
+<!--HEADER COPY END HERE-->
+
     <section class="hero">
         <h1>Terms and Conditions</h1>
-        <p>Our Terms and Conditions</p>
+        <p>Guidelines for using the site</p>
     </section>
 
     <main>
-        <p class="text">placeholder page so links work</p>
+        <section class="TnC-container">
+            <h2>By accessing this website, you agree to the following <br> terms and conditions</h2>
+
+            <div class="TnC-info">
+                <h3>Use of Our Services</h3>
+                <p>
+                    Our services are available to individuals aged 18 and above. By using IoTBay, <br>you agree to use our website lawfully.</p>
+
+                <h3>Orders & Payments</h3>
+                <p>
+                    All orders placed through our platform are subject to availability and acceptance. 
+                    <br>
+                    We accept various payment methods in a manner that is safe and secure.
+                </p>
+
+                <h3>Returns & Refunds</h3>
+                <p>Customers can return products within 14 days of purchase. Refunds will be processed based on our return policy.</p>
+
+                <h3>Intellectual Property</h3>
+                <p>All content on this website, including images, text, and logos, is the property of IoTBay and cannot be used without permission.</p>
+
+                <h3>Privacy & Data Protection</h3>
+                <p>We collect and store customer data in accordance with our <a href="/privacypolicy">privacy policy</a>. <br>Your personal information will not be shared without your consent.</p>
+
+                <h3>Changes to These Terms</h3>
+                <p>IoTBay reserves the right to modify these terms at any time. <br> Changes will be posted on this page.</p>
+
+                <h3>Additional Information</h3>
+                <p>If you have any questions regarding the nature of these terms, <br> please feel free to <a href="/contact">contact us</a>.</p>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -76,8 +113,8 @@
                     <li><a href="#">Announcements</a></li>
                     <li><a href="#">Merchandise</a></li>
                     <li><a href="#">Careers at IoTBay</a></li>
-                    <li><a href="#">Terms & Conditions</a></li>
-                    <li><a href="#">Privacy & Cookies</a></li>
+                    <li><a href="/termconditions">Terms & Conditions</a></li>
+                    <li><a href="/privacypolicy">Privacy Policy</a></li>
                 </ul>
             </div>
         </div>

@@ -1,16 +1,17 @@
+<!--HEADER COPY START HERE-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - IoTBay</title>
+    <title>IoTBay - Home</title>
     <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
 </head>
 <body>
     <div class="navbar">
         <div class="logo">
             <a href="/index">
-                <img src="{{ url_for('serve_images', filename='logo.png')}}" width="125px" alt="IoTBay Logo">
+                <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
             </a>
         </div>
         <nav>  
@@ -23,21 +24,27 @@
         </nav>
         <div class="icon-buttons">
             <button class="icon-btn" onclick="toggleSearchBar();">
-                <img src="{{ url_for('serve_images', filename='search.png')}}" alt="search" class="icon-img">
+                <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
             </button>
-            <button class="icon-btn" onclick="location.href='/login';">
-                <img src="{{ url_for('serve_images', filename='login.png')}}" alt="login" class="icon-img">
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
+                <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
             </button>                
             <button class="icon-btn" onclick="location.href='/shoppingcart';">
-                <img src="{{ url_for('serve_images', filename='cart.png')}}" alt="shopping cart" class="icon-img">
+                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shopping cart" class="icon-img">
             </button>
         </div>
     </div>
+
     <div id="search-bar" class="search-bar">
         <input type="text" placeholder="Search products..." id="search-input">
         <button onclick="searchProduct()">Search</button>
         <button onclick="toggleSearchBar()">Close</button>
     </div>
+
+    <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+</body>
+</html>
+<!--HEADER COPY END HERE-->
 
     <section class="hero">
         <h1>Login</h1>
@@ -46,16 +53,17 @@
     <main>
         <section class="contact-container">
             <h2>Login</h2>
-            <form action="#" method="POST" class="login-form">
+            <p id="responseMessage"></p>
+            <form action="#" method="POST" class="login-form" id="loginForm">
                 <div class="login-form-input-div">
-                    <input class="login-form-input-box" type="text" name="email" autocomplete="email" placeholder="Email" value="">
-                    <input class="login-form-input-box" type="password" name="password" autocomplete="current-password" placeholder="Password" value="">
+                    <input class="login-form-input-box" type="email" id="email" name="email" autocomplete="email" placeholder="Email" value="" required>
+                    <input class="login-form-input-box" type="password" id="password" name="password" autocomplete="current-password" placeholder="Password" value="" required>
                 </div>
                 <div class="login-reset-register-links-div">
                     <a class="login-links" href="/forgotpass">Forgot Password?</a>
                 </div>
                 <div class="login-button-div">
-                    <button type="button" class="login-button" style="width: 293px; height: 40px;" onclick="window.location.href='/welcome'">Login</button>
+                    <button type="submit" class="login-button" style="width: 293px; height: 40px;">Login</button>
                 </div>  
             </form>
             <button class="login-button" onclick='location.href="/register";'>Don't have an account register here</button>
@@ -90,8 +98,8 @@
                     <li><a href="#">Announcements</a></li>
                     <li><a href="#">Merchandise</a></li>
                     <li><a href="#">Careers at IoTBay</a></li>
-                    <li><a href="#">Terms & Conditions</a></li>
-                    <li><a href="#">Privacy & Cookies</a></li>
+                    <li><a href="/termconditions">Terms & Conditions</a></li>
+                    <li><a href="/privacypolicy">Privacy Policy</a></li>
                 </ul>
             </div>
         </div>
@@ -107,18 +115,20 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
-    <script>
-        function loginUser(event) {
-            event.preventDefault();
-    
-            let email = document.getElementById("email").value;
-    
-            sessionStorage.setItem("userEmail", email);
-    
-            window.location.href = "/welcome";
-        }
-    </script>
+<div class="subscription-modal">
+<div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h3>Thank you for subscribing!</h3>
+    <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
+</div>
+</div>
+<div class="modal-backdrop"></div>
+
+<!--FOOTER COPY END HERE-->
+
+    <script defer src="{{ url_for('serve_js', filename='frontend.js')}}"></script>
+    <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
+
     </body>
     </html>
 </body>

@@ -1,0 +1,254 @@
+<!--HEADER COPY START HERE-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoTBay - Home</title>
+    <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <a href="/index">
+                <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
+            </a>
+        </div>
+        <nav>  
+            <ul>
+                <li><a href="/index">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/contact">Contact</a></li>                
+            </ul>
+        </nav>
+        <div class="icon-buttons">
+            <button class="icon-btn" onclick="toggleSearchBar();">
+                <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
+            </button>
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
+                <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
+            </button>                
+            <button class="icon-btn" onclick="location.href='/shoppingcart';">
+                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shoppingcart" class="icon-img">
+            </button>
+        </div>
+    </div>
+
+    <div id="search-bar" class="search-bar">
+        <input type="text" placeholder="Search products..." id="search-input">
+        <button onclick="searchProduct()">Search</button>
+        <button onclick="toggleSearchBar()">Close</button>
+    </div>
+
+    <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+</body>
+</html>
+<!--HEADER COPY END HERE-->
+
+<section class="hero">
+    <h1>Your Shopping Cart</h1>
+</section>
+
+<main class="cart-container">
+    
+    <!-- Add to existing cart page -->
+<!-- <div class="order-management">
+    <div class="search-order">
+        <input type="text" id="order-search" placeholder="Search by Order Number">
+        <input type="date" id="date-search">
+        <button onclick="searchOrders()">Search Orders</button>
+    </div>
+
+    <div class="cart-actions">
+        <button class="btn-save-draft" onclick="saveAsDraft()">Save Draft</button>
+        <button class="btn-submit" onclick="submitOrder()">Submit Order</button>
+    </div>
+
+    <div id="draft-section" class="draft-notice">
+        Draft status will load here
+    </div>
+</div> -->
+
+    <div class="cart-content">
+        <!-- Cart Items Section -->
+        <div class="cart-items">
+            <div class="cart-item">
+                <!-- <img src="{{ url_for('serve_images', filename='product1.jpg') }}" alt="IoT Sensor"> -->
+                <div class="item-details">
+                    <h3>Smart Temperature Sensor</h3>
+                    <p class="price">$89.99</p>
+                    <div class="quantity-control">
+                        <button class="qty-btn" onclick="updateQuantity(this, -1)">-</button>
+                        <input type="number" class="qty-input" value="1" min="1">
+                        <button class="qty-btn" onclick="updateQuantity(this, 1)">+</button>
+                    </div>
+                </div>
+                <button class="remove-btn" onclick="removeItem(this)">Remove</button>
+            </div>
+
+            <div class="cart-item">
+                <div class="item-details">
+                    <h3>Smart Temperature Sensor</h3>
+                    <p class="price">$89.99</p>
+                    <div class="quantity-control">
+                        <button class="qty-btn" onclick="updateQuantity(this, -1)">-</button>
+                        <input type="number" class="qty-input" value="1" min="1">
+                        <button class="qty-btn" onclick="updateQuantity(this, 1)">+</button>
+                    </div>
+                </div>
+                <button class="remove-btn" onclick="removeItem(this)">Remove</button>
+            </div>
+
+
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            <div class="summary-details">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span class="subtotal">$89.99</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax (10%):</span>
+                    <span class="tax">$8.99</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span class="total-amount">$98.98</span>
+                </div>
+            </div>
+            <div class="cart-actions">
+                <button class="btn-checkout" onclick="location.href='/checkout'">Checkout</button>
+                <button class="btn-save" onclick="saveCart()">Save Order</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Quantity Update
+    function updateQuantity(btn, change) {
+        const input = btn.parentElement.querySelector('.qty-input');
+        let newVal = parseInt(input.value) + change;
+        if(newVal < 1) newVal = 1;
+        input.value = newVal;
+        updateTotals();
+    }
+    
+    // Remove Item
+    function removeItem(btn) {
+        btn.closest('.cart-item').remove();
+        updateTotals();
+    }
+    
+    // Save Cart
+    function saveCart() {
+        const cartItems = [];
+        document.querySelectorAll('.cart-item').forEach(item => {
+            cartItems.push({
+                product: item.querySelector('h3').innerText,
+                quantity: item.querySelector('.qty-input').value,
+                price: parseFloat(item.querySelector('.price').innerText.replace('$',''))
+            });
+        });
+        
+        // Send to backend
+        fetch('/update-cart', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(cartItems)
+        }).then(response => {
+            alert('Cart saved successfully!');
+        });
+    }
+    
+    // Calculate Totals
+    function updateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const price = parseFloat(item.querySelector('.price').innerText.replace('$',''));
+            const qty = parseInt(item.querySelector('.qty-input').value);
+            subtotal += price * qty;
+        });
+        
+        const tax = subtotal * 0.10;
+        const total = subtotal + tax;
+        
+        document.querySelector('.subtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.querySelector('.tax').textContent = `$${tax.toFixed(2)}`;
+        document.querySelector('.total-amount').textContent = `$${total.toFixed(2)}`;
+    }
+    
+    // Initial calculation
+    updateTotals();
+    </script>
+
+<!--FOOTER COPY Start HERE-->
+<div class="footer-newsletter">
+    <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
+    <div class="newsletter-form">
+        <form>
+            <input type="email" placeholder="Only an email away..." required>
+            <button type="submit">Sign me up!</button>
+        </form>
+    </div>
+</div>
+
+<div class="footer-links">
+    <div class="footer-column">
+        <h3>ABOUT</h3>
+        <ul>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="#">Payment Methods</a></li>
+            <li><a href="#">Shipping Methods</a></li>
+        </ul>
+    </div>
+    <div class="footer-column">
+        <h3>HELP</h3>
+        <ul>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Support</a></li>
+            <li><a href="#">Warranty & Returns</a></li>
+            <li><a href="#">Services</a></li>
+        </ul>
+    </div>
+    <div class="footer-column">
+        <h3>OTHER</h3>
+        <ul>
+            <li><a href="#">Announcements</a></li>
+            <li><a href="#">Careers at IoTBay</a></li>
+            <li><a href="/termconditions">Terms & Conditions</a></li>
+            <li><a href="/privacypolicy">Privacy Policy</a></li>
+        </ul>
+    </div>
+
+<div class="footer-column">
+<h3>Need advice?</h3>
+<p style="color: white"> Speak to our friendly staff</p>
+<a href="/contact" class="contact-button">Contact Us</a>
+</div>
+</div>
+
+<div class="footer-copyright">
+<p> Copyright &copy; 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
+</div>
+</footer>
+
+<div class="subscription-modal">
+<div class="modal-content">
+<span class="close-modal">&times;</span>
+<h3>Thank you for subscribing!</h3>
+<p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
+</div>
+</div>
+<div class="modal-backdrop"></div>
+
+<!--FOOTER COPY END HERE-->
+
+    <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
+</body>
+</html>

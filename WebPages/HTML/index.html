@@ -1,3 +1,4 @@
+<!--HEADER COPY START HERE-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,11 +26,11 @@
             <button class="icon-btn" onclick="toggleSearchBar();">
                 <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
             </button>
-            <button class="icon-btn" onclick="location.href='/login';">
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
                 <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
             </button>                
             <button class="icon-btn" onclick="location.href='/shoppingcart';">
-                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shopping cart" class="icon-img">
+                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shoppingcart" class="icon-img">
             </button>
         </div>
     </div>
@@ -43,6 +44,7 @@
     <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
 </body>
 </html>
+<!--HEADER COPY END HERE-->
 
 <main>
     <section class="hero">
@@ -245,31 +247,31 @@
                 <ul>
                     <li><a href="#">Announcements</a></li>
                     <li><a href="#">Careers at IoTBay</a></li>
-                    <li><a href="#">Terms & Conditions</a></li>
-                    <li><a href="#">Privacy & Cookies</a></li>
+                    <li><a href="/termconditions">Terms & Conditions</a></li>
+                    <li><a href="/privacypolicy">Privacy Policy</a></li>
                 </ul>
             </div>
 
-            <div class="footer-column">
-                <h3>Need advice?</h3>
-                <p>Speak to our friendly staff</p>
-                <a href="/contact" class="contact-button">Contact Us</a>
-            </div>
-        </div>
-
-        <div class="footer-copyright">
-            <p> Copyright &copy; 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
-        </div>
-    </footer>
-
-    <div class="subscription-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h3>Thank you for subscribing!</h3>
-            <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
-        </div>
+    <div class="footer-column">
+        <h3>Need advice?</h3>
+        <p style="color: white"> Speak to our friendly staff</p>
+        <a href="/contact" class="contact-button">Contact Us</a>
     </div>
-    <div class="modal-backdrop"></div>
+</div>
+
+<div class="footer-copyright">
+    <p> Copyright &copy; 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
+</div>
+</footer>
+
+<div class="subscription-modal">
+<div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h3>Thank you for subscribing!</h3>
+    <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
+</div>
+</div>
+<div class="modal-backdrop"></div>
 
 <!--FOOTER COPY END HERE-->
 

@@ -1,51 +1,210 @@
-require('dotenv').config();
+require('dotenv').config({ path: "../../.env" });
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
 const bodyParser = require('body-parser');
-const db = require('./database');  // Import your SQLite database setup
+const db = require('./database');
+const cors = require("cors");
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:5000' })); // Allow Flask (Frontend)
-app.use(bodyParser.json());  // Parse JSON data
+const port = 3000;
 
-const SECRET_KEY = "your_secret_key";  // Use environment variable for production
+// Loads secret key and makes sure it exists
+const SECRET_KEY = process.env.SECRET_KEY;
+if (!SECRET_KEY) {
+    console.error("Error: SECRET_KEY is not defined in .env file!");
+    process.exit(1);
+}
 
-// User registration endpoint
+
+// Middleware
+app.use(bodyParser.json()); // finding in forms
+app.use(cors()); // allowing request through
+
+// Customer registration
 app.post('/register', (req, res) => {
-    const { username, email, password } = req.body;
+    const { email, first_name, surname, password, marketing } = req.body;
+
+    if (!email || !first_name || !surname || !password) {
+        return res.status(400).json({ message: 'All fields are required!' });
+    }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)){
+        return res.status(400).json({ message: 'Please enter a valid email'});
+    }
+
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    db.run(`INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)`,
-        [username, email, hashedPassword], function (err) {
-        if (err) return res.status(400).json({ error: err.message });
-        res.json({ message: "User registered successfully" });
+    db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error: ' + err.message });
+        }
+
+        if (row) {
+            return res.status(400).json({ message: 'Email already exists.' });
+        }
+
+        db.run("INSERT INTO users (email, user_type"+/*, first_name, surname, password_hash, marketing*/") VALUES (?, ?)",
+            [email, ''/*, first_name, surname, hashedPassword, marketing*/], function(err) {
+                if (err) {
+                    logAction(email, 'unsuccessful register');
+                    return res.status(500).json({ message: 'Error registering user: ' + err.message });
+                }
+                let id;
+                db.run("SELECT last_insert_rowid()", (err3, row) => {
+                    if (err3) {
+                        logAction(email, 'unsuccessful register');
+                        return res.status(500).json({ message: 'Database error: ' + err.message });
+                    }
+                    if (row) {
+                        id = row;
+                    }
+                });
+                db.run("INSERT INTO customer (id, first_name, surname, password_hash, marketing) values (?,?,?,?,?)",
+                    [id, first_name, surname, hashedPassword, marketing], function (err2) {
+                        if (err2){
+                            logAction(email, 'unsuccessful register');
+                            return res.status(500).json({ message: 'Error registering user: ' + err2.message });
+                        }
+                    }
+                )
+                res.status(200).json({ message: 'User registered successfully!' });
+                logAction(email, 'successful register');
+            });
+
+
+        db.get("SELECT * FROM marketing WHERE email = ?", [email], (err,row) => {
+            if (err) {
+                return res.status(500).json({ message: 'Database error: ' + err.message });
+            }
+            if (row) {
+                db.run("DELETE FROM marketing WHERE email = ?", [email]);
+            }
+        });
     });
 });
 
-// User login endpoint
+// Customer login
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
-    db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
-        if (err || !user) return res.status(401).json({ message: "User not found" });
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required." });
+    }
 
-        if (!bcrypt.compareSync(password, user.password_hash))
-            return res.status(401).json({ message: "Invalid password" });
-
-        const token = jwt.sign({ userId: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
-        res.json({ message: "Login successful", token });
+    
+    db.get("SELECT * FROM customer INNER JOIN users ON users.id = customer.id WHERE email = ?", [email], (err, row) => {
+        if (err) {
+            logAction(email, 'error logging in');
+            return res.status(500).json({ message: 'Database error: ' + err.message });
+        }
+        
+        if (!row || !bcrypt.compareSync(password, row.password_hash)) {
+            logAction(email, 'Unsuccessful login');
+            return res.status(401).json({ message: 'Invalid email or password.' });
+        }
+        
+        const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name, last_name: row.surname }, SECRET_KEY, { expiresIn: '1h' });
+        res.status(200).json({ message: 'Login successful!', token });
+        logAction(email, 'successful login');
     });
 });
 
-// Get all products
-app.get('/products', (req, res) => {
-    db.all("SELECT * FROM products", [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
+app.post('/cart', (req, res) => {
+    const { product_no, customer_id } = req.body;
+
+    // if no customer_id, create temp ID 
+    // check active order for cutomer ID
+    // if no order create order
+
+
+
+
+    db.run("INSERT INTO cart (order_no, product_no) VALUES (?, ?)",
+            [order_no, product_no], function(err) {
+                if (err) {
+                    return res.status(500).json({ message: 'Error adding item to cart: ' + err.message });
+                }
+                res.status(200).json({ message: 'item added successfully' });
+            });
+});
+
+app.post('/newsletter', (req,res) => {
+    const { email } = req.body;
+    db.get("SELECT * FROM marketing WHERE email = ?", [email], (err,row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error: ' + err.message });
+        }
+
+        if (row) {
+            return res.status(401).json({ message: 'Email already on mailing list'})
+        }
+        db.get("SELECT * FROM users WHERE email = ?", [email], (err, rowU) => {
+            if (err) {
+                return res.status(500).json({ message: 'Database error: ' + err.message });
+            }
+            if (rowU) {
+                if (rowU.marketing === 'off') {
+                    db.run("UPDATE users SET marketing WHERE email = ?", [email]);
+                    logAction(email, 'newletter');
+                    res.status(200).json({ message: email + ' marketing preferences have be changed'});
+                } else if (rowU.marketing === 'on') {
+                    logAction(email, 'newletter');
+                    res.status(401).json({ message: 'Email on mailing list'});
+                } 
+            } else {
+                db.run("INSERT INTO marketing (email) VALUES (?)", [email]);
+                logAction(email, 'newletter');
+                res.status(200).json({ message: email + ' added to mailing list'});
+            }
+        });
     });
 });
 
-// Start backend server
-app.listen(3000, () => console.log("Backend running on http://localhost:3000"));
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized: No token provided." });
+    }
+
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: "Token is invalid or expired." });
+        }
+        req.user = user;
+        next();
+    });
+}
+
+// Check Login Status (for session persistence)
+app.get("/check-session", authenticateToken, (req, res) => {
+    res.json({ user: req.user.email });
+});
+
+// Check Login Status (for session persistence)
+app.post("/logout", (req, res) => {
+    const {email} = req.body;
+    logAction(email, 'logout');
+    res.json({ message: "Logout successful. Clear token on client-side." });
+});
+
+// Start server
+app.listen(port, () => {
+    console.log(`Backend server is running on http://localhost:${port}`);
+});
+
+function logAction(email, type) {
+    db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error: ' + err.message });
+        }
+        if (row) {
+            const id = row.id;
+            db.run("INSERT INTO user_logs (user_id, type) VALUES (?, ?)",[id, type]);
+        }
+    });
+    console.log(type + ' logged in database');
+}
