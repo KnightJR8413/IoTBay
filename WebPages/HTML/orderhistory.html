@@ -46,9 +46,12 @@
 </html>
 <!--HEADER COPY END HERE-->
 
+<section class="hero">
+    <h1>Order History</h1>
+</section>
+
 <!-- New page template -->
 <main class="order-history">
-    <h1>Order History</h1>
     
     <div class="order-filters">
         <input type="text" placeholder="Order Number">
@@ -64,20 +67,25 @@
                 <span>Saved: 2024-02-20</span>
             </div>
             <div class="order-actions">
+                <button class="btn-payment" onclick="viewPaymentDetails('ORD_456')">View Payment</button>
                 <button onclick="editDraft('DRAFT_123')">Edit</button>
                 <button onclick="deleteDraft('DRAFT_123')">Cancel</button>
             </div>
         </div>
 
-        <div class="order-item submitted">
+        <!-- <div class="order-item submitted">
             <div class="order-header">
                 <span>Order #ORD_456</span>
                 <span>Submitted: 2024-02-19</span>
             </div>
             <div class="order-details">
-                <!-- Order details would expand here -->
             </div>
-        </div>
+            <div class="order-actions">
+                <button class="btn-payment" onclick="viewPaymentDetails('ORD_456')">View Payment</button>
+            </div>
+            <div class="payment-details">
+            </div>
+        </div> -->
     </div>
 </main>
 
