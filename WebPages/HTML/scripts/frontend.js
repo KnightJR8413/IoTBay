@@ -9,9 +9,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 first_name: document.getElementById("first_name").value,
                 surname: document.getElementById("surname").value,
                 password: document.getElementById("password").value,
-                marketing: document.getElementById("marketing").value
+                marketing: document.getElementById("marketing").checked
             };
-
+            console.log(formData.marketing);
             try {
                 const response = await fetch("http://localhost:3000/register", {
                     method: "POST",
@@ -101,11 +101,12 @@ function loginUser(email, password){
 
 // Logout user (Clear token)
 function logoutUser() {
+    const email = JSON.parse(atob(localStorage.getItem('token').split('.')[1])).email;
+    console.log(email);
     fetch('http://localhost:3000/logout', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json',},
+      body: JSON.stringify({email})
     })
       .then(response => response.json())
       .then(data => {
@@ -113,13 +114,7 @@ function logoutUser() {
         console.log(data.message);
   
         localStorage.removeItem('token');
-  
-        // const messageDiv = document.getElementById('logoutMessage');
-        // messageDiv.innerText = "You have successfully logged out and will be redirected to the homepage!";
-        // messageDiv.style.color = "green"; // Optional, to show success in green color
-        // messageDiv.style.fontSize = "20px"; // Optional, to make the text larger
 
-        window.location.href = '/';
       })
       .catch(error => {
         console.error('Error logging out:', error);
