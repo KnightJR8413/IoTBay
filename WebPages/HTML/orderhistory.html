@@ -50,43 +50,66 @@
     <h1>Order History</h1>
 </section>
 
-<!-- New page template -->
+<!-- Order History Page Content -->
 <main class="order-history">
-    
+    <div class="order-history-header">
+        <h1>Your Orders</h1>
+    </div>
+    <button>View Payment History</button>
+
+    <!-- Filters Section -->
     <div class="order-filters">
-        <input type="text" placeholder="Order Number">
-        <input type="date" id="filter-date">
-        <button onclick="filterOrders()">Filter</button>
-    </div>
-
-    <div class="order-list">
-        <!-- Orders will be dynamically populated -->
-        <div class="order-item draft">
-            <div class="order-header">
-                <span>Order #DRAFT_123</span>
-                <span>Saved: 2024-02-20</span>
-            </div>
-            <div class="order-actions">
-                <button class="btn-payment" onclick="viewPaymentDetails('ORD_456')">View Payment</button>
-                <button onclick="editDraft('DRAFT_123')">Edit</button>
-                <button onclick="deleteDraft('DRAFT_123')">Cancel</button>
-            </div>
+        <div class="filter-group">
+            <label>FROM DATE</label>
+            <input type="date" class="date-filter">
         </div>
-
-        <!-- <div class="order-item submitted">
-            <div class="order-header">
-                <span>Order #ORD_456</span>
-                <span>Submitted: 2024-02-19</span>
-            </div>
-            <div class="order-details">
-            </div>
-            <div class="order-actions">
-                <button class="btn-payment" onclick="viewPaymentDetails('ORD_456')">View Payment</button>
-            </div>
-            <div class="payment-details">
-            </div>
-        </div> -->
+        <div class="filter-group">
+            <label>TO DATE</label>
+            <input type="date" class="date-filter">
+        </div>
+        <div class="filter-group">
+            <label>REFERENCE #</label>
+            <input type="text" placeholder="Reference number" class="reference-filter">
+        </div>
+        <div class="filter-actions">
+            <button class="btn-clear" onclick="clearFilters()">CLEAR</button>
+            <button class="btn-search" onclick="applyFilters()">SEARCH</button>
+        </div>
     </div>
+
+    <!-- Orders Table -->
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>Order #</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Items</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    <!-- Example Row -->
+    <tr>
+        <td>ORD-42</td>
+        <td>2023-08-15 14:30</td>
+        <td>$210.50</td>
+        <td>3 items</td>
+        <td class="actions">
+            <button class="btn-view" onclick="viewOrderDetails('ORD-42')">
+                View Order Details
+            </button>
+            <button class="btn-payment" onclick="viewPaymentDetails('ORD-42')">
+                View Payment Details
+            </button>
+            <button class="btn-cancel" onclick="cancelOrder('ORD-42')">
+                Cancel
+            </button>
+        </td>
+    </tr>
+    <!-- Add more rows dynamically -->
+</tbody>
+</table>
 </main>
 
 <!--FOOTER COPY Start HERE-->
