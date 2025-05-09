@@ -90,6 +90,25 @@ app.post('/login', (req, res) => {
     });
 });
 
+app.post('/cart', (req, res) => {
+    const { product_no, customer_id } = req.body;
+
+    // if no customer_id, create temp ID 
+    // check active order for cutomer ID
+    // if no order create order
+
+
+
+
+    db.run("INSERT INTO cart (order_no, product_no) VALUES (?, ?)",
+            [order_no, product_no], function(err) {
+                if (err) {
+                    return res.status(500).json({ message: 'Error adding item to cart: ' + err.message });
+                }
+                res.status(200).json({ message: 'item added successfully' });
+            });
+});
+
 app.post('/newsletter', (req,res) => {
     const { email } = req.body;
     db.get("SELECT * FROM marketing WHERE email = ?", [email], (err,row) => {

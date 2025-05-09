@@ -9,11 +9,11 @@
 
 CREATE TABLE if NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    first_name TEXT NOT NULL, -- temp fix
-    surname TEXT NOT NULL, -- temp fix
-    password_hash TEXT NOT NULL, -- temp fix
+    first_name TEXT, -- temp fix
+    surname TEXT, -- temp fix
+    password_hash TEXT, -- temp fix
     marketing BOOLEAN DEFAULT 'off', -- temp fix
     user_type TEXT -- NOT NULL
 );
@@ -127,14 +127,24 @@ CREATE TABLE if NOT EXISTS discount_codes (
 );
 
 CREATE TABLE if NOT EXISTS cart (
-    customer_id INTEGER NOT NULL,
     order_no INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
     no_items INTEGER DEFAULT 1,
     discount_code INTEGER,
-    PRIMARY KEY (customer_id, order_no, product_id),
-    FOREIGN KEY (customer_id) REFERENCES customer(id),
+    PRIMARY KEY (order_no, product_id),
     FOREIGN KEY (order_no) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (discount_code) REFERENCES discount_codes(code)
 );
+
+INSERT INTO products (name, price, stock, supplier, brand, model, release_year, specifications, size, image_url) values ("A", 1, 1, "A", "A", "A", 1, "A", "A", "URL");
+
+-- name TEXT 
+-- price REAL 
+-- stock INTEGER 
+-- supplier TEXT 
+-- brand TEXT 
+-- model TEXT 
+-- release_year INTEGER 
+-- specifications TEXT 
+-- size TEXT 
