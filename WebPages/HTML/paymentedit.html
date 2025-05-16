@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Payment Method - IoTBay</title>
+  <link rel="stylesheet" href="CSS/styles.css" />
+  <style>
+    .edit-payment-container {
+      max-width: 600px;
+      margin: 60px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .edit-payment-container h2 {
+      color: #3a4163;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .edit-payment-form label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      color: #3a4163;
+    }
+
+    .edit-payment-form input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .edit-payment-form button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 15px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: white;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease-in-out;
+    }
+
+    .edit-payment-form button:hover {
+      background-color: #0056b3;
+    }
+
+    .back-link {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      text-decoration: none;
+      color: #007BFF;
+      font-weight: bold;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="logo">
+      <a href="index.html">
+        <img src="images/logo.png" width="125px" alt="IoTBay Logo" />
+      </a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <section class="hero">
+    <h1>Edit Payment Method</h1>
+    <p>Update your saved payment details securely.</p>
+  </section>
+
+  <div class="edit-payment-container">
+    <h2>Update Your Card</h2>
+    <form class="edit-payment-form">
+      <label for="cardholder">Cardholder Name</label>
+      <input type="text" id="cardholder" name="cardholder" placeholder="John Smith" required>
+
+      <label for="cardnumber">Card Number</label>
+      <input type="text" id="cardnumber" name="cardnumber" placeholder="**** **** **** 1234" required>
+
+      <label for="expiry">Expiry Date</label>
+      <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required>
+
+      <label for="cvc">CVC</label>
+      <input type="text" id="cvc" name="cvc" placeholder="123" required>
+
+      <button type="submit">Save Changes</button>
+    </form>
+    <a href="paymenthistory2.html" class="back-link">← Back to Payment History</a>
+  </div>
+
+  <footer>
+    <div class="footer-newsletter">
+      <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
+      <div class="newsletter-form">
+        <form>
+          <input type="email" placeholder="Only an email away..." required>
+          <button type="submit">Sign me up!</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-links">
+      <!-- You can reuse your existing footer columns here -->
+    </div>
+    <div class="footer-contact">
+      <h3>Contact Our Support Team</h3>
+      <p>Need help? Reach out to us any time.</p>
+      <a href="contact.html" class="contact-button">Contact Us</a>
+    </div>
+    <div class="footer-copyright">
+      <p>&copy; 2025 IoTBay. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
