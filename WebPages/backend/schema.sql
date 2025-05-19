@@ -3,10 +3,6 @@ CREATE TABLE if NOT EXISTS users (
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     email TEXT,
     user_type TEXT
-    -- first_name TEXT, -- temp fix
-    -- surname TEXT, -- temp fix
-    -- password_hash TEXT, -- temp fix
-    -- marketing BOOLEAN DEFAULT 'off', -- temp fix
 );
 
 CREATE TABLE if NOT EXISTS customer (
