@@ -97,7 +97,18 @@ function loginUser(email, password){
     .catch(error => console.error('Error:', error));
 };
 
+function isLoggedIn() {
+  const token = localStorage.getItem('token');
+  if (!token) return false;
 
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp > now; // true if token is not expired
+  } catch (e) {
+    return false; // Invalid token format
+  }
+}
 
 // Logout user (Clear token)
 function logoutUser() {
