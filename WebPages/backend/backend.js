@@ -45,27 +45,27 @@ app.post('/register', (req, res) => {
             return res.status(400).json({ message: 'Email already exists.' });
         }
 
-        db.run("INSERT INTO users (email, user_type"+/*, first_name, surname, password_hash, marketing*/") VALUES (?, ?)",
-            [email, ''/*, first_name, surname, hashedPassword, marketing*/], function(err) {
-                if (err) {
+        db.run("INSERT INTO users (email, user_type) VALUES (?, ?)",
+            [email, 'c'], function(err2) {
+                if (err2) {
                     logAction(email, 'unsuccessful register');
-                    return res.status(500).json({ message: 'Error registering user: ' + err.message });
+                    return res.status(500).json({ message: 'Error registering user: ' + err2.message });
                 }
                 let id;
-                db.run("SELECT last_insert_rowid()", (err3, row) => {
+                db.run("SELECT last_insert_rowid()", (err3, row2) => {
                     if (err3) {
                         logAction(email, 'unsuccessful register');
-                        return res.status(500).json({ message: 'Database error: ' + err.message });
+                        return res.status(500).json({ message: 'Database error: ' + err3.message });
                     }
-                    if (row) {
-                        id = row;
+                    if (row2) {
+                        id = row2;
                     }
                 });
                 db.run("INSERT INTO customer (id, first_name, surname, password_hash, marketing) values (?,?,?,?,?)",
-                    [id, first_name, surname, hashedPassword, marketing], function (err2) {
-                        if (err2){
+                    [id, first_name, surname, hashedPassword, marketing], function (err3) {
+                        if (err3){
                             logAction(email, 'unsuccessful register');
-                            return res.status(500).json({ message: 'Error registering user: ' + err2.message });
+                            return res.status(500).json({ message: 'Error registering user: ' + err3.message });
                         }
                     }
                 )
@@ -74,11 +74,11 @@ app.post('/register', (req, res) => {
             });
 
 
-        db.get("SELECT * FROM marketing WHERE email = ?", [email], (err,row) => {
-            if (err) {
-                return res.status(500).json({ message: 'Database error: ' + err.message });
+        db.get("SELECT * FROM marketing WHERE email = ?", [email], (err2,row2) => {
+            if (err2) {
+                return res.status(500).json({ message: 'Database error: ' + err2.message });
             }
-            if (row) {
+            if (row2) {
                 db.run("DELETE FROM marketing WHERE email = ?", [email]);
             }
         });
@@ -94,7 +94,7 @@ app.post('/login', (req, res) => {
     }
 
     
-    db.get("SELECT * FROM customer INNER JOIN users ON users.id = customer.id WHERE email = ?", [email], (err, row) => {
+    db.get("SELECT * FROM customer INNER JOIN users ON users.id = customer.id WHERE email = ? AND user_type ='c'", [email], (err, row) => {
         if (err) {
             logAction(email, 'error logging in');
             return res.status(500).json({ message: 'Database error: ' + err.message });
@@ -112,12 +112,43 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/cart', (req, res) => {
-    const { product_no, customer_id } = req.body;
+    const { product_no, userId } = req.body;
+    let customer_id = userId;
+    if (!customer_id) {
+    // Step 1: Create guest user with auto-increment ID
+        db.run("INSERT INTO users (user_type) VALUES ('g')", function(err) {
+            if (err) {
+                return res.status(500).json({ message: 'Error creating guest user', error: err.message });
+            }
+            customer_id = this.lastID;
+        });
+    }
 
-    // if no customer_id, create temp ID 
-    // check active order for cutomer ID
-    // if no order create order
+    db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [customer_id], (err, row) => {
+      if (err) {
+        return res.status(500).json({ message: 'DB error finding order', error: err.message });
+      }
 
+      const insertIntoCart = (order_no) => {
+        db.run("INSERT INTO cart (order_no, product_no) VALUES (?, ?)", [order_no, product_no], function(err) {
+          if (err) {
+            return res.status(500).json({ message: 'Error adding to cart', error: err.message });
+          }
+          res.status(200).json({ message: 'Item added to cart', customer_id });
+        });
+      };
+
+      if (row) {
+        insertIntoCart(row.order_no);
+      } else {
+        db.run("INSERT INTO orders (customer_id, status) VALUES (?, 'active')", [customer_id], function(err) {
+          if (err) {
+            return res.status(500).json({ message: 'Error creating order', error: err.message });
+          }
+          insertIntoCart(this.lastID);
+        });
+      }
+    });
 
 
 
@@ -207,4 +238,17 @@ function logAction(email, type) {
         }
     });
     console.log(type + ' logged in database');
+}
+
+function getCustomerIdFromToken(req) {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) return null;
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    return decoded.userId;
+  } catch (err) {
+    return null;
+  }
 }

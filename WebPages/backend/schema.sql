@@ -3,10 +3,6 @@ CREATE TABLE if NOT EXISTS users (
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     email TEXT,
     user_type TEXT
-    -- first_name TEXT, -- temp fix
-    -- surname TEXT, -- temp fix
-    -- password_hash TEXT, -- temp fix
-    -- marketing BOOLEAN DEFAULT 'off', -- temp fix
 );
 
 CREATE TABLE if NOT EXISTS customer (
@@ -99,11 +95,12 @@ CREATE TABLE if NOT EXISTS payment (
 
 CREATE TABLE if NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id INTERGER  NOT NULL,
-    shipping_address INTERGER  NOT NULL,
-    billing_address INTERGER  NOT NULL,
-    payment_id INTERGER NOT NULL,
+    customer_id INTERGER NOT NULL,
+    shipping_address INTERGER,
+    billing_address INTERGER,
+    payment_id INTERGER,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status TEXT,
     FOREIGN KEY (customer_id) REFERENCES customer(id),
     FOREIGN KEY (shipping_address) REFERENCES address(id),
     FOREIGN KEY (billing_address) REFERENCES address(id),
@@ -118,11 +115,11 @@ CREATE TABLE if NOT EXISTS discount_codes (
 );
 
 CREATE TABLE if NOT EXISTS cart (
+    cart_id INTEGER PRIMARY KEY AUTOINCREMENT,
     order_no INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
     no_items INTEGER DEFAULT 1,
     discount_code INTEGER,
-    PRIMARY KEY (order_no, product_id),
     FOREIGN KEY (order_no) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (discount_code) REFERENCES discount_codes(code)
