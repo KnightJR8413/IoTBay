@@ -89,6 +89,10 @@ function loginUser(email, password){
     .then(data => {
         if (data.token) {
             localStorage.setItem('token', data.token);
+            const token = data.token;
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const customer_id = payload.userId;
+            localStorage.setItem('customer_id', customer_id);
             window.location.href = '/welcome';
         } else {
             alert(data.error || 'Login failed');
@@ -112,7 +116,8 @@ function logoutUser() {
         console.log(data.message);
   
         localStorage.removeItem('token');
-
+        localStorage.removeItem('customer_id');
+        
       })
       .catch(error => {
         console.error('Error logging out:', error);
