@@ -114,13 +114,14 @@ CREATE TABLE if NOT EXISTS discount_codes (
     end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TABLE if NOT EXISTS cart (
+CREATE TABLE IF NOT EXISTS cart (
     cart_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_no INTEGER NOT NULL,
+    order_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
     no_items INTEGER DEFAULT 1,
-    discount_code INTEGER,
-    FOREIGN KEY (order_no) REFERENCES orders(id),
+    discount_code TEXT,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (discount_code) REFERENCES discount_codes(code)
 );
+

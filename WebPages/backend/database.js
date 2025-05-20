@@ -23,3 +23,4 @@ const initializeDatabase = () => {
 initializeDatabase(); // Call it to initialize tables
 
 module.exports = db;
+

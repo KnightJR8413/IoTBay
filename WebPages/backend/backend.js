@@ -111,55 +111,191 @@ app.post('/login', (req, res) => {
     });
 });
 
+// 1) CREATE PRODUCT
+app.post('/products', (req, res) => {
+  const {
+    name,
+    price,
+    description = '',
+    stock,
+    image_url,
+    supplier,
+    brand,
+    model,
+    release_year,
+    specifications,
+    size,
+    colour = ''
+  } = req.body;
+
+  // basic validation
+  if (!name || price == null || stock == null || !supplier || !brand || !model || !release_year || !specifications || !size) {
+    return res.status(400).json({ message: 'Missing required fields.' });
+  }
+
+  const sql = `
+    INSERT INTO products
+      (name, price, description, stock, image_url, supplier, brand, model, release_year, specifications, size, colour)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  const params = [name, price, description, stock, image_url, supplier, brand, model, release_year, specifications, size, colour];
+
+  db.run(sql, params, function(err) {
+    if (err) return res.status(500).json({ message: err.message });
+    // `this.lastID` is the new product's id
+    res.status(201).json({
+      message: 'Product created',
+      product: { id: this.lastID, ...req.body }
+    });
+  });
+});
+
+// 2) LIST PRODUCTS
+app.get('/products', (req, res) => {
+  db.all("SELECT * FROM products ORDER BY id DESC", [], (err, rows) => {
+    if (err) return res.status(500).json({ message: err.message });
+    res.json(rows);
+  });
+});
+
+// ── CART HANDLERS ──
+
+// ADD TO CART
 app.post('/cart', (req, res) => {
-    const { product_no, userId } = req.body;
-    let customer_id = userId;
-    if (!customer_id) {
-    // Step 1: Create guest user with auto-increment ID
-        db.run("INSERT INTO users (user_type) VALUES ('g')", function(err) {
-            if (err) {
-                return res.status(500).json({ message: 'Error creating guest user', error: err.message });
-            }
-            customer_id = this.lastID;
-        });
-    }
+  const { product_id, userId } = req.body;
+  let customer_id = userId;
 
+  const proceedWithOrder = () => {
     db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [customer_id], (err, row) => {
-      if (err) {
-        return res.status(500).json({ message: 'DB error finding order', error: err.message });
-      }
+      if (err) return res.status(500).json({ message: err.message });
 
-      const insertIntoCart = (order_no) => {
-        db.run("INSERT INTO cart (order_no, product_no) VALUES (?, ?)", [order_no, product_no], function(err) {
-          if (err) {
-            return res.status(500).json({ message: 'Error adding to cart', error: err.message });
+      const insertIntoCart = orderId => {
+        db.run(
+          "INSERT INTO cart (order_id, product_id, no_items) VALUES (?, ?, 1)",
+          [orderId, product_id],
+          function(err) {
+            if (err) return res.status(500).json({ message: err.message });
+            res.status(200).json({ message: 'Item added to cart', customer_id });
           }
-          res.status(200).json({ message: 'Item added to cart', customer_id });
-        });
+        );
       };
 
       if (row) {
-        insertIntoCart(row.order_no);
+        insertIntoCart(row.id);
       } else {
-        db.run("INSERT INTO orders (customer_id, status) VALUES (?, 'active')", [customer_id], function(err) {
-          if (err) {
-            return res.status(500).json({ message: 'Error creating order', error: err.message });
-          }
+        db.run("INSERT INTO orders (customer_id, status) VALUES (?, 'active')", [customer_id], function(err2) {
+          if (err2) return res.status(500).json({ message: err2.message });
           insertIntoCart(this.lastID);
         });
       }
     });
+  };
 
-
-
-    db.run("INSERT INTO cart (order_no, product_no) VALUES (?, ?)",
-            [order_no, product_no], function(err) {
-                if (err) {
-                    return res.status(500).json({ message: 'Error adding item to cart: ' + err.message });
-                }
-                res.status(200).json({ message: 'item added successfully' });
-            });
+  if (!customer_id) {
+    db.run("INSERT INTO users (user_type) VALUES ('g')", function(err) {
+      if (err) return res.status(500).json({ message: err.message });
+      customer_id = this.lastID;
+      proceedWithOrder();
+    });
+  } else {
+    proceedWithOrder();
+  }
 });
+
+// GET CART ITEMS
+app.get('/cart', (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) return res.status(400).json({ message: 'userId is required' });
+
+  db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [userId], (err, orderRow) => {
+    if (err) return res.status(500).json({ message: err.message });
+    if (!orderRow) return res.json([]);
+
+    db.all(`
+      SELECT
+        c.product_id,
+        c.no_items,
+        p.name,
+        p.price,
+        p.image_url
+      FROM cart c
+      JOIN products p ON p.id = c.product_id
+      WHERE c.order_id = ?
+    `, [orderRow.id], (err2, rows) => {
+      if (err2) return res.status(500).json({ message: err2.message });
+      res.json(rows);
+    });
+  });
+});
+
+// REMOVE ITEM FROM CART
+app.delete('/cart', (req, res) => {
+  const { product_id, userId } = req.body;
+  if (!product_id || !userId) {
+    return res.status(400).json({ message: 'product_id and userId are required' });
+  }
+
+  db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [userId], (err, orderRow) => {
+    if (err) return res.status(500).json({ message: err.message });
+    if (!orderRow) return res.status(404).json({ message: 'No active cart found' });
+
+    db.run("DELETE FROM cart WHERE order_id = ? AND product_id = ?", [orderRow.id, product_id], function(err2) {
+      if (err2) return res.status(500).json({ message: err2.message });
+      if (this.changes === 0) {
+        return res.status(404).json({ message: 'Item not found in cart' });
+      }
+      res.json({ message: 'Item removed' });
+    });
+  });
+});
+
+
+// app.post('/cart', (req, res) => {
+//     const { product_no, userId } = req.body;
+//     let customer_id = userId;
+//     if (!customer_id) {
+//         db.run("INSERT INTO users (user_type) VALUES ('g')", function(err) {
+//             if (err) {
+//                 return res.status(500).json({ message: 'Error creating guest user', error: err.message });
+//             }
+//             customer_id = this.lastID;
+//         });
+//     }
+
+//     db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [customer_id], (err, row) => {
+//       if (err) {
+//         return res.status(500).json({ message: 'DB error finding order', error: err.message });
+//       }
+
+//       const insertIntoCart = (order_no) => {
+//         db.run("INSERT INTO cart (order_no, product_no) VALUES (?, ?)", [order_no, product_no], function(err) {
+//           if (err) {
+//             return res.status(500).json({ message: 'Error adding to cart', error: err.message });
+//           }
+//           res.status(200).json({ message: 'Item added to cart', customer_id });
+//         });
+//       };
+
+//       if (row) {
+//         insertIntoCart(row.order_no);
+//       } else {
+//         db.run("INSERT INTO orders (customer_id, status) VALUES (?, 'active')", [customer_id], function(err) {
+//           if (err) {
+//             return res.status(500).json({ message: 'Error creating order', error: err.message });
+//           }
+//           insertIntoCart(this.lastID);
+//         });
+//       }
+//     });
+
+//     db.run("INSERT INTO cart (order_no, product_no) VALUES (?, ?)",
+//             [order_no, product_no], function(err) {
+//                 if (err) {
+//                     return res.status(500).json({ message: 'Error adding item to cart: ' + err.message });
+//                 }
+//                 res.status(200).json({ message: 'item added successfully' });
+//             });
+// });
 
 app.post('/newsletter', (req,res) => {
     const { email } = req.body;

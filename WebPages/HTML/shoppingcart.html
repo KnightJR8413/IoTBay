@@ -71,61 +71,26 @@
 </div> -->
 
     <div class="cart-content">
-        <!-- Cart Items Section -->
-        <div class="cart-items">
-            <div class="cart-item">
-                <!-- <img src="{{ url_for('serve_images', filename='product1.jpg') }}" alt="IoT Sensor"> -->
-                <div class="item-details">
-                    <h3>Smart Temperature Sensor</h3>
-                    <p class="price">$89.99</p>
-                    <div class="quantity-control">
-                        <button class="qty-btn" onclick="updateQuantity(this, -1)">-</button>
-                        <input type="number" class="qty-input" value="1" min="1">
-                        <button class="qty-btn" onclick="updateQuantity(this, 1)">+</button>
-                    </div>
-                </div>
-                <button class="remove-btn" onclick="removeItem(this)">Remove</button>
-            </div>
+  <!-- Cart Items Section -->
+  <div class="cart-items" id="cart-items">
+    <!-- JS will dynamically render .cart-item elements here -->
+  </div>
 
-            <div class="cart-item">
-                <div class="item-details">
-                    <h3>Smart Temperature Sensor</h3>
-                    <p class="price">$89.99</p>
-                    <div class="quantity-control">
-                        <button class="qty-btn" onclick="updateQuantity(this, -1)">-</button>
-                        <input type="number" class="qty-input" value="1" min="1">
-                        <button class="qty-btn" onclick="updateQuantity(this, 1)">+</button>
-                    </div>
-                </div>
-                <button class="remove-btn" onclick="removeItem(this)">Remove</button>
-            </div>
-
-
-        </div>
-
-        <!-- Order Summary -->
-        <div class="order-summary">
-            <h2>Order Summary</h2>
-            <div class="summary-details">
-                <div class="summary-row">
-                    <span>Subtotal:</span>
-                    <span class="subtotal">$89.99</span>
-                </div>
-                <div class="summary-row">
-                    <span>Tax (10%):</span>
-                    <span class="tax">$8.99</span>
-                </div>
-                <div class="summary-row total">
-                    <span>Total:</span>
-                    <span class="total-amount">$98.98</span>
-                </div>
-            </div>
-            <div class="cart-actions">
-                <button class="btn-checkout" onclick="location.href='/checkout'">Checkout</button>
-                <button class="btn-save" onclick="saveCart()">Save Order</button>
-            </div>
-        </div>
+  <!-- Order Summary -->
+  <div class="order-summary">
+    <h2>Order Summary</h2>
+    <div class="summary-details">
+      <div class="summary-row total">
+        <span>Total:</span>
+        <span class="total-amount">$0.00</span>
+      </div>
     </div>
+    <div class="cart-actions">
+      <button class="btn-checkout" onclick="location.href='/checkout'">Checkout</button>
+      <button class="btn-save" onclick="saveCart()">Save Order</button>
+    </div>
+  </div>
+</div>
 </main>
 
 <script>
