@@ -97,19 +97,6 @@ function loginUser(email, password){
     .catch(error => console.error('Error:', error));
 };
 
-function isLoggedIn() {
-  const token = localStorage.getItem('token');
-  if (!token) return false;
-
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const now = Math.floor(Date.now() / 1000);
-    return payload.exp > now; // true if token is not expired
-  } catch (e) {
-    return false; // Invalid token format
-  }
-}
-
 // Logout user (Clear token)
 function logoutUser() {
     const email = JSON.parse(atob(localStorage.getItem('token').split('.')[1])).email;
@@ -139,3 +126,38 @@ document.addEventListener("DOMContentLoaded", function () {
         logoutButton.addEventListener("click", logout);
     }
 });
+
+async function addToCart(product_no) {
+  // Check if we already have a stored customer ID
+  let customer_id = localStorage.getItem('customer_id');
+
+  const payload = { product_no };
+  if (customer_id) {
+    payload.customer_id = parseInt(customer_id);
+  }
+
+  try {
+    const response = await fetch('/cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // If a customer_id was returned (new guest), store it
+      if (data.customer_id) {
+        localStorage.setItem('customer_id', data.customer_id);
+      }
+      console.log('Item added to cart:', data.message);
+    } else {
+      console.error('Error:', data.message);
+    }
+
+  } catch (err) {
+    console.error('Fetch error:', err);
+  }
+}
