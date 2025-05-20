@@ -251,7 +251,8 @@ app.delete('/cart', (req, res) => {
 
 // SAVE ORDER: Finalize the active order and mark it as completed
 app.post('/update-cart', (req, res) => {
-  const { userId } = req.body;
+    console.log('Received request on /update-cart with body:', req.body);
+    const { userId } = req.body;
 
   if (!userId) {
     return res.status(400).json({ message: 'userId is required' });
