@@ -64,8 +64,8 @@ CREATE TABLE if NOT EXISTS tags (
 );
 
 CREATE TABLE if NOT EXISTS product_tags (
-    product_id INTERGER NOT NULL,
-    tag_id INTERGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
     PRIMARY KEY (product_id, tag_id),
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (tag_id) REFERENCES tags(id)
@@ -95,10 +95,10 @@ CREATE TABLE if NOT EXISTS payment (
 
 CREATE TABLE if NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id INTERGER NOT NULL,
-    shipping_address INTERGER,
-    billing_address INTERGER,
-    payment_id INTERGER,
+    customer_id INTEGER NOT NULL,
+    shipping_address INTEGER,
+    billing_address INTEGER,
+    payment_id INTEGER,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT,
     FOREIGN KEY (customer_id) REFERENCES customer(id),

@@ -9,6 +9,10 @@ const cors = require("cors");
 const app = express();
 const port = 3000;
 
+//these two lines are added for now will see if they are needed for order history
+app.use(cors());
+app.use(express.json());
+
 // Loads secret key and makes sure it exists
 const SECRET_KEY = process.env.SECRET_KEY;
 if (!SECRET_KEY) {
