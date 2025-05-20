@@ -121,7 +121,7 @@
         });
         
         // Send to backend
-        fetch('/update-cart', {
+        fetch('http://localhost:3000/update-cart', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(cartItems)
@@ -132,20 +132,16 @@
     
     // Calculate Totals
     function updateTotals() {
-        let subtotal = 0;
-        document.querySelectorAll('.cart-item').forEach(item => {
-            const price = parseFloat(item.querySelector('.price').innerText.replace('$',''));
-            const qty = parseInt(item.querySelector('.qty-input').value);
-            subtotal += price * qty;
-        });
-        
-        const tax = subtotal * 0.10;
-        const total = subtotal + tax;
-        
-        document.querySelector('.subtotal').textContent = `$${subtotal.toFixed(2)}`;
-        document.querySelector('.tax').textContent = `$${tax.toFixed(2)}`;
-        document.querySelector('.total-amount').textContent = `$${total.toFixed(2)}`;
-    }
+    let total = 0;
+    document.querySelectorAll('.cart-item').forEach(item => {
+        const price = parseFloat(item.querySelector('.price').innerText.replace('$',''));
+        const qty = parseInt(item.querySelector('.qty-input').value);
+        total += price * qty;
+    });
+
+    const totalElem = document.querySelector('.total-amount');
+    if(totalElem) totalElem.textContent = `$${total.toFixed(2)}`;
+}
     
     // Initial calculation
     updateTotals();

@@ -200,7 +200,7 @@ function renderCartItems(items) {
         <p class="price">$${it.price.toFixed(2)}</p>
         <div class="quantity-control">
           <button class="qty-btn" onclick="updateQuantity(this,-1)">-</button>
-          <input type="number" class="qty-input" value="${it.quantity}" min="1">
+          <input type="number" class="qty-input" value="${it.quantity ?? 1}" min="1">
           <button class="qty-btn" onclick="updateQuantity(this,1)">+</button>
         </div>
       </div>

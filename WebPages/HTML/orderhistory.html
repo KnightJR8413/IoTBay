@@ -1,20 +1,20 @@
-<!--HEADER COPY START HERE-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoTBay - Home</title>
+    <title>IoTBay - Order History</title>
     <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
 </head>
 <body>
+    <!-- HEADER -->
     <div class="navbar">
         <div class="logo">
             <a href="/index">
                 <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
             </a>
         </div>
-        <nav>  
+        <nav>
             <ul>
                 <li><a href="/index">Home</a></li>
                 <li><a href="/about">About</a></li>
@@ -41,140 +41,166 @@
         <button onclick="toggleSearchBar()">Close</button>
     </div>
 
-    <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
-</body>
-</html>
-<!--HEADER COPY END HERE-->
+    <!-- HERO -->
+    <section class="hero">
+        <h1>Order History</h1>
+    </section>
 
-<section class="hero">
-    <h1>Order History</h1>
-</section>
-
-<!-- Order History Page Content -->
-<main class="order-history">
-    <div class="order-history-header">
-        <h1>Your Orders</h1>
-    </div>
-    <button class="login-button" onclick='location.href="/paymenthistory2";'>View Payment History</button>
-
-    <!-- Filters Section -->
-    <div class="order-filters">
-        <div class="filter-group">
-            <label>FROM DATE</label>
-            <input type="date" class="date-filter">
+    <!-- MAIN ORDER HISTORY SECTION -->
+    <main class="order-history">
+        <div class="order-history-header">
+            <h1>Your Orders</h1>
         </div>
-        <div class="filter-group">
-            <label>TO DATE</label>
-            <input type="date" class="date-filter">
+        <button class="login-button" onclick='location.href="/paymenthistory2";'>View Payment History</button>
+
+        <!-- Filters Section -->
+        <div class="order-filters">
+            <div class="filter-group">
+                <label>FROM DATE</label>
+                <input type="date" class="date-filter">
+            </div>
+            <div class="filter-group">
+                <label>TO DATE</label>
+                <input type="date" class="date-filter">
+            </div>
+            <div class="filter-group">
+                <label>REFERENCE #</label>
+                <input type="text" placeholder="Reference number" class="reference-filter">
+            </div>
+            <div class="filter-actions">
+                <button class="btn-clear" onclick="clearFilters()">CLEAR</button>
+                <button class="btn-search" onclick="applyFilters()">SEARCH</button>
+            </div>
         </div>
-        <div class="filter-group">
-            <label>REFERENCE #</label>
-            <input type="text" placeholder="Reference number" class="reference-filter">
+
+        <!-- Orders Table -->
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Items</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="order-history-body">
+                <!-- Orders will be injected here -->
+            </tbody>
+        </table>
+    </main>
+
+    <!-- FOOTER -->
+    <div class="footer-newsletter">
+        <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
+        <div class="newsletter-form">
+            <form>
+                <input type="email" placeholder="Only an email away..." required>
+                <button type="submit">Sign me up!</button>
+            </form>
         </div>
-        <div class="filter-actions">
-            <button class="btn-clear" onclick="clearFilters()">CLEAR</button>
-            <button class="btn-search" onclick="applyFilters()">SEARCH</button>
+    </div>
+
+    <div class="footer-links">
+        <div class="footer-column">
+            <h3>ABOUT</h3>
+            <ul>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+                <li><a href="#">Payment Methods</a></li>
+                <li><a href="#">Shipping Methods</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>HELP</h3>
+            <ul>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Support</a></li>
+                <li><a href="#">Warranty & Returns</a></li>
+                <li><a href="#">Services</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>OTHER</h3>
+            <ul>
+                <li><a href="#">Announcements</a></li>
+                <li><a href="#">Careers at IoTBay</a></li>
+                <li><a href="/termconditions">Terms & Conditions</a></li>
+                <li><a href="/privacypolicy">Privacy Policy</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>Need advice?</h3>
+            <p style="color: white"> Speak to our friendly staff</p>
+            <a href="/contact" class="contact-button">Contact Us</a>
         </div>
     </div>
 
-    <!-- Orders Table -->
-    <table class="orders-table">
-        <thead>
-            <tr>
-                <th>Order #</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Items</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-    <!-- Example Row -->
-    <tr>
-        <td>ORD-42</td>
-        <td>2023-08-15 14:30</td>
-        <td>$210.50</td>
-        <td>3 items</td>
-        <td class="actions">
-            <button class="btn-view" onclick="viewOrderDetails('ORD-42')">
-                View Order Details
-            </button>
-            <button class="btn-payment" onclick="viewPaymentDetails('ORD-42')">
-                View Payment Details
-            </button>
-            <button class="btn-cancel" onclick="cancelOrder('ORD-42')">
-                Cancel
-            </button>
-        </td>
-    </tr>
-    <!-- Add more rows dynamically -->
-</tbody>
-</table>
-</main>
-
-<!--FOOTER COPY Start HERE-->
-<div class="footer-newsletter">
-    <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
-    <div class="newsletter-form">
-        <form>
-            <input type="email" placeholder="Only an email away..." required>
-            <button type="submit">Sign me up!</button>
-        </form>
-    </div>
-</div>
-
-<div class="footer-links">
-    <div class="footer-column">
-        <h3>ABOUT</h3>
-        <ul>
-            <li><a href="/about">About Us</a></li>
-            <li><a href="/contact">Contact Us</a></li>
-            <li><a href="#">Payment Methods</a></li>
-            <li><a href="#">Shipping Methods</a></li>
-        </ul>
-    </div>
-    <div class="footer-column">
-        <h3>HELP</h3>
-        <ul>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Support</a></li>
-            <li><a href="#">Warranty & Returns</a></li>
-            <li><a href="#">Services</a></li>
-        </ul>
-    </div>
-    <div class="footer-column">
-        <h3>OTHER</h3>
-        <ul>
-            <li><a href="#">Announcements</a></li>
-            <li><a href="#">Careers at IoTBay</a></li>
-            <li><a href="/termconditions">Terms & Conditions</a></li>
-            <li><a href="/privacypolicy">Privacy Policy</a></li>
-        </ul>
+    <div class="footer-copyright">
+        <p> Copyright &copy; 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
     </div>
 
-<div class="footer-column">
-<h3>Need advice?</h3>
-<p style="color: white"> Speak to our friendly staff</p>
-<a href="/contact" class="contact-button">Contact Us</a>
-</div>
-</div>
+    <div class="subscription-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Thank you for subscribing!</h3>
+            <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
+        </div>
+    </div>
+    <div class="modal-backdrop"></div>
 
-<div class="footer-copyright">
-<p> Copyright &copy; 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
-</div>
-</footer>
-
-<div class="subscription-modal">
-<div class="modal-content">
-<span class="close-modal">&times;</span>
-<h3>Thank you for subscribing!</h3>
-<p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
-</div>
-</div>
-<div class="modal-backdrop"></div>
-
-<!--FOOTER COPY END HERE-->
-
+    <!-- Scripts -->
     <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('Please log in to view your order history.');
+                return;
+            }
+
+            fetch(`/order-history?userId=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('order-history-body');
+                    tbody.innerHTML = '';
+
+                    if (!data.length) {
+                        tbody.innerHTML = `<tr><td colspan="5">No past orders found.</td></tr>`;
+                        return;
+                    }
+
+                    data.forEach(order => {
+                        const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
+                        const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>ORD-${order.order_id}</td>
+                            <td>${new Date(order.order_date).toLocaleString()}</td>
+                            <td>$${total}</td>
+                            <td>${itemCount} item${itemCount > 1 ? 's' : ''}</td>
+                            <td class="actions">
+                                <button class="btn-view" onclick="viewOrderDetails('ORD-${order.order_id}')">
+                                    View Order Details
+                                </button>
+                                <button class="btn-payment" onclick="viewPaymentDetails('ORD-${order.order_id}')">
+                                    View Payment Details
+                                </button>
+                                <button class="btn-cancel" onclick="cancelOrder('ORD-${order.order_id}')">
+                                    Cancel
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(err => {
+                    console.error('Error fetching order history:', err);
+                });
+        });
+    </script>
 </body>
 </html>
+

@@ -249,53 +249,72 @@ app.delete('/cart', (req, res) => {
   });
 });
 
+// SAVE ORDER: Finalize the active order and mark it as completed
+app.post('/update-cart', (req, res) => {
+  const { userId } = req.body;
 
-// app.post('/cart', (req, res) => {
-//     const { product_no, userId } = req.body;
-//     let customer_id = userId;
-//     if (!customer_id) {
-//         db.run("INSERT INTO users (user_type) VALUES ('g')", function(err) {
-//             if (err) {
-//                 return res.status(500).json({ message: 'Error creating guest user', error: err.message });
-//             }
-//             customer_id = this.lastID;
-//         });
-//     }
+  if (!userId) {
+    return res.status(400).json({ message: 'userId is required' });
+  }
 
-//     db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [customer_id], (err, row) => {
-//       if (err) {
-//         return res.status(500).json({ message: 'DB error finding order', error: err.message });
-//       }
+  db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [userId], (err, orderRow) => {
+    if (err) return res.status(500).json({ message: err.message });
+    if (!orderRow) return res.status(404).json({ message: 'No active cart found' });
 
-//       const insertIntoCart = (order_no) => {
-//         db.run("INSERT INTO cart (order_no, product_no) VALUES (?, ?)", [order_no, product_no], function(err) {
-//           if (err) {
-//             return res.status(500).json({ message: 'Error adding to cart', error: err.message });
-//           }
-//           res.status(200).json({ message: 'Item added to cart', customer_id });
-//         });
-//       };
+    db.run("UPDATE orders SET status = 'completed', order_date = datetime('now') WHERE id = ?", [orderRow.id], function(err2) {
+      if (err2) return res.status(500).json({ message: err2.message });
+      res.json({ message: 'Order finalized and saved successfully!' });
+    });
+  });
+});
 
-//       if (row) {
-//         insertIntoCart(row.order_no);
-//       } else {
-//         db.run("INSERT INTO orders (customer_id, status) VALUES (?, 'active')", [customer_id], function(err) {
-//           if (err) {
-//             return res.status(500).json({ message: 'Error creating order', error: err.message });
-//           }
-//           insertIntoCart(this.lastID);
-//         });
-//       }
-//     });
 
-//     db.run("INSERT INTO cart (order_no, product_no) VALUES (?, ?)",
-//             [order_no, product_no], function(err) {
-//                 if (err) {
-//                     return res.status(500).json({ message: 'Error adding item to cart: ' + err.message });
-//                 }
-//                 res.status(200).json({ message: 'item added successfully' });
-//             });
-// });
+// GET ORDER HISTORY
+app.get('/order-history', (req, res) => {
+  const userId = req.query.userId;
+
+  if (!userId) return res.status(400).json({ message: 'userId is required' });
+
+  db.all(`
+    SELECT 
+      o.id AS order_id,
+      o.status,
+      o.order_date,
+      c.product_id,
+      c.no_items,
+      p.name,
+      p.price,
+      p.image_url
+    FROM orders o
+    JOIN cart c ON o.id = c.order_id
+    JOIN products p ON p.id = c.product_id
+    WHERE o.customer_id = ? AND o.status != 'active'
+    ORDER BY o.order_date DESC
+  `, [userId], (err, rows) => {
+    if (err) return res.status(500).json({ message: err.message });
+
+    const orders = {};
+    for (const row of rows) {
+      if (!orders[row.order_id]) {
+        orders[row.order_id] = {
+          order_id: row.order_id,
+          status: row.status,
+          order_date: row.order_date,
+          items: [],
+        };
+      }
+      orders[row.order_id].items.push({
+        product_id: row.product_id,
+        name: row.name,
+        price: row.price,
+        image_url: row.image_url,
+        quantity: row.no_items,
+      });
+    }
+
+    res.json(Object.values(orders));
+  });
+});
 
 app.post('/newsletter', (req,res) => {
     const { email } = req.body;
