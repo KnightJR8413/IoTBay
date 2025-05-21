@@ -88,9 +88,6 @@
   <!-- will be injected -->
 </tbody>
 
-
-
-
   <!-- Scripts -->
   <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
   <script>
@@ -187,7 +184,7 @@
       document.querySelector('.btn-clear' ).addEventListener('click', clearFilters);
 
       // the rest of your existing globals…
-      window.viewOrderDetails   = id => window.location.href = `/order-details.html?orderId=${id}`;
+      window.viewOrderDetails   = id => window.location.href = `/order-details?orderId=${id}`;
       window.viewPaymentDetails = id => window.location.href = `/paymenthistory2?orderId=${id}`;
       window.cancelOrder        = id => {
         if (!confirm(`Cancel order ORD-${id}?`)) return;
