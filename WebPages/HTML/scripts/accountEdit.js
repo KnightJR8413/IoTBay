@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteAccountBtn');
 
     editBtn.addEventListener('click', () => {
         const mode = editBtn.dataset.mode;
@@ -8,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (mode === 'view') {
         editBtn.textContent = 'Update';
         editBtn.dataset.mode = 'edit';
+        deleteBtn.style.display = 'inline-block';
 
         document.querySelectorAll('.info-row .info-value')
             .forEach(span => {
@@ -60,6 +62,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
         editBtn.textContent = 'Edit';
         editBtn.dataset.mode = 'view';
+        deleteBtn.style.display = 'none';
+        }
+    });
+
+    deleteBtn.addEventListener('click', async () => {
+        const confirmed = confirm("Are you sure you want to delete your account? This cannot be undone.");
+        if (confirmed) {
+            try {
+                const res = await fetch('http://localhost:3000/delete-account', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!res.ok) throw new Error('Deletion failed');
+                alert("Account deleted successfully.");
+                localStorage.removeItem("token");
+                window.location.href = '/'; // Redirect to homepage
+            } catch (err) {
+                console.error("Delete error:", err);
+                alert("There was a problem deleting your account.");
+            }
         }
     });
 });

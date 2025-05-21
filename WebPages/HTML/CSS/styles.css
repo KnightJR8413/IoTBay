@@ -1515,3 +1515,17 @@ p.text {
 .user-logs-table tr:hover {
     background-color: #f9f9f9;
 }
+
+.delete-btn {
+  float: left;          /* Moves the button to the right */
+  color: red;            /* Red text color */
+  background: transparent; /* Transparent background */
+  border: none;          /* No border */
+  cursor: pointer;       /* Pointer cursor on hover */
+  font-weight: bold;     /* Bold text */
+  padding: 6px 12px;     /* Some padding */
+}
+
+.delete-btn:hover {
+  text-decoration: underline; /* Optional: underline on hover */
+}

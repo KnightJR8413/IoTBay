@@ -193,6 +193,45 @@ app.get('/user-logs', authenticateToken, async (req, res) => {
   }
 });
 
+app.delete('/delete-account', authenticateToken, async (req, res) => {
+    const userId = req.user.userId;
+    function runAsync(db, sql, params = []) {
+        return new Promise((resolve, reject) => {
+            db.run(sql, params, function(err) {
+                if (err) reject(err);
+                else resolve(this);  // `this` is the statement context, e.g. lastID, changes
+            });
+        });
+    }
+
+    try {
+        // Delete logs, customer, and user record
+        await runAsync(db, `
+            UPDATE users
+            SET email = NULL,
+                user_type = 'd'
+            WHERE id = ?;
+        `, [userId]);
+
+        await runAsync(db, `
+            UPDATE customer
+            SET first_name = NULL,
+                last_name = NULL,
+                address_line_1 = NULL,
+                address_line_2 = NULL,
+                password_hash = NULL,
+                marketing = NULL,
+                phone_no = NULL
+            WHERE id = ?;
+        `, [userId]);
+
+        res.json({ message: "Account deleted successfully." });
+    } catch (err) {
+        console.error("Error deleting account:", err);
+        res.status(500).json({ error: "Internal server error." });
+    }
+});
+
 // 1) CREATE PRODUCT
 app.post('/products', (req, res) => {
   const {
