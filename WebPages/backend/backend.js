@@ -370,6 +370,37 @@ app.delete('/cart', (req, res) => {
   });
 });
 
+// CANCEL / DELETE AN ORDER
+app.delete('/orders/:id', (req, res) => {
+  const userId  = req.body.userId;
+  const orderId = parseInt(req.params.id, 10);
+
+  if (!userId) {
+    return res.status(400).json({ message: 'userId is required' });
+  }
+
+  // ensure that order belongs to this user
+  db.get(
+    "SELECT id FROM orders WHERE id = ? AND customer_id = ? AND status != 'active'",
+    [orderId, userId],
+    (err, row) => {
+      if (err) return res.status(500).json({ message: err.message });
+      if (!row) return res.status(404).json({ message: 'Order not found or cannot be cancelled' });
+
+      // delete the cart items
+      db.run("DELETE FROM cart WHERE order_id = ?", [orderId], function(err2) {
+        if (err2) return res.status(500).json({ message: err2.message });
+
+        // delete the order itself
+        db.run("DELETE FROM orders WHERE id = ?", [orderId], function(err3) {
+          if (err3) return res.status(500).json({ message: err3.message });
+          res.json({ message: 'Order cancelled successfully' });
+        });
+      });
+    }
+  );
+});
+
 // SAVE ORDER: Finalize the active order and mark it as completed
 app.post('/update-cart', (req, res) => {
     console.log('Received request on /update-cart with body:', req.body);
@@ -437,6 +468,9 @@ app.get('/order-history', (req, res) => {
     res.json(Object.values(orders));
   });
 });
+
+
+
 
 app.post('/newsletter', (req,res) => {
     const { email } = req.body;

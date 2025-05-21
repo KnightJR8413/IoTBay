@@ -56,16 +56,16 @@
         <!-- Filters Section -->
         <div class="order-filters">
             <div class="filter-group">
+                <label>Order #</label>
+                <input type="text" placeholder="Order Number" class="reference-filter">
+            </div>
+            <div class="filter-group">
                 <label>FROM DATE</label>
                 <input type="date" class="date-filter">
             </div>
             <div class="filter-group">
                 <label>TO DATE</label>
                 <input type="date" class="date-filter">
-            </div>
-            <div class="filter-group">
-                <label>REFERENCE #</label>
-                <input type="text" placeholder="Reference number" class="reference-filter">
             </div>
             <div class="filter-actions">
                 <button class="btn-clear" onclick="clearFilters()">CLEAR</button>
@@ -85,8 +85,99 @@
                 </tr>
             </thead>
             <tbody id="order-history-body">
-                <!-- Orders will be injected here -->
-            </tbody>
+  <!-- will be injected -->
+</tbody>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const API = 'http://localhost:3000';
+    const userId = localStorage.getItem('userId');
+    if (!userId) return alert('Please log in first.');
+
+    // load & render history
+    function fetchHistory() {
+      fetch(`${API}/order-history?userId=${userId}`)
+        .then(r => r.json())
+        .then(data => {
+          const tbody = document.getElementById('order-history-body');
+          tbody.innerHTML = '';
+          if (!data.length) {
+            tbody.innerHTML = `<tr><td colspan="5">No past orders found.</td></tr>`;
+            return;
+          }
+          data.forEach(order => {
+            const total = order.items
+                          .reduce((sum, i) => sum + i.price * i.quantity, 0)
+                          .toFixed(2);
+            const count = order.items
+                          .reduce((sum, i) => sum + i.quantity, 0);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>ORD-${order.order_id}</td>
+              <td>${new Date(order.order_date).toLocaleString()}</td>
+              <td>$${total}</td>
+              <td>${count} item${count>1?'s':''}</td>
+              <td class="actions">
+                <button class="btn-view" onclick="viewOrderDetails(${order.order_id})">
+                  View Order Details
+                </button>
+                <button class="btn-payment" onclick="viewPaymentDetails(${order.order_id})">
+                  View Payment Details
+                </button>
+                <button class="btn-cancel" onclick="cancelOrder(${order.order_id})">
+                  Cancel
+                </button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(e => console.error('Error fetching order history:', e));
+    }
+
+    // go to a details page
+    window.viewOrderDetails = id =>
+      window.location.href = `/order-details.html?orderId=${id}`;
+
+    // simple pass‐through
+    window.viewPaymentDetails = id =>
+      window.location.href = `/payment-details.html?orderId=${id}`;
+
+    // cancel and reload
+    window.cancelOrder = rawId => {
+      // ensure numeric
+      const orderId = typeof rawId === 'string'
+        ? parseInt(rawId.replace(/^ORD-/, ''), 10)
+        : rawId;
+
+      if (!confirm(`Are you sure you want to cancel order ORD-${orderId}?`))
+        return;
+
+      fetch(`${API}/orders/${orderId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      })
+      .then(r => {
+        if (!r.ok) return r.json().then(j => Promise.reject(j.message));
+        return r.json();
+      })
+      .then(() => {
+        alert(`Order ORD-${orderId} cancelled.`);
+        fetchHistory();
+      })
+      .catch(msg => {
+        console.error('Cancel order failed:', msg);
+        alert(`Could not cancel order: ${msg}`);
+      });
+    };
+
+    // kick it off
+    fetchHistory();
+  });
+</script>
+
         </table>
     </main>
 
