@@ -1,91 +1,49 @@
+<!--HEADER COPY START HERE-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Edit Payment Method - IoTBay</title>
-  <link rel="stylesheet" href="CSS/styles.css" />
-  <style>
-    .edit-payment-container {
-      max-width: 600px;
-      margin: 60px auto;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
-
-    .edit-payment-container h2 {
-      color: #3a4163;
-      text-align: center;
-      margin-bottom: 25px;
-    }
-
-    .edit-payment-form label {
-      font-weight: bold;
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      color: #3a4163;
-    }
-
-    .edit-payment-form input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-
-    .edit-payment-form button {
-      margin-top: 25px;
-      width: 100%;
-      padding: 15px;
-      font-size: 1rem;
-      font-weight: bold;
-      color: white;
-      background-color: #007BFF;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s ease-in-out;
-    }
-
-    .edit-payment-form button:hover {
-      background-color: #0056b3;
-    }
-
-    .back-link {
-      display: block;
-      margin-top: 20px;
-      text-align: center;
-      text-decoration: none;
-      color: #007BFF;
-      font-weight: bold;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoTBay - Home</title>
+    <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
 </head>
 <body>
-
-  <div class="navbar">
-    <div class="logo">
-      <a href="index.html">
-        <img src="images/logo.png" width="125px" alt="IoTBay Logo" />
-      </a>
+    <div class="navbar">
+        <div class="logo">
+            <a href="/index">
+                <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
+            </a>
+        </div>
+        <nav>  
+            <ul>
+                <li><a href="/index">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/contact">Contact</a></li>                
+            </ul>
+        </nav>
+        <div class="icon-buttons">
+            <button class="icon-btn" onclick="toggleSearchBar();">
+                <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
+            </button>
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
+                <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
+            </button>                
+            <button class="icon-btn" onclick="location.href='/shoppingcart';">
+                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shoppingcart" class="icon-img">
+            </button>
+        </div>
     </div>
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="products.html">Products</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
-  </div>
+
+    <div id="search-bar" class="search-bar">
+        <input type="text" placeholder="Search products..." id="search-input">
+        <button onclick="searchProduct()">Search</button>
+        <button onclick="toggleSearchBar()">Close</button>
+    </div>
+
+    <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+
+<!--HEADER COPY END HERE-->
 
   <section class="hero">
     <h1>Edit Payment Method</h1>
@@ -109,7 +67,7 @@
 
       <button type="submit">Save Changes</button>
     </form>
-    <a href="paymenthistory2.html" class="back-link">← Back to Payment History</a>
+    <a href="paymenthistory2" class="back-link">← Back to Payment History</a>
   </div>
 
   <footer>
@@ -134,6 +92,47 @@
       <p>&copy; 2025 IoTBay. All rights reserved.</p>
     </div>
   </footer>
+
+<script>
+document.querySelector('.edit-payment-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  console.log("🚀 Submit button clicked");
+
+  const id = localStorage.getItem('edit_payment_id');
+  console.log("Editing card ID:", id);
+
+  const data = {
+    card_no: document.getElementById('cardnumber').value,
+    expiry_date: document.getElementById('expiry').value,
+    cvc: document.getElementById('cvc').value,
+    name: document.getElementById('cardholder').value
+  };
+
+  try {
+    const res = await fetch(`http://localhost:3000/payments/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    console.log("Update response:", result);
+
+    if (res.ok) {
+      window.location.href = 'paymenthistory2';
+    } else {
+      alert(result.message);
+    }
+  } catch (err) {
+    console.error("Update failed:", err);
+    alert("Something went wrong.");
+  }
+});
+</script>
+
 
 </body>
 </html>

@@ -1529,3 +1529,63 @@ p.text {
 .delete-btn:hover {
   text-decoration: underline; /* Optional: underline on hover */
 }
+
+.edit-payment-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.edit-payment-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.edit-payment-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-payment-form label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  margin-top: 1rem;
+}
+
+.edit-payment-form input {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.edit-payment-form button {
+  margin-top: 1.5rem;
+  padding: 0.8rem;
+  font-size: 1rem;
+  background-color: #0066e6;
+  color: white;
+  border: none;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 1.2rem;
+  padding: 0.6rem 1rem;
+  text-align: center;
+  background-color: #e6f0ff;
+  color: #0066e6;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.back-link:hover {
+  background-color: #d0e5ff;
+  color: #0047a0;
+}
