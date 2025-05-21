@@ -106,57 +106,67 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const API = 'http://localhost:3000';
-    const userId = localStorage.getItem('userId');
-    const params = new URLSearchParams(window.location.search);
+    const API     = 'http://localhost:3000';
+    const params  = new URLSearchParams(window.location.search);
     const orderId = parseInt(params.get('orderId'), 10);
 
     const container = document.getElementById('details-content');
-    if (!userId || isNaN(orderId)) {
-      container.innerHTML = '<p style="color:red">Invalid order or you are not logged in.</p>';
+
+    // --- get userId from token, not localStorage.userId ---
+    const token = localStorage.getItem('token');
+    if (!token) {
+      container.innerHTML = '<p style="color:red">Please log in to view this page.</p>';
+      return;
+    }
+    let payload;
+    try {
+      payload = JSON.parse(atob(token.split('.')[1]));
+    } catch {
+      container.innerHTML = '<p style="color:red">Invalid token—please log in again.</p>';
+      return;
+    }
+    const userId = payload.userId;
+
+    if (isNaN(orderId)) {
+      container.innerHTML = '<p style="color:red">Invalid order ID.</p>';
       return;
     }
 
-    // fetch all orders, then pick out the one we need
+    // fetch all past orders, then pick out the one we need
     fetch(`${API}/order-history?userId=${userId}`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`Server responded ${r.status}`);
+        return r.json();
+      })
       .then(orders => {
         const order = orders.find(o => o.order_id === orderId);
         if (!order) {
           container.innerHTML = '<p>No such order found.</p>';
           return;
         }
-
-        // build a table of items
+        // render it...
         let html = `
           <h2>Order ORD-${orderId}</h2>
           <p><strong>Date:</strong> ${new Date(order.order_date).toLocaleString()}</p>
           <table class="orders-table" style="width:100%;border-collapse:collapse;">
             <thead>
               <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Subtotal</th>
+                <th>Product</th><th>Price</th><th>Quantity</th><th>Subtotal</th>
               </tr>
-            </thead>
-            <tbody>
+            </thead><tbody>
         `;
-
         let total = 0;
         order.items.forEach(item => {
-          const subtotal = (item.price * item.quantity).toFixed(2);
-          total += parseFloat(subtotal);
+          const sub = item.price * item.quantity;
+          total += sub;
           html += `
             <tr>
               <td>${item.name}</td>
               <td>$${item.price.toFixed(2)}</td>
               <td>${item.quantity}</td>
-              <td>$${subtotal}</td>
-            </tr>
-          `;
+              <td>$${sub.toFixed(2)}</td>
+            </tr>`;
         });
-
         html += `
             </tbody>
             <tfoot>
@@ -167,7 +177,6 @@
             </tfoot>
           </table>
         `;
-
         container.innerHTML = html;
       })
       .catch(err => {
@@ -176,5 +185,6 @@
       });
   });
 </script>
+
 </body>
 </html>
