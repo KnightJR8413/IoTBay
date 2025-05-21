@@ -160,7 +160,7 @@
                 return;
             }
 
-            fetch(`/order-history?userId=${userId}`)
+            fetch(`http://localhost:3000/order-history?userId=${userId}`)
                 .then(response => response.json())
                 .then(data => {
                     const tbody = document.getElementById('order-history-body');

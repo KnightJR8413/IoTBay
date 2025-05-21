@@ -51,24 +51,6 @@
 </section>
 
 <main class="cart-container">
-    
-    <!-- Add to existing cart page -->
-<!-- <div class="order-management">
-    <div class="search-order">
-        <input type="text" id="order-search" placeholder="Search by Order Number">
-        <input type="date" id="date-search">
-        <button onclick="searchOrders()">Search Orders</button>
-    </div>
-
-    <div class="cart-actions">
-        <button class="btn-save-draft" onclick="saveAsDraft()">Save Draft</button>
-        <button class="btn-submit" onclick="submitOrder()">Submit Order</button>
-    </div>
-
-    <div id="draft-section" class="draft-notice">
-        Draft status will load here
-    </div>
-</div> -->
 
     <div class="cart-content">
   <!-- Cart Items Section -->
@@ -109,26 +91,35 @@
         updateTotals();
     }
     
-    // Save Cart
-    function saveCart() {
-        const cartItems = [];
-        document.querySelectorAll('.cart-item').forEach(item => {
-            cartItems.push({
-                product: item.querySelector('h3').innerText,
-                quantity: item.querySelector('.qty-input').value,
-                price: parseFloat(item.querySelector('.price').innerText.replace('$',''))
-            });
-        });
-        
-        // Send to backend
-        fetch('http://localhost:3000/update-cart', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(cartItems)
-        }).then(response => {
-            alert('Cart saved successfully!');
-        });
-    }
+function saveCart() {
+  // grab the userId
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    return alert('No userId found – please add something to your cart first.');
+  }
+  fetch('http://localhost:3000/update-cart', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({ userId })      // ← only the userId
+  })
+  .then(res => {
+    if (!res.ok) throw res;
+    return res.json();
+  })
+  .then(json => {
+    alert('✅ Cart saved as an order!');
+    // optionally redirect to /order-history
+    // location.href = '/orderhistory';
+  })
+  .catch(async err => {
+    let msg = err instanceof Response
+      ? (await err.json()).message
+      : err.message;
+    console.error('Save-order failed:', msg);
+    alert('❌ Couldn’t save your order: ' + msg);
+  });
+}
+
     
     // Calculate Totals
     function updateTotals() {
