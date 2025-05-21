@@ -7,7 +7,7 @@ CREATE TABLE if NOT EXISTS users (
 
 CREATE TABLE if NOT EXISTS customer (
     id INTEGER PRIMARY KEY,
-    phone_no VARCHAR(10),
+    phone_no TEXT,
     first_name TEXT,
     last_name TEXT,
     password_hash TEXT,
@@ -19,7 +19,7 @@ CREATE TABLE if NOT EXISTS customer (
 
 CREATE TABLE if NOT EXISTS staff (
     id INTEGER PRIMARY KEY,
-    phone_no VARCHAR(10),
+    phone_no TEXT,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     password_hash TEXT,

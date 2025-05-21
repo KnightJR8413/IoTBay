@@ -122,6 +122,7 @@ function logoutUser() {
       .catch(error => {
         console.error('Error logging out:', error);
       });
+      window.location.href = '/logout'
   }
 
 // Attach logout function to button if it exists

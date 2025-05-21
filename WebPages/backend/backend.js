@@ -112,17 +112,17 @@ app.post('/login', (req, res) => {
         
         const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name, last_name: row.last_name }, SECRET_KEY, { expiresIn: '1h' });
         res.status(200).json({ message: 'Login successful!', token });
-        logAction(email, 'successful login');
+        logAction(email, 'login');
     });
 });
 
 app.post('/update-customer', authenticateToken, async (req, res) => {
     const { first_name, last_name, email, address_line_1, address_line_2, phone_no } = req.body;
-    const userId = req.user.id; 
+    const userId = req.user.userId; 
 
     try {
-        await db.run("UPDATE user SET email = ? WHERE id = ?", [email, userId]);
-        await db.run("UPDATE customer SET first_name = ?, last_name = ?, phone_no = ?, address_line_1 = ?, address_line_2 = ? WHERE user_id = ?",
+        await db.run("UPDATE users SET email = ? WHERE id = ?", [email, userId]);
+        await db.run("UPDATE customer SET first_name = ?, last_name = ?, phone_no = ?, address_line_1 = ?, address_line_2 = ? WHERE id = ?",
             [first_name, last_name, phone_no, address_line_1, address_line_2, userId]);
 
         res.json({ message: 'User and customer info updated successfully.' });
@@ -130,6 +130,67 @@ app.post('/update-customer', authenticateToken, async (req, res) => {
         console.error(err);
         res.status(500).json({ error: "Failed to update user info" });
     }
+});
+
+app.get('/user-details', authenticateToken, async (req, res) => {
+    const getAsync = (sql, params) => {
+        return new Promise((resolve, reject) => {
+            db.get(sql, params, (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+    };
+    const userId = req.user.userId;
+    try {
+        const user = await getAsync('SELECT email FROM users WHERE id = ?', [userId]);
+
+        const customer = await getAsync(`
+            SELECT first_name, last_name, phone_no, address_line_1, address_line_2
+            FROM customer WHERE id = ?
+        `, [userId]);
+
+        if (!user || !customer) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({
+            email: user.email,
+            first_name: customer.first_name,
+            last_name: customer.last_name,
+            phone_no: customer.phone_no,
+            address_line_1: customer.address_line_1,
+            address_line_2: customer.address_line_2
+        });
+
+    } catch (err) {
+        console.error('Error fetching user details:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/user-logs', authenticateToken, async (req, res) => {
+    const getAsync = (sql, params) => {
+        return new Promise((resolve, reject) => {
+            db.all(sql, params, (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+    };
+  const userId = req.user.userId;
+
+  try {
+    const logs = await getAsync(
+      'SELECT type, date FROM user_logs WHERE user_id = ? AND (type = "login" OR type = "logout") ORDER BY date DESC',
+      [userId]
+    );
+
+    res.json(logs);
+  } catch (err) {
+    console.error('Error fetching user logs:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // 1) CREATE PRODUCT
@@ -370,22 +431,6 @@ app.post('/newsletter', (req,res) => {
     });
 });
 
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-
-    if (!token) {
-        return res.status(401).json({ message: "Unauthorized: No token provided." });
-    }
-
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: "Token is invalid or expired." });
-        }
-        req.user = user;
-        next();
-    });
-}
 
 // Check Login Status (for session persistence)
 app.get("/check-session", authenticateToken, (req, res) => {

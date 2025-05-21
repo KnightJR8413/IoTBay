@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
             input.parentNode.replaceChild(span, input);
             });
 
-        fetch('http://localhost:3000/update-user', {
+        fetch('http://localhost:3000/update-customer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
