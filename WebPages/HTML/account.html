@@ -44,6 +44,7 @@
     <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
     <script src="{{ url_for('serve_js', filename='frontend.js') }}"></script>
     <script src="{{ url_for('serve_js', filename='welcome.js') }}"></script>
+    <script src="{{ url_for('serve_js', filename='accountEdit.js') }}"></script>
 </body>
 </html>
 <!--HEADER COPY END HERE-->
@@ -63,7 +64,7 @@
                     <li><a href="#"><i class="icon-heart"></i>Details</a></li>
                     <li><a href="/orderhistory"><i class="icon-package"></i>Order History</a></li>
                     <li><a href="/paymenthistory2"><i class="icon-eye"></i>Payment History</a></li>
-                    <li><a href="#"><i class="icon-eye"></i>Recently Viewed</a></li>
+                    <li><a href="#"><i class="icon-eye"></i>User Logs</a></li>
                     <li><a href="/logout" onclick="logoutUser();" class="logout-link"><i class="icon-log-out"></i>Log Out</a></li>
                 </ul>
             </nav>
@@ -87,15 +88,19 @@
                     </div>
                     <div class="info-row">
                         <span class="info-label">Email:</span>
-                        <span class="info-value" id="user_email">Email</span>
+                        <span class="info-value" id="email">Email</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Address:</span>
-                        <span class="info-value"></span>
+                        <span class="info-label">Address line 1:</span>
+                        <span class="info-value" id="address_line_1" ></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Address line 2:</span>
+                        <span class="info-value" id="address_line_2" ></span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Contact Number:</span>
-                        <span class="info-value"></span>
+                        <span class="info-value" id="phone_no"></span>
                     </div>
                                       
                     <!-- Additional Spacing Elements -->
@@ -108,52 +113,6 @@
                     <!-- <a href="/changeDetails" onclick="changeDetails();" class="btn">Edit Details</a> -->
                 </div>
             </div>
-            <script>
-                const editBtn = document.getElementById('editBtn');
-              
-                editBtn.addEventListener('click', () => {
-                  const mode = editBtn.dataset.mode;
-              
-                  // EDIT MODE: swap spans → inputs
-                  if (mode === 'view') {
-                    editBtn.textContent = 'Update';
-                    editBtn.dataset.mode = 'edit';
-              
-                    document.querySelectorAll('.info-row .info-value')
-                      .forEach(span => {
-                        const value = span.textContent.trim();
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.value = value;
-                        input.className = 'info-input';
-                        // Optional: give name attributes so you can serialize later
-                        input.name = span.id || '';  // e.g. first_name, last_name, etc.
-                        span.parentNode.replaceChild(input, span);
-                      });
-                  }
-              
-                  // UPDATE MODE: swap inputs → spans
-                  else {
-                    // collect the new values if you need to POST them
-                    const payload = {};
-              
-                    document.querySelectorAll('.info-row input.info-input')
-                      .forEach(input => {
-                        const span = document.createElement('span');
-                        span.className = 'info-value';
-                        span.id = input.name;        // preserve the id
-                        span.textContent = input.value;
-                        payload[input.name] = input.value;
-                        input.parentNode.replaceChild(span, input);
-                      });
-              
-                    // TODO: send `payload` up to your server here via fetch/AJAX
-              
-                    editBtn.textContent = 'Edit';
-                    editBtn.dataset.mode = 'view';
-                  }
-                });
-              </script>
               
         </div>
     </div>

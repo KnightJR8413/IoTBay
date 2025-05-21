@@ -9,19 +9,19 @@ CREATE TABLE if NOT EXISTS customer (
     id INTEGER PRIMARY KEY,
     phone_no VARCHAR(10),
     first_name TEXT,
-    surname TEXT,
+    last_name TEXT,
     password_hash TEXT,
+    address_line_1 TEXT,
+    address_line_2 TEXT,
     marketing BOOLEAN DEFAULT 'off',
-    address_id INTEGER,
-    FOREIGN KEY (id) REFERENCES users(id),
-    FOREIGN KEY (address_id) REFERENCES address(id)
+    FOREIGN KEY (id) REFERENCES users(id)
 );
 
 CREATE TABLE if NOT EXISTS staff (
     id INTEGER PRIMARY KEY,
     phone_no VARCHAR(10),
     first_name TEXT NOT NULL,
-    surname TEXT NOT NULL,
+    last_name TEXT NOT NULL,
     password_hash TEXT,
     FOREIGN KEY (id) REFERENCES users(id)
 );
@@ -71,17 +71,17 @@ CREATE TABLE if NOT EXISTS product_tags (
     FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 
-CREATE TABLE if NOT EXISTS address (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    apartment_no INTEGER,
-    street_no VARCHAR(8) NOT NULL,
-    address_line_1 TEXT NOT NULL,
-    address_line_2 TEXT,
-    city TEXT NOT NULL,
-    state TEXT NOT NULL,
-    country TEXT NOT NULL,
-    postcode INTEGER NOT NULL
-);
+-- CREATE TABLE if NOT EXISTS address (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     user_id,
+--     address_line_1 TEXT NOT NULL,
+--     address_line_2 TEXT,
+--     city TEXT NOT NULL,
+--     state TEXT NOT NULL,
+--     country TEXT NOT NULL,
+--     postcode INTEGER NOT NULL,
+--     FOREIGN KEY (user_id) REFERENCES users(id)
+-- );
 
 CREATE TABLE if NOT EXISTS payment (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

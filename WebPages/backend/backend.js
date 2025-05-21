@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const db = require('./database');
 const cors = require("cors");
+const authenticateToken = require('./authenticateToken');
 
 const app = express();
 const port = 3000;
@@ -27,9 +28,9 @@ app.use(cors()); // allowing request through
 
 // Customer registration
 app.post('/register', (req, res) => {
-    const { email, first_name, surname, password, marketing } = req.body;
+    const { email, first_name, last_name, password, marketing } = req.body;
 
-    if (!email || !first_name || !surname || !password) {
+    if (!email || !first_name || !last_name || !password) {
         return res.status(400).json({ message: 'All fields are required!' });
     }
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,8 +66,8 @@ app.post('/register', (req, res) => {
                         id = row2;
                     }
                 });
-                db.run("INSERT INTO customer (id, first_name, surname, password_hash, marketing) values (?,?,?,?,?)",
-                    [id, first_name, surname, hashedPassword, marketing], function (err3) {
+                db.run("INSERT INTO customer (id, first_name, last_name, password_hash, marketing) values (?,?,?,?,?)",
+                    [id, first_name, last_name, hashedPassword, marketing], function (err3) {
                         if (err3){
                             logAction(email, 'unsuccessful register');
                             return res.status(500).json({ message: 'Error registering user: ' + err3.message });
@@ -109,10 +110,26 @@ app.post('/login', (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password.' });
         }
         
-        const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name, last_name: row.surname }, SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name, last_name: row.last_name }, SECRET_KEY, { expiresIn: '1h' });
         res.status(200).json({ message: 'Login successful!', token });
         logAction(email, 'successful login');
     });
+});
+
+app.post('/update-customer', authenticateToken, async (req, res) => {
+    const { first_name, last_name, email, address_line_1, address_line_2, phone_no } = req.body;
+    const userId = req.user.id; 
+
+    try {
+        await db.run("UPDATE user SET email = ? WHERE id = ?", [email, userId]);
+        await db.run("UPDATE customer SET first_name = ?, last_name = ?, phone_no = ?, address_line_1 = ?, address_line_2 = ? WHERE user_id = ?",
+            [first_name, last_name, phone_no, address_line_1, address_line_2, userId]);
+
+        res.json({ message: 'User and customer info updated successfully.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to update user info" });
+    }
 });
 
 // 1) CREATE PRODUCT

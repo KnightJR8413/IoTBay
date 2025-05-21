@@ -7,11 +7,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const formData = {
                 email: document.getElementById("email").value,
                 first_name: document.getElementById("first_name").value,
-                surname: document.getElementById("surname").value,
+                last_name: document.getElementById("last_name").value,
                 password: document.getElementById("password").value,
                 marketing: document.getElementById("marketing").checked
             };
-            console.log(formData.marketing);
+
             try {
                 const response = await fetch("http://localhost:3000/register", {
                     method: "POST",
