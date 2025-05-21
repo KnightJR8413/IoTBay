@@ -47,75 +47,19 @@
 <!--HEADER COPY END HERE-->
 
 <main>
-    <div class="products-container">
-        <div class="sidebar">
-            <a>Smart home</a>
-            <a>Laptops</a>
-            <a>Accessories</a>
-            <a>Network</a> 
-        </div>
-    
-        <section class="products-hero">        
-
-            <div class="products-grid">    
-
-                <div class="product-card">
-                    <img src="{{ url_for('serve_images', filename='ring cam.png')}}" alt="Ring Camera" style="width:100%">
-                    <h3>Ring Camera</h3>
-                    <p>Ring Doorbell Camera</p>
-                    <div class="rating">⭐ 4.6</div>
-                    <div class="price">$64.99</div>
-                    <button class="buy-btn">Add to Cart</button></p>
-                </div>
-                
-                <div class="product-card">
-                    <img src="{{ url_for('serve_images', filename='ring cam.png')}}" alt="Ring Camera" style="width:100%">
-                    <h3>Ring Camera</h3>
-                    <p>Ring Doorbell Camera</p>
-                    <div class="rating">⭐ 4.6</div>
-                    <div class="price">$64.99</div>
-                    <button class="buy-btn">Add to Cart</button></p>
-                </div>
-
-                <div class="product-card">
-                    <img src="{{ url_for('serve_images', filename='sensor light.png')}}" alt="Sensor Light">
-                    <h3>Infrared Sensor Light</h3>
-                    <p>Automatcally lights up!</p>
-                    <div class="rating">⭐ 4.4</div>
-                    <div class="price">$39.99</div>
-                    <button class="buy-btn">Add to Cart</button></p>
-                </div>
-
-                <div class="product-card">
-                    <img src="{{ url_for('serve_images', filename='ring cam.png')}}" alt="Ring Camera">
-                    <h3>Ring Camera</h3>
-                    <p>Ring Doorbell Camera</p>
-                    <div class="rating">⭐ 4.6</div>
-                    <div class="price">$64.99</div>
-                    <button class="buy-btn">Add to Cart</button></p>
-                </div>
-
-                <div class="product-card">
-                    <img src="{{ url_for('serve_images', filename='sensor light.png')}}" alt="Sensor Light" style="width:100%">
-                    <h3>Infrared Sensor Light</h3>
-                    <p>Automatcally lights up!</p>
-                    <div class="rating">⭐ 4.4</div>
-                    <div class="price">$39.99</div>
-                    <button class="buy-btn">Add to Cart</button></p>
-                </div>
-
-                <div class="product-card">
-                    <img src="{{ url_for('serve_images', filename='ring cam.png')}}" alt="Ring Camera" style="width:100%">
-                    <h3>Ring Camera</h3>
-                    <p>Ring Doorbell Camera</p>
-                    <div class="rating">⭐ 4.6</div>
-                    <div class="price">$64.99</div>
-                    <button class="buy-btn">Add to Cart</button></p>
-                </div>
-            </div>
-        </section>
+  <div class="products-container">
+    <div class="sidebar">
+      <!-- ... -->
     </div>
+
+    <section class="products-hero">
+      <div class="products-grid" id="products-grid">
+        <!-- JS will inject .product-card elements here -->
+      </div>
+    </section>
+  </div>
 </main>
+
 
     <footer>
         <div class="footer-links">

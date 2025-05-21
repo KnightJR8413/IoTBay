@@ -51,81 +51,28 @@
 </section>
 
 <main class="cart-container">
-    
-    <!-- Add to existing cart page -->
-<!-- <div class="order-management">
-    <div class="search-order">
-        <input type="text" id="order-search" placeholder="Search by Order Number">
-        <input type="date" id="date-search">
-        <button onclick="searchOrders()">Search Orders</button>
-    </div>
-
-    <div class="cart-actions">
-        <button class="btn-save-draft" onclick="saveAsDraft()">Save Draft</button>
-        <button class="btn-submit" onclick="submitOrder()">Submit Order</button>
-    </div>
-
-    <div id="draft-section" class="draft-notice">
-        Draft status will load here
-    </div>
-</div> -->
 
     <div class="cart-content">
-        <!-- Cart Items Section -->
-        <div class="cart-items">
-            <div class="cart-item">
-                <!-- <img src="{{ url_for('serve_images', filename='product1.jpg') }}" alt="IoT Sensor"> -->
-                <div class="item-details">
-                    <h3>Smart Temperature Sensor</h3>
-                    <p class="price">$89.99</p>
-                    <div class="quantity-control">
-                        <button class="qty-btn" onclick="updateQuantity(this, -1)">-</button>
-                        <input type="number" class="qty-input" value="1" min="1">
-                        <button class="qty-btn" onclick="updateQuantity(this, 1)">+</button>
-                    </div>
-                </div>
-                <button class="remove-btn" onclick="removeItem(this)">Remove</button>
-            </div>
+  <!-- Cart Items Section -->
+  <div class="cart-items" id="cart-items">
+    <!-- JS will dynamically render .cart-item elements here -->
+  </div>
 
-            <div class="cart-item">
-                <div class="item-details">
-                    <h3>Smart Temperature Sensor</h3>
-                    <p class="price">$89.99</p>
-                    <div class="quantity-control">
-                        <button class="qty-btn" onclick="updateQuantity(this, -1)">-</button>
-                        <input type="number" class="qty-input" value="1" min="1">
-                        <button class="qty-btn" onclick="updateQuantity(this, 1)">+</button>
-                    </div>
-                </div>
-                <button class="remove-btn" onclick="removeItem(this)">Remove</button>
-            </div>
-
-
-        </div>
-
-        <!-- Order Summary -->
-        <div class="order-summary">
-            <h2>Order Summary</h2>
-            <div class="summary-details">
-                <div class="summary-row">
-                    <span>Subtotal:</span>
-                    <span class="subtotal">$89.99</span>
-                </div>
-                <div class="summary-row">
-                    <span>Tax (10%):</span>
-                    <span class="tax">$8.99</span>
-                </div>
-                <div class="summary-row total">
-                    <span>Total:</span>
-                    <span class="total-amount">$98.98</span>
-                </div>
-            </div>
-            <div class="cart-actions">
-                <button class="btn-checkout" onclick="location.href='/checkout'">Checkout</button>
-                <button class="btn-save" onclick="saveCart()">Save Order</button>
-            </div>
-        </div>
+  <!-- Order Summary -->
+  <div class="order-summary">
+    <h2>Order Summary</h2>
+    <div class="summary-details">
+      <div class="summary-row total">
+        <span>Total:</span>
+        <span class="total-amount">$0.00</span>
+      </div>
     </div>
+    <div class="cart-actions">
+      <button class="btn-checkout" onclick="location.href='/checkout'">Checkout</button>
+      <button class="btn-save" onclick="saveCart()">Save Order</button>
+    </div>
+  </div>
+</div>
 </main>
 
 <script>
@@ -144,43 +91,48 @@
         updateTotals();
     }
     
-    // Save Cart
-    function saveCart() {
-        const cartItems = [];
-        document.querySelectorAll('.cart-item').forEach(item => {
-            cartItems.push({
-                product: item.querySelector('h3').innerText,
-                quantity: item.querySelector('.qty-input').value,
-                price: parseFloat(item.querySelector('.price').innerText.replace('$',''))
-            });
-        });
-        
-        // Send to backend
-        fetch('/update-cart', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(cartItems)
-        }).then(response => {
-            alert('Cart saved successfully!');
-        });
-    }
+function saveCart() {
+  // grab the userId
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    return alert('No userId found – please add something to your cart first.');
+  }
+  fetch('http://localhost:3000/update-cart', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({ userId })      // ← only the userId
+  })
+  .then(res => {
+    if (!res.ok) throw res;
+    return res.json();
+  })
+  .then(json => {
+    alert('✅ Cart saved as an order!');
+    // optionally redirect to /order-history
+    // location.href = '/orderhistory';
+  })
+  .catch(async err => {
+    let msg = err instanceof Response
+      ? (await err.json()).message
+      : err.message;
+    console.error('Save-order failed:', msg);
+    alert('❌ Couldn’t save your order: ' + msg);
+  });
+}
+
     
     // Calculate Totals
     function updateTotals() {
-        let subtotal = 0;
-        document.querySelectorAll('.cart-item').forEach(item => {
-            const price = parseFloat(item.querySelector('.price').innerText.replace('$',''));
-            const qty = parseInt(item.querySelector('.qty-input').value);
-            subtotal += price * qty;
-        });
-        
-        const tax = subtotal * 0.10;
-        const total = subtotal + tax;
-        
-        document.querySelector('.subtotal').textContent = `$${subtotal.toFixed(2)}`;
-        document.querySelector('.tax').textContent = `$${tax.toFixed(2)}`;
-        document.querySelector('.total-amount').textContent = `$${total.toFixed(2)}`;
-    }
+    let total = 0;
+    document.querySelectorAll('.cart-item').forEach(item => {
+        const price = parseFloat(item.querySelector('.price').innerText.replace('$',''));
+        const qty = parseInt(item.querySelector('.qty-input').value);
+        total += price * qty;
+    });
+
+    const totalElem = document.querySelector('.total-amount');
+    if(totalElem) totalElem.textContent = `$${total.toFixed(2)}`;
+}
     
     // Initial calculation
     updateTotals();

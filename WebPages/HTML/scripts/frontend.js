@@ -7,11 +7,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const formData = {
                 email: document.getElementById("email").value,
                 first_name: document.getElementById("first_name").value,
-                surname: document.getElementById("surname").value,
+                last_name: document.getElementById("last_name").value,
                 password: document.getElementById("password").value,
                 marketing: document.getElementById("marketing").checked
             };
-            console.log(formData.marketing);
+
             try {
                 const response = await fetch("http://localhost:3000/register", {
                     method: "POST",
@@ -89,6 +89,10 @@ function loginUser(email, password){
     .then(data => {
         if (data.token) {
             localStorage.setItem('token', data.token);
+            const token = data.token;
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const customer_id = payload.userId;
+            localStorage.setItem('customer_id', customer_id);
             window.location.href = '/welcome';
         } else {
             alert(data.error || 'Login failed');
@@ -96,8 +100,6 @@ function loginUser(email, password){
     })
     .catch(error => console.error('Error:', error));
 };
-
-
 
 // Logout user (Clear token)
 function logoutUser() {
@@ -114,11 +116,13 @@ function logoutUser() {
         console.log(data.message);
   
         localStorage.removeItem('token');
-
+        localStorage.removeItem('customer_id');
+        
       })
       .catch(error => {
         console.error('Error logging out:', error);
       });
+      window.location.href = '/logout'
   }
 
 // Attach logout function to button if it exists
@@ -128,3 +132,38 @@ document.addEventListener("DOMContentLoaded", function () {
         logoutButton.addEventListener("click", logout);
     }
 });
+
+async function addToCart(product_no) {
+  // Check if we already have a stored customer ID
+  let customer_id = localStorage.getItem('customer_id');
+
+  const payload = { product_no };
+  if (customer_id) {
+    payload.customer_id = parseInt(customer_id);
+  }
+
+  try {
+    const response = await fetch('/cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // If a customer_id was returned (new guest), store it
+      if (data.customer_id) {
+        localStorage.setItem('customer_id', data.customer_id);
+      }
+      console.log('Item added to cart:', data.message);
+    } else {
+      console.error('Error:', data.message);
+    }
+
+  } catch (err) {
+    console.error('Fetch error:', err);
+  }
+}

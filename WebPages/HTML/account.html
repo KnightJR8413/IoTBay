@@ -44,6 +44,7 @@
     <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
     <script src="{{ url_for('serve_js', filename='frontend.js') }}"></script>
     <script src="{{ url_for('serve_js', filename='welcome.js') }}"></script>
+    <script src="{{ url_for('serve_js', filename='accountEdit.js') }}"></script>
 </body>
 </html>
 <!--HEADER COPY END HERE-->
@@ -61,10 +62,10 @@
             <nav class="account-nav">
                 <ul>
                     <li><a href="#"><i class="icon-heart"></i>Details</a></li>
-                    <li><a href="#"><i class="icon-package"></i>Order History</a></li>
-                    <li><a href="#"><i class="icon-eye"></i>Payment History</a></li>
-                    <li><a href="#"><i class="icon-eye"></i>Recently Viewed</a></li>
-                    <li><a href="/logout" onclick="logoutUser();" class="logout-link"><i class="icon-log-out"></i>Log Out</a></li>
+                    <li><a href="/orderhistory"><i class="icon-package"></i>Order History</a></li>
+                    <li><a href="/paymenthistory2"><i class="icon-eye"></i>Payment History</a></li>
+                    <li><a href="/userlogs"><i class="icon-eye"></i>User Logs</a></li>
+                    <li><a href="#" onclick="logoutUser();" class="logout-link"><i class="icon-log-out"></i>Log Out</a></li>
                 </ul>
             </nav>
 
@@ -80,22 +81,25 @@
                         <span class="info-label">First Name:</span>
                         <span class="info-value" id="first_name">User</span>
                     </div>
-
                     <div class="info-row">
                         <span class="info-label">Last Name:</span>
                         <span class="info-value" id="last_name"></span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Email:</span>
-                        <span class="info-value" id="user_email">Email</span>
+                        <span class="info-value" id="email">Email</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Address:</span>
-                        <span class="info-value"></span>
+                        <span class="info-label">Address line 1:</span>
+                        <span class="info-value" id="address_line_1" ></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Address line 2:</span>
+                        <span class="info-value" id="address_line_2" ></span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Contact Number:</span>
-                        <span class="info-value"></span>
+                        <span class="info-value" id="phone_no"></span>
                     </div>
                                       
                     <!-- Additional Spacing Elements -->
@@ -104,56 +108,11 @@
                 </div>
                 
                 <div class="info-actions">
+                    <button id="deleteAccountBtn" class="delete-btn" style="display: none;">Delete Account</button>
                     <button id="editBtn" class="edit-btn" data-mode="view">Edit</button>
                     <!-- <a href="/changeDetails" onclick="changeDetails();" class="btn">Edit Details</a> -->
                 </div>
             </div>
-            <script>
-                const editBtn = document.getElementById('editBtn');
-              
-                editBtn.addEventListener('click', () => {
-                  const mode = editBtn.dataset.mode;
-              
-                  // EDIT MODE: swap spans → inputs
-                  if (mode === 'view') {
-                    editBtn.textContent = 'Update';
-                    editBtn.dataset.mode = 'edit';
-              
-                    document.querySelectorAll('.info-row .info-value')
-                      .forEach(span => {
-                        const value = span.textContent.trim();
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.value = value;
-                        input.className = 'info-input';
-                        // Optional: give name attributes so you can serialize later
-                        input.name = span.id || '';  // e.g. first_name, last_name, etc.
-                        span.parentNode.replaceChild(input, span);
-                      });
-                  }
-              
-                  // UPDATE MODE: swap inputs → spans
-                  else {
-                    // collect the new values if you need to POST them
-                    const payload = {};
-              
-                    document.querySelectorAll('.info-row input.info-input')
-                      .forEach(input => {
-                        const span = document.createElement('span');
-                        span.className = 'info-value';
-                        span.id = input.name;        // preserve the id
-                        span.textContent = input.value;
-                        payload[input.name] = input.value;
-                        input.parentNode.replaceChild(span, input);
-                      });
-              
-                    // TODO: send `payload` up to your server here via fetch/AJAX
-              
-                    editBtn.textContent = 'Edit';
-                    editBtn.dataset.mode = 'view';
-                  }
-                });
-              </script>
               
         </div>
     </div>
@@ -165,19 +124,21 @@
         // Fetch user data from server if needed
         document.addEventListener("DOMContentLoaded", async function() {
             try {
-                // Fetch user details (e.g., via a /get-user endpoint if necessary)
                 const response = await fetch('http://localhost:3000/user-details', {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}` // Send token if needed
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
                 const data = await response.json();
                 if (response.ok) {
-                    // Display user data
-                    document.getElementById("first-name").textContent = data.first_name;
-                    document.getElementById("user-email").textContent = data.email;
+                    document.getElementById("first_name").textContent = data.first_name;
+                    document.getElementById("last_name").textContent = data.last_name;
+                    document.getElementById("email").textContent = data.email;
+                    document.getElementById("address_line_1").textContent = data.address_line_1;
+                    document.getElementById("address_line_2").textContent = data.address_line_2;
+                    document.getElementById("phone_no").textContent = data.phone_no;
                 } else {
                     alert("Error fetching user data.");
                 }
