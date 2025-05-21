@@ -1,108 +1,47 @@
+<!--HEADER COPY START HERE-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Payment History - IoTBay</title>
-  <link rel="stylesheet" href="CSS/styles.css">
-  <style>
-    .search-bar-container {
-      text-align: center;
-      margin: 30px 0;
-    }
-
-    .search-input {
-      padding: 10px;
-      width: 320px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-
-    .search-label {
-      font-weight: bold;
-      margin-right: 10px;
-      font-size: 18px;
-      color: #3a4163;
-    }
-
-    .history-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    .history-table th,
-    .history-table td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: left;
-      font-size: 16px;
-    }
-
-    .history-table th {
-      background-color: #5aa8d6;
-      color: white;
-    }
-
-    .edit-btn {
-      background-color: #007BFF;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    .edit-btn:hover {
-      background-color: #0056b3;
-    }
-
-    .saved-payment {
-      margin-top: 40px;
-      background: #ffffff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoTBay - Home</title>
+    <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
 </head>
 <body>
-
-  <!-- Navbar -->
-  <div class="navbar">
-    <div class="logo">
-      <a href="index.html">
-        <img src="images/logo.png" width="125px" alt="IoTBay Logo">
-      </a>
+    <div class="navbar">
+        <div class="logo">
+            <a href="/index">
+                <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
+            </a>
+        </div>
+        <nav>  
+            <ul>
+                <li><a href="/index">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/contact">Contact</a></li>                
+            </ul>
+        </nav>
+        <div class="icon-buttons">
+            <button class="icon-btn" onclick="toggleSearchBar();">
+                <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
+            </button>
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
+                <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
+            </button>                
+            <button class="icon-btn" onclick="location.href='/shoppingcart';">
+                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shoppingcart" class="icon-img">
+            </button>
+        </div>
     </div>
-    <nav>  
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="products.html">Products</a></li>
-        <li><a href="contact.html">Contact</a></li>                
-      </ul>
-    </nav>
-    <div class="icon-buttons">
-      <button class="icon-btn" onclick="toggleSearchBar();">
-        <img src="images/search.png" alt="search" class="icon-img">
-      </button>
-      <button class="icon-btn" onclick="location.href='login.html';">
-        <img src="images/login.png" alt="login" class="icon-img">
-      </button>                
-      <button class="icon-btn" onclick="location.href='shoppingcart.html';">
-        <img src="images/cart.png" alt="shopping cart" class="icon-img">
-      </button>
-    </div>
-  </div>
 
-  <div id="search-bar" class="search-bar">
-    <input type="text" placeholder="Search products..." id="search-input">
-    <button onclick="searchProduct()">Search</button>
-    <button onclick="toggleSearchBar()">Close</button>
-  </div>
+    <div id="search-bar" class="search-bar">
+        <input type="text" placeholder="Search products..." id="search-input">
+        <button onclick="searchProduct()">Search</button>
+        <button onclick="toggleSearchBar()">Close</button>
+    </div>
+
+    <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
 
   <!-- Page Header -->
   <section class="hero">
@@ -129,22 +68,7 @@
           <th>Account</th>
         </tr>
       </thead>
-      <tbody id="paymentTable">
-        <tr>
-          <td>#002134</td>
-          <td>2025-05-01</td>
-          <td>$79.99</td>
-          <td>Visa</td>
-          <td>**** 1234</td>
-        </tr>
-        <tr>
-          <td>#002105</td>
-          <td>2025-04-20</td>
-          <td>$189.50</td>
-          <td>Mastercard</td>
-          <td>**** 7890</td>
-        </tr>
-      </tbody>
+      <tbody id="paymentTable"></tbody>
     </table>
 
     <!-- Saved Payment Methods Section -->
@@ -159,28 +83,7 @@
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>John Smith</td>
-          <td>Visa</td>
-          <td>**** 1234</td>
-          <td>07/27</td>
-          <td>
-            <button class="edit-btn" onclick="location.href='paymentedit.html'">Edit</button>
-            <button class="delete-btn">Delete</button>
-          </td>
-        </tr>
-        <tr>
-          <td>John Smith</td>
-          <td>Mastercard</td>
-          <td>**** 7890</td>
-          <td>11/26</td>
-          <td>
-            <button class="edit-btn">Edit</button>
-            <button class="delete-btn">Delete</button>
-          </td>
-        </tr>
-      </tbody>
+      <tbody id="savedPaymentMethodsTable"></tbody>
     </table>
   </main>
 
@@ -195,49 +98,16 @@
         </form>
       </div>
     </div>
-    <div class="footer-links">
-      <div class="footer-column">
-        <h3>ABOUT</h3>
-        <ul>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
-          <li><a href="#">Store Locations</a></li>
-          <li><a href="#">Payment Methods</a></li>
-          <li><a href="#">Shipping Methods</a></li>
-        </ul>
-      </div>
-      <div class="footer-column">
-        <h3>HELP</h3>
-        <ul>
-          <li><a href="#">Support</a></li>
-          <li><a href="#">Warranty & Returns</a></li>
-          <li><a href="#">Services</a></li>
-          <li><a href="#">Omitie Services</a></li>
-          <li><a href="#">Site Map</a></li>
-        </ul>
-      </div>
-      <div class="footer-column">
-        <h3>OTHER</h3>
-        <ul>
-          <li><a href="#">Announcements</a></li>
-          <li><a href="#">Merchandise</a></li>
-          <li><a href="#">Careers at IoTBay</a></li>
-          <li><a href="#">Terms & Conditions</a></li>
-          <li><a href="#">Privacy & Cookies</a></li>
-        </ul>
-      </div>
-      <div class="footer-column">
-        <h3>Need advice?</h3>
-        <p>Speak to our friendly staff</p>
-        <a href="contact.html" class="contact-button">Contact Us</a>
-      </div>
-    </div>
+    <div class="footer-links">...</div>
+    <div class="footer-column">...</div>
+    <div class="footer-column">...</div>
+    <div class="footer-column">...</div>
     <div class="footer-copyright">
       <p>&copy; 2025 IoTBay. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- JavaScript for Filtering -->
+  <!-- JavaScript -->
   <script>
     const searchInput = document.getElementById("searchInput");
     const tableRows = document.querySelectorAll("#paymentTable tr");
@@ -249,6 +119,119 @@
         const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(query));
         row.style.display = match ? "" : "none";
       });
+    });
+  </script>
+
+<script>
+  async function editCard(id) {
+    localStorage.setItem('edit_payment_id', id);
+    window.location.href = 'paymentedit';
+  }
+
+  async function deleteCard(id) {
+    console.log("Attempting to delete card ID:", id); // Debug log
+    const token = localStorage.getItem('token');
+    console.log("Using token:", token); // Debug log
+
+    if (!id || !token) {
+      alert("Missing card ID or auth token.");
+      return;
+    }
+
+    if (!confirm("Are you sure you want to delete this card?")) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/payments/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      });
+
+      const result = await res.json();
+      console.log("Server response:", result); // Debug log
+
+      if (res.ok) {
+        alert("Card deleted successfully.");
+        location.reload();
+      } else {
+        alert(result.message || "Failed to delete card.");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Something went wrong.");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const cardsRes = await fetch('http://localhost:3000/payment-methods', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const cards = await cardsRes.json();
+
+      const savedTable = document.querySelector(".payment-methods-table tbody");
+      savedTable.innerHTML = "";
+
+      cards.forEach(c => {
+        console.log("Loaded card from backend:", c);
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+  <td>${c.name}</td>
+  <td>Visa</td>
+  <td>**** ${c.card_no.slice(-4)}</td>
+  <td>${c.expiry_date}</td>
+  <td>
+    <button class="edit-btn" onclick="editCard(${c.id})">Edit</button>
+    <button class="delete-btn" onclick="deleteCard(${c.id})">Delete</button>
+  </td>
+`;
+
+        savedTable.appendChild(row);
+      });
+
+    } catch (err) {
+      console.error('Error loading payment data:', err);
+    }
+  });
+</script>
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
+
+      try {
+        const res = await fetch('http://localhost:3000/order-history?userId=' + userId);
+        const data = await res.json();
+
+        const paymentTable = document.getElementById('paymentTable');
+        paymentTable.innerHTML = '';
+
+        data.forEach(order => {
+          const totalAmount = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
+          const cardType = order.items[0].name.includes('Visa') ? 'Visa' : 'Card';
+          const cardEnding = '**** ' + ('' + order.items[0].product_id).slice(-4);
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>#${String(order.order_id).padStart(6, '0')}</td>
+            <td>${order.order_date.split('T')[0]}</td>
+            <td>$${totalAmount}</td>
+            <td>${cardType}</td>
+            <td>${cardEnding}</td>
+          `;
+          paymentTable.appendChild(row);
+        });
+      } catch (err) {
+        console.error('Failed to load order history:', err);
+      }
     });
   </script>
 

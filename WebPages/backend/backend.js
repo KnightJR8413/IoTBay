@@ -517,6 +517,25 @@ app.post("/logout", (req, res) => {
     res.json({ message: "Logout successful. Clear token on client-side." });
 });
 
+app.post('/payments', authenticateToken, (req, res) => {
+  const { card_no, expiry_date, cvc, name } = req.body;
+  const customer_id = req.user.userId;
+
+  if (!card_no || !expiry_date || !cvc || !name) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  db.run(`
+    INSERT INTO payment (customer_id, card_no, expiry_date, cvc, name)
+    VALUES (?, ?, ?, ?, ?)`,
+    [customer_id, card_no, expiry_date, cvc, name],
+    function (err) {
+      if (err) return res.status(500).json({ message: 'Database error: ' + err.message });
+      res.status(201).json({ message: 'Payment method saved successfully!' });
+    });
+});
+
+
 // Start server
 app.listen(port, () => {
     console.log(`Backend server is running on http://localhost:${port}`);
@@ -534,3 +553,68 @@ function logAction(email, type) {
     });
     console.log(type + ' logged in database');
 }
+
+// GET Saved Payment Methods
+app.get('/payment-methods', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  db.all(`SELECT id, name, card_no, expiry_date FROM payment WHERE customer_id = ?`, [userId], (err, rows) => {
+    if (err) return res.status(500).json({ message: err.message });
+    res.json(rows);
+  });
+});
+
+// GET Recent Payments (Completed Orders)
+app.get('/recent-payments', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  db.all(`
+    SELECT 
+      o.id AS order_id,
+      o.order_date,
+      p.card_no,
+      p.expiry_date,
+      p.name,
+      'Visa' as payment_method,  -- Placeholder; update if you track card type
+      79.99 as amount            -- Placeholder for testing; change if needed
+    FROM orders o
+    JOIN payment p ON o.payment_id = p.id
+    WHERE o.customer_id = ? AND o.status = 'completed'
+    ORDER BY o.order_date DESC
+  `, [userId], (err, rows) => {
+    if (err) return res.status(500).json({ message: err.message });
+    res.json(rows);
+  });
+});
+
+app.delete('/payments/:id', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const paymentId = parseInt(req.params.id);
+
+  db.run("DELETE FROM payment WHERE id = ? AND customer_id = ?", [paymentId, userId], function(err) {
+    if (err) return res.status(500).json({ message: err.message });
+    if (this.changes === 0) return res.status(404).json({ message: 'Card not found or not owned by user.' });
+    res.json({ message: 'Card deleted successfully.' });
+  });
+});
+
+
+
+
+
+app.put('/payments/:id', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const paymentId = parseInt(req.params.id);
+  const { name, card_no, expiry_date, cvc } = req.body;
+
+  db.run(
+    `UPDATE payment SET name = ?, card_no = ?, expiry_date = ?, cvc = ?
+     WHERE id = ? AND customer_id = ?`,
+    [name, card_no, expiry_date, cvc, paymentId, userId],
+    function (err) {
+      if (err) return res.status(500).json({ message: err.message });
+      if (this.changes === 0)
+        return res.status(404).json({ message: 'Card not found or not owned by user.' });
+
+      res.json({ message: 'Card updated successfully.' });
+    }
+  );
+});

@@ -42,6 +42,26 @@
     </div>
 
     <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+    
+
+<script>
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    const res = await fetch('http://localhost:3000/cart?userId=' + userId);
+    const cartItems = await res.json();
+
+    const total = cartItems.reduce((sum, item) => sum + (item.price * item.no_items), 0);
+    document.getElementById('amount-display').textContent = `$${total.toFixed(2)}`;
+  } catch (err) {
+    console.error('Could not load cart total:', err);
+  }
+});
+</script>
+
+
 </body>
 </html>
 <!--HEADER COPY END HERE-->
@@ -78,7 +98,8 @@
       <!-- Payment -->
       <div class="form-section">
         <h3>Payment Method</h3>
-        <p><strong>Amount:</strong> $79.99 (Placeholder)</p>
+        <p><strong>Amount:</strong> <span id="amount-display">$0.00</span></p>
+
         <input type="text" placeholder="Card number" required>
         <input type="text" placeholder="Expiration (MM/YY)" required>
         <input type="text" placeholder="CVV" required>
@@ -86,8 +107,9 @@
       </div>
 
       <div class="form-section">
-        <button type="submit" onclick='location.href="/paymentconfirmation";' class="btn">Pay Now</button>
-        <!-- <button type="submit" class="btn" onclick='location.href="/paymentconfirmation";'>Pay Now</button> -->
+<button type="button" class="btn" id="pay-button">Pay Now</button>
+
+
       </div>
     </form>
   </section>
@@ -148,5 +170,54 @@
   </footer>
 
   <script src="JAVA/script.js"></script>
+
+
+  <script>
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    const res = await fetch('http://localhost:3000/cart?userId=' + userId);
+    const cartItems = await res.json();
+
+    const total = cartItems.reduce((sum, item) => sum + (item.price * item.no_items), 0);
+    document.getElementById('amount-display').textContent = `$${total.toFixed(2)}`;
+  } catch (err) {
+    console.error('Could not load cart total:', err);
+  }
+});
+
+document.getElementById('pay-button').addEventListener('click', async () => {
+  const data = {
+    card_no: document.querySelector('input[placeholder="Card number"]').value,
+    expiry_date: document.querySelector('input[placeholder="Expiration (MM/YY)"]').value,
+    cvc: document.querySelector('input[placeholder="CVV"]').value,
+    name: document.querySelector('input[placeholder="Name on card"]').value
+  };
+
+  try {
+    const res = await fetch('http://localhost:3000/payments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      window.location.href = '/paymentconfirmation';
+    } else {
+      alert(result.message || 'Payment failed.');
+    }
+  } catch (error) {
+    alert('Something went wrong. Try again.');
+    console.error(error);
+  }
+});
+</script>
+
 </body>
 </html>
