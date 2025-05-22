@@ -1,0 +1,5 @@
+{% for s in shipments %}
+    <p>{{ s.order_id }} - {{ s.shipment_method }} - {{ s.shipment_date }}</p>
+    <a href="{{ url_for('shipment.update_shipment', shipment_id=s.id) }}">Edit</a>
+    <a href="{{ url_for('shipment.delete_shipment', shipment_id=s.id) }}">Delete</a>
+{% endfor %}
