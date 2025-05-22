@@ -406,19 +406,19 @@ app.post('/update-cart', (req, res) => {
     console.log('Received request on /update-cart with body:', req.body);
     const { userId } = req.body;
 
-  if (!userId) {
-    return res.status(400).json({ message: 'userId is required' });
-  }
+    if (!userId) {
+        return res.status(400).json({ message: 'userId is required' });
+    }
 
-  db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [userId], (err, orderRow) => {
-    if (err) return res.status(500).json({ message: err.message });
-    if (!orderRow) return res.status(404).json({ message: 'No active cart found' });
+    db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [userId], (err, orderRow) => {
+        if (err) return res.status(500).json({ message: err.message });
+        if (!orderRow) return res.status(404).json({ message: 'No active cart found' });
 
-    db.run("UPDATE orders SET status = 'completed', order_date = datetime('now') WHERE id = ?", [orderRow.id], function(err2) {
-      if (err2) return res.status(500).json({ message: err2.message });
-      res.json({ message: 'Order finalized and saved successfully!' });
+        db.run("UPDATE orders SET status = 'completed', order_date = datetime('now') WHERE id = ?", [orderRow.id], function(err2) {
+            if (err2) return res.status(500).json({ message: err2.message });
+            res.json({ message: 'Order finalized and saved successfully!' });
+        });
     });
-  });
 });
 
 app.get('/order-history', (req, res) => {
@@ -633,6 +633,19 @@ app.post("/logout", (req, res) => {
     logAction(email, 'logout');
     res.json({ message: "Logout successful. Clear token on client-side." });
 });
+
+
+/*
+Shipping details psudeo code
+user endpoints at line 424 and below as references on how stuff works
+
+endpoint that retrieves shipping info
+
+endpoint that creates or edits info
+
+endpoint that deletes shipping details
+*/
+
 
 // Start server
 app.listen(port, () => {
