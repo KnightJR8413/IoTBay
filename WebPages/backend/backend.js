@@ -21,6 +21,24 @@ if (!SECRET_KEY) {
     process.exit(1);
 }
 
+//helpers for getting users
+const getALLAsync = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+};
+
+const getAsync = (sql, params = []) => {
+    return new Promise((resolve, reject) => {
+        db.get(sql, params, (err, row) => {
+            if (err) reject(err);
+            else resolve(row);
+        });
+    });
+};
 
 // Middleware
 app.use(bodyParser.json()); // finding in forms
@@ -97,7 +115,31 @@ app.post('/login', (req, res) => {
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required." });
     }
+    
+    //CHECKING IF THEY'RE THE ADMIN
+    if (email.toLowerCase() == "admin@iotbay.com") {
+      if (!bcrypt.compareSync(password, "$2a$12$4dffGL/MnFj5ch0oYF50QO4ZyajjHAlOzhw5ve93wVs4rDtR8vxq2")) {
+          logAction(email, 'Unsuccessful login');
+          return res.status(401).json({ message: 'Invalid email or password.' });
+      }
+      
+      db.get("SELECT * FROM staff INNER JOIN users ON users.id = staff.id WHERE email = ?", [email], (err, adminRow) => {
+        if (err) {
+            logAction(email, 'error logging in');
+            return res.status(500).json({ message: 'Database error: ' + err.message });
+        }
 
+        if (!adminRow) {
+            logAction(email, 'Unsuccessful login');
+            return res.status(404).json({ message: 'Admin record not found.' });
+        }
+
+        const token = jwt.sign({ userId: adminRow.id, email: adminRow.email, first_name: adminRow.first_name, last_name: adminRow.last_name, user_type: adminRow.user_type, role: "admin" }, SECRET_KEY, { expiresIn: '1h' });
+        res.status(200).json({ message: 'Login successful!', token });
+        logAction(email, 'login');
+      });
+      return;
+    }
     
     db.get("SELECT * FROM customer INNER JOIN users ON users.id = customer.id WHERE email = ? AND user_type ='c'", [email], (err, row) => {
         if (err) {
@@ -133,51 +175,45 @@ app.post('/update-customer', authenticateToken, async (req, res) => {
 });
 
 app.get('/user-details', authenticateToken, async (req, res) => {
-    const getAsync = (sql, params) => {
-        return new Promise((resolve, reject) => {
-            db.get(sql, params, (err, row) => {
-                if (err) reject(err);
-                else resolve(row);
-            });
-        });
-    };
-    const userId = req.user.userId;
-    try {
-        const user = await getAsync('SELECT email FROM users WHERE id = ?', [userId]);
-
-        const customer = await getAsync(`
-            SELECT first_name, last_name, phone_no, address_line_1, address_line_2
-            FROM customer WHERE id = ?
-        `, [userId]);
-
-        if (!user || !customer) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        res.json({
-            email: user.email,
-            first_name: customer.first_name,
-            last_name: customer.last_name,
-            phone_no: customer.phone_no,
-            address_line_1: customer.address_line_1,
-            address_line_2: customer.address_line_2
-        });
-
-    } catch (err) {
-        console.error('Error fetching user details:', err);
-        res.status(500).json({ error: 'Internal server error' });
+  const userId = req.user.userId;
+  try {
+    const user = await getAsync('SELECT email FROM users WHERE id = ?', [userId]);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
+
+    let details;
+    // Check the role from the token—if it's admin, query the staff table.
+    if (req.user.role && req.user.role === 'admin') {
+      details = await getAsync(`
+        SELECT first_name, last_name, phone_no
+        FROM staff
+        WHERE id = ?
+      `, [userId]);
+    } else {
+      // Otherwise, assume customer and query the customer table.
+      details = await getAsync(`
+        SELECT first_name, last_name, phone_no, address_line_1, address_line_2
+        FROM customer
+        WHERE id = ?
+      `, [userId]);
+    }
+
+    if (!details) {
+      return res.status(404).json({ error: 'User details not found' });
+    }
+
+    res.json({
+      email: user.email,
+      ...details
+    });
+  } catch (err) {
+    console.error('Error fetching user details:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.get('/user-logs', authenticateToken, async (req, res) => {
-    const getAsync = (sql, params) => {
-        return new Promise((resolve, reject) => {
-            db.all(sql, params, (err, row) => {
-                if (err) reject(err);
-                else resolve(row);
-            });
-        });
-    };
   const userId = req.user.userId;
 
   try {
@@ -231,6 +267,244 @@ app.delete('/delete-account', authenticateToken, async (req, res) => {
         res.status(500).json({ error: "Internal server error." });
     }
 });
+
+//ADMIN USER STUFF
+
+// GETTING USERS FOR ADMIN
+app.get("/admin/users", authenticateToken, async (req, res) => {
+  if (!req.user || req.user.role !== 'admin') {
+    logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
+    return res.status(403).json({ error: 'Access denied. Admins only.' });
+  }
+
+  try {
+    const searchParam = req.query.search ? `%${req.query.search}%` : '%';
+
+     const customersSql = `
+      SELECT 
+        u.id as userId, 
+        u.email,
+        (c.first_name || ' ' || c.last_name) AS full_name,
+        c.phone_no AS phone, 
+        u.user_type, 
+        u.status
+      FROM users u
+      INNER JOIN customer c ON u.id = c.id
+      WHERE u.user_type = 'c'
+        AND (
+          u.email LIKE ?
+          OR c.first_name LIKE ?
+          OR c.last_name LIKE ?
+          OR c.phone_no LIKE ?
+        )
+    `;
+
+    const staffSql = `
+      SELECT 
+        u.id as userId, 
+        u.email,
+        (s.first_name || ' ' || s.last_name) AS full_name,
+        '' AS phone, 
+        u.user_type, 
+        u.status
+      FROM users u
+      INNER JOIN staff s ON u.id = s.id
+      WHERE u.user_type = 'staff'
+        AND (
+          u.email LIKE ?
+          OR s.first_name LIKE ?
+          OR s.last_name LIKE ?
+        )
+    `;
+
+    const customerParams = [searchParam, searchParam, searchParam, searchParam];
+    const staffParams = [searchParam, searchParam, searchParam];
+    const customers = await getALLAsync(customersSql, customerParams);
+    const staff     = await getALLAsync(staffSql, staffParams);
+
+    const users = customers.concat(staff);
+    res.json({ users });
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GETTING SPECIFIC USER DETAILS
+app.get('/admin/users/:id', authenticateToken, async (req, res) => {
+  if (!req.user || req.user.role != 'admin') {
+    logAction(email, 'Unauthorised Access');
+    return res.status(403).json({ error: 'Access denied. Admins only.' });
+  }
+  const userId = req.params.id;
+  try {
+    const query = `
+      SELECT u.id as userId, u.email,
+          COALESCE(c.first_name || ' ' || c.last_name, s.first_name || ' ' || s.last_name) AS full_name,
+          COALESCE(c.phone_no, '') as phone,
+          u.user_type, 'active' as status
+      FROM users u
+      LEFT JOIN customer c ON u.id = c.id
+      LEFT JOIN staff s ON u.id = s.id
+      WHERE u.id = ?
+    `;
+    const user = await getAsync(query, [userId]);
+    if (!user) {
+      logAction(email, 'User not found');
+      return res.status(404).json({ message: 'User not found.'});
+    }
+    res.json({ user });
+  } catch (err) {
+    console.error('Error fetching user details:', err);
+    res.status(500).json({ error: 'Internal server error'});
+  }
+});
+
+// CREATE USER
+app.post('/admin/users', authenticateToken, async (req, res) => {
+  if (!req.user || req.user.role != 'admin') {
+    logAction(email, 'Unauthorised Access');
+    return res.status(403).json({ error: 'Access denied. Admins only.' });
+  }
+  const { full_name, email, phone, user_type } = req.body;
+  const names = full_name.split(' ');
+  const first_name = names[0];
+  const last_name = names.slice(1).join(' ') || '';
+
+  //Insert into users table
+  db.run(
+    "INSERT INTO users (email, user_type) VALUES (?, ?)",
+    [email, user_type],
+    function (err) {
+      if (err) return res.status(500).json({ error: "Database error: " + err.message });
+      const newUserId = this.lastID;
+      if (user_type == 'c') {
+        // Setting a default password
+        const defaultPasswordHash = bcrypt.hashSync('default123', 10);
+        db.run(
+          "INSERT INTO customer (id, first_name, last_name, phone_no, password_hash) VALUES (?, ?, ?, ?, ?)",
+          [newUserId, first_name, last_name, phone, defaultPasswordHash],
+          (err) => {
+            if (err) return res.status(500).json({ error: "Database error: " + err.message });
+            res.json({ message: 'Customer created', userId: newUserId });
+          }
+        );
+      } else if (user_type == 'staff') {
+        const defaultPasswordHash = bcrypt.hashSync('default123', 10);
+        db.run(
+          "INSERT INTO staff (id, first_name, last_name, password_hash) VALUES (?, ?, ?, ?)",
+          [newUserId, first_name, last_name, defaultPasswordHash],
+          (err) => {
+            if (err) return res.status(500).json({ error: "Database error: " + err.message });
+            res.json({ message: 'Staff created', userId: newUserId });
+          }
+        );
+      } else {
+        res.status(400).json({ error: 'Invalid user type' });
+      }
+    }
+  );
+});
+
+// UPDATING USER DETAILS
+app.put('/admin/users/:id', authenticateToken, async (req, res) => {
+  if (!req.user || req.user.role != 'admin') {
+    logAction(email, 'Unauthorised Access');
+    return res.status(403).json({ error: 'Access denied. Admins only.' });
+  }
+  const userId = req.params.id;
+  const { full_name, email, phone, user_type } = req.body;
+  const names = full_name.split(' ');
+  const first_name = names[0];
+  const last_name = names.slice(1).join(' ') || '';
+
+  db.run(
+    "UPDATE users SET email = ?, user_type = ? WHERE id = ?",
+    [email, user_type, userId],
+    function (err) {
+      if (err) return res.status(500).json({ error: "Database error: " + err.message });
+      if (user_type == 'c') {
+        db.run(
+          "UPDATE customer SET first_name = ?, last_name = ?, phone_no = ? WHERE id = ?",
+          [first_name, last_name, phone, userId],
+          function (err) {
+            if (err) return res.status(500).json({ error: "Database error: " + err.message });
+            res.json({ message: 'Customer updated' });
+          }
+        );
+      } else if (user_type == 'staff') {
+        db.run(
+          "UPDATE staff SET first_name = ?, last_name = ? WHERE id = ?",
+          [first_name, last_name, userId],
+          function (err) {
+            if (err) return res.status(500).json({ error: "Database error: " + err.message });
+            res.json({ message: 'Staff updated' });
+          }
+        );
+      } else {
+        res.status(400).json({ error: 'Invalid user type' });
+      }
+    }
+  );
+});
+
+// TOGGLING USER STATUS (active/inactive)
+app.put('/admin/users/:id/status', authenticateToken, async (req, res) => {
+  if (!req.user || req.user.role !== 'admin') {
+    logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
+    return res.status(403).json({ error: 'Access denied. Admins only.' });
+  }
+
+  const userId = req.params.id;
+  const { status } = req.body; 
+
+  try {
+    const user = await getAsync("SELECT email FROM users WHERE id = ?", [userId]);
+    if (user && user.email.toLowerCase() === "admin@iotbay.com") {
+      return res.status(403).json({ error: "Admin status cannot be changed." });
+    }
+    
+    db.run("UPDATE users SET status = ? WHERE id = ?", [status, userId], function (err) {
+      if (err) return res.status(500).json({ error: "Database error: " + err.message });
+      res.json({ message: 'Status updated.' });
+    });
+  } catch (error) {
+    console.error("Error updating status:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+app.delete('/admin/users/:id', authenticateToken, async (req, res) => {
+  if (!req.user || req.user.role != 'admin') {
+    logAction(email, 'Unauthorised Access');
+    return res.status(403).json({ error: 'Access denied. Admins only.' });
+  }
+  const userId = req.params.id;
+  
+  try {
+    //Getting the type of user after checking whether they exist or not
+    const user = await getAsync("SELECT user_type FROM users WHERE id = ?", [userId]);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (user.user_type == 'c') {
+      await getAsync("DELETE FROM customer WHERE id = ?", [userId]);
+    } else if (user.user_type == 'staff') {
+      await getAsync("DELETE FROM staff WHERE id = ?", [userId]);
+    }
+
+    //After the user is deleted from their specific table, they are deleted from the overall users table
+    await getAsync("DELETE FROM users WHERE id = ?", [userId]);
+
+    res.json({ messsage: 'User records deleted successfully from all necessary tables'});
+  } catch (error) {
+    console.error('Error deleting user: ', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//END ADMIN USER STUFF
 
 // 1) CREATE PRODUCT
 app.post('/products', (req, res) => {

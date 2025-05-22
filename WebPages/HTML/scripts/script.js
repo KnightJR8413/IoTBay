@@ -1,5 +1,29 @@
 // script.js
 
+// Redirecting unauthorised users away from the Admin Dashboard
+document.addEventListener('DOMContentLoaded', () => {
+  // Only run this check on the admin dashboard page.
+  if (window.location.pathname === '/admindashboard') {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Check that the role is 'admin'
+      if (payload.role !== 'admin') {
+        // If the user is not an admin, redirect away (e.g. to the home page)
+        window.location.href = '/';
+      }
+    } catch (err) {
+      // If decoding fails, clear the token and redirect to the login page.
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+  }
+});
+
 // ─────────────────────────────────────────────
 // 1) SEARCH BAR
 // ─────────────────────────────────────────────
@@ -135,15 +159,15 @@ function renderProducts(products) {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.innerHTML = `
-      <img src="/images/${p.image_url}" alt="${p.name}" style="width:100%">
-      <h3>${p.name}</h3>
-      <p>${p.description}</p>
-      <div class="rating">⭐ ${p.rating || '—'}</div>
-      <div class="price">$${p.price.toFixed(2)}</div>
-      <button class="buy-btn" ${p.stock===0?'disabled':''}
-        onclick="addToCart(${p.id})">
-        ${p.stock===0?'Out of Stock':'Add to Cart'}
-      </button>
+    <img src="/images/${p.image_url}" alt="${p.name}" style="width:100%">
+    <h3>${p.name}</h3>
+    <p>${p.description}</p>
+    <div class="rating">⭐ ${p.rating || '—'}</div>
+    <div class="price">$${p.price.toFixed(2)}</div>
+    <button class="buy-btn" ${p.stock===0?'disabled':''}
+    onclick="addToCart(${p.id})">
+    ${p.stock===0?'Out of Stock':'Add to Cart'}
+    </button>
     `;
     grid.appendChild(card);
   });
@@ -253,5 +277,198 @@ function updateTotals() {
   document.querySelector('.total-amount').textContent = `$${tot.toFixed(2)}`;
 }
 
+//ADMIN STUFF
+const token = localStorage.getItem('token');
 
+// Helper function which automatically includes the Authorization header
+function authFetch(url, options = {}) {
+  options.headers = options.headers || {};
+  options.headers['Authorization'] = 'Bearer ' + token;
+  options.headers['Content-Type'] = 'application/json';
+  return fetch(url, options);
+}
+
+// Loads list of users for the admin 
+async function loadUsers(query = '') {
+  try {
+    let url = `${API_BASE}/admin/users`;
+    if (query) url += `?search=${encodeURIComponent(query)}`;
+    const res = await authFetch(url);
+    const data = await res.json();
+    renderUserTable(data.users);
+  } catch (error) {
+    console.error('Error loading users:', error);
+  }
+}
+
+function renderUserTable(users) {
+  const tbody = document.querySelector('#userTable tbody');
+  tbody.innerHTML = '';
+  
+  users.forEach(user => {
+    const isAdmin = user.email.toLowerCase() === "admin@iotbay.com";
+    let actionButtons = `<button class="adm-btn btn btn-edit" onclick="openUserModal(${user.userId})">Edit</button>`;
+    
+    if (!isAdmin) {
+      actionButtons += `<button class="adm-btn btn btn-delete" onclick="deleteUser(${user.userId})">Delete</button>`;
+      actionButtons += `<button class="adm-btn btn btn-toggle" data-user-id="${user.userId}" onclick="toggleStatus(${user.userId}, '${user.status}')">
+                           ${user.status === 'active' ? 'Deactivate' : 'Activate'}
+                        </button>`;
+    }
+    
+    const rowHTML = `
+    <tr>
+    <td>${user.full_name}</td>
+    <td>${user.email}</td>
+    <td>${user.phone || 'N/A'}</td>
+    <td>${user.user_type === 'c' ? 'Customer' : 'Staff'}</td>
+    <td id="status-${user.userId}">${user.status}</td>
+    <td>${actionButtons}</td>
+    </tr>
+    `;
+    tbody.insertAdjacentHTML('beforeend', rowHTML);
+  });
+}
+
+
+function searchUsers() {
+  const query = document.getElementById('searchInput').value;
+  loadUsers(query);
+}
+
+// Allows the adding or editing of users
+function openUserModal(userId = null) {
+  if (userId) {
+    // Edit mode: fetch the user details first
+    authFetch(`${API_BASE}/admin/users/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('modalTitle').innerText = 'Edit User';
+      document.getElementById('userId').value = data.user.userId;
+      document.getElementById('fullName').value = data.user.full_name;
+      document.getElementById('emailInput').value = data.user.email;
+      document.getElementById('phoneInput').value = data.user.phone || '';
+      document.getElementById('userType').value = data.user.user_type;
+        document.getElementById('statusInput').value = data.user.status;
+        document.getElementById('userModal').style.display = 'flex';
+      })
+      .catch(err => console.error('Error fetching user:', err));
+    } else {
+      // Add mode: clear the form and open the modal
+      document.getElementById('modalTitle').innerText = 'Add New User';
+      document.getElementById('userForm').reset();
+      document.getElementById('userId').value = '';
+      document.getElementById('userModal').style.display = 'flex';
+    }
+  }
+  
+  function closeUserModal() {
+    document.getElementById('userModal').style.display = 'none';
+  }
+  
+  // Form for adding/editing a user
+  document.getElementById('userForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const id = document.getElementById('userId').value;
+    const payload = {
+      full_name: document.getElementById('fullName').value,
+      email: document.getElementById('emailInput').value,
+      phone: document.getElementById('phoneInput').value,
+      user_type: document.getElementById('userType').value,
+      status: document.getElementById('statusInput').value
+    };
+    
+    try {
+      let url = `${API_BASE}/admin/users`;
+      let method = 'POST';
+      if (id) {
+        url += `/${id}`;
+        method = 'PUT';
+      }
+      const res = await authFetch(url, {
+        method,
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        closeUserModal();
+        loadUsers();
+      } else {
+        alert(data.error || data.message);
+      }
+    } catch (err) {
+      console.error('Error saving user:', err);
+    }
+});
+
+async function deleteUser(userId) {
+  if (confirm('Are you sure you want to delete this user?')) {
+    try {
+      const res = await authFetch(`${API_BASE}/admin/users/${userId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        loadUsers();
+      } else {
+        alert(data.error || data.message);
+      }
+    } catch (err) {
+      console.error('Error deleting user:', err);
+    }
+  }
+}
+
+// Function for toggling the users status
+async function toggleStatus(userId, currentStatus) {
+  const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+  
+  try {
+    const response = await fetch(`http://localhost:3000/admin/users/${userId}/status`, {
+      method: 'PUT',
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      loadUsers();
+    } else {
+      alert(data.error || "Failed to update status.");
+    }
+  } catch (error) {
+    console.error("Error toggling status:", error);
+  }
+}
+
+// Loading users when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('userTable')) {
+    console.log('Loading users ...');
+    loadUsers();
+  }  
+});
+
+// Hiding the button for admin dashboart from non-admins
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('token');
+  const adminLink = document.getElementById('adminDashboardLink');
+  
+  if (!adminLink) return;
+
+  adminLink.style.setProperty('display', 'none', 'important');
+
+  if (token) {
+    try { 
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.role == 'admin') {
+        adminLink.style.setProperty('display', 'block', 'important')
+      }
+    } catch (error) {
+      console.error('Error decoding token:', error);
+    }
+  }
+});
 

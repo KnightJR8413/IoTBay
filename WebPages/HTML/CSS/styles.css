@@ -1641,6 +1641,82 @@ p.text {
   color: #0047a0;
 }
 
+.admin-container {
+    max-width: 100%;
+    margin: 2rem auto;
+    padding: 20px;
+    text-align: center;
+}
+
+#userTable {
+    margin: 0 auto;
+    width: 90%;
+    border-collapse: collapse;
+    background-color: #3a4163;
+}
+
+#userTable th,
+#userTable td {
+    text-align: center;
+    padding: 12px 8px;
+    border: 4px solid #ddd;
+}
+
+select {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    text-align: center;
+    width: 50%;
+    justify-content: center;
+}
+
+.modal .modal-content {
+    width: 75%;
+}
+
+.admin-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.modalTitle {
+    font-size: 1.2rem;
+}
+
+.adm-btn {
+    background-color: #007BFF;
+    color: white;
+    padding: 15px 25px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out;
+}
+
+.adm-btn:hover {
+    background-color: #0056b3;
+}
+
 .btn-view-cart {
   background-color: #4CAF50;
   color: white;
