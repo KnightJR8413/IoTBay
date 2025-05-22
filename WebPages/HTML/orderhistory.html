@@ -122,8 +122,8 @@ function renderTable(data) {
       <td>$${total}</td>
       <td>${count} item${count>1?'s':''}</td>
       <td class="actions">
-        <button class="btn-view" onclick="viewOrderDetails(${order.order_id})">View Order Details</button>
-        <button class="btn-payment" onclick="viewPaymentDetails(${order.order_id})">View Payment Details</button>
+        <button class="btn-view" onclick="viewOrderDetails(${order.order_id})">View Details</button>
+        <button class="btn-payment" onclick="viewPaymentDetails(${order.order_id})">Payment</button>
         <button class="btn-view-cart" onclick="copyOrderToCart(${order.order_id})">View Cart</button>
         <button class="btn-cancel" onclick="cancelOrder(${order.order_id})">Cancel</button>
       </td>
@@ -132,6 +132,34 @@ function renderTable(data) {
   });
 }
 
+// Add this new function
+window.copyOrderToCart = async (orderId) => {
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    alert('Please log in first.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`/order/${orderId}/copy-to-cart`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customerId: userId })
+    });
+
+    if (!response.ok) throw new Error('Failed to copy order');
+    
+    const data = await response.json();
+    if (data.success) {
+      window.location.href = '/shoppingcart';
+    } else {
+      alert(data.message || 'Failed to copy order to cart');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert(error.message || 'Error copying order to cart');
+  }
+};
       // initial fetch
       fetch(`${API}/order-history?userId=${userId}`)
         .then(r => r.json())
@@ -186,42 +214,6 @@ function renderTable(data) {
     
     window.viewOrderDetails = id => { window.location.href = `/order-details?orderId=${id}`; };
       window.viewPaymentDetails = id => window.location.href = `/paymenthistory2?orderId=${id}`;
-      window.viewCartOrder = async (orderId) => {
-  const API = 'http://localhost:3000';
-  const userId = localStorage.getItem('userId');
-  if (!userId) {
-    alert('Please log in first.');
-    return;
-  }
-
-  try {
-    // Fetch the items of the selected order
-    const response = await fetch(`${API}/orders/${orderId}/items`);
-    if (!response.ok) throw new Error('Failed to fetch order items');
-    const items = await response.json();
-
-    // Clear current cart (optional, depends on your UX)
-    // If you want to clear, you might want to implement an API call to clear the active cart here
-
-    // Add each item to the current cart
-    for (const item of items) {
-      // POST to /cart with product_id and userId
-      await fetch(`${API}/cart`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_id: item.product_id, userId })
-      });
-    }
-
-    // Redirect to the shopping cart page
-    window.location.href = '/shoppingcart';
-
-  } catch (error) {
-    alert('Error loading order into cart: ' + error.message);
-    console.error(error);
-  }
-};
-
       window.cancelOrder        = id => {
         if (!confirm(`Cancel order ORD-${id}?`)) return;
         fetch(`${API}/orders/${id}`, {
