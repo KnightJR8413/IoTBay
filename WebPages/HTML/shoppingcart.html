@@ -77,14 +77,6 @@
 </main>
 
 <script>
-    // Quantity Update
-    function updateQuantity(btn, change) {
-        const input = btn.parentElement.querySelector('.qty-input');
-        let newVal = parseInt(input.value) + change;
-        if(newVal < 1) newVal = 1;
-        input.value = newVal;
-        updateTotals();
-    }
 
 function saveCart() {
     const userId = localStorage.getItem('userId') || 'guest'; // Get existing or create guest ID
