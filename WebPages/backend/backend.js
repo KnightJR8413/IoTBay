@@ -488,106 +488,91 @@ app.get('/orders/:orderId/items', (req, res) => {
 });
 
 
-// POST: Copy items from an order into a new cart
+// POST: Copy items from an order into a new cart (authenticated version)
 app.post('/order/:orderId/copy-to-cart', (req, res) => {
   const { orderId } = req.params;
-  
-  // Create temporary session for anonymous user
-  const sessionId = req.headers['x-session-id'] || crypto.randomUUID();
-  
-  // 1. Find or create temporary user
-  db.get("SELECT id FROM users WHERE email = ?", [sessionId], (err, userRow) => {
-    if (err) return res.status(500).json({ message: err.message });
-    
-    let customerId;
-    if (userRow) {
-      customerId = userRow.id;
-      proceedWithOrder(customerId);
-    } else {
-      db.run("INSERT INTO users (user_type, email) VALUES ('g', ?)", [sessionId], function(err) {
-        if (err) return res.status(500).json({ message: err.message });
-        customerId = this.lastID;
-        proceedWithOrder(customerId);
-      });
-    }
-  });
+  const { customerId } = req.body; // Changed from session ID to customerId
 
-  function proceedWithOrder(customerId) {
-    // 2. Find or create active cart
-    db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [customerId], (err, orderRow) => {
-      if (err) return res.status(500).json({ message: err.message });
-      
-      let activeOrderId;
-      if (orderRow) {
-        activeOrderId = orderRow.id;
-        copyItems(activeOrderId);
-      } else {
-        db.run("INSERT INTO orders (customer_id, status) VALUES (?, 'active')", [customerId], function(err) {
-          if (err) return res.status(500).json({ message: err.message });
-          activeOrderId = this.lastID;
-          copyItems(activeOrderId);
-        });
-      }
-    });
+  if (!customerId) {
+    return res.status(400).json({ success: false, message: 'Missing customerId.' });
   }
+
+  // 1. Verify the order belongs to the customer
+  db.get(
+    "SELECT id FROM orders WHERE id = ? AND customer_id = ?",
+    [orderId, customerId],
+    (err, orderRow) => {
+      if (err) return res.status(500).json({ message: err.message });
+      if (!orderRow) return res.status(403).json({ message: 'Order not found' });
+
+      // 2. Find or create active cart
+      db.get(
+        "SELECT id FROM orders WHERE customer_id = ? AND status = 'active'",
+        [customerId],
+        (err, activeOrder) => {
+          if (err) return res.status(500).json({ message: err.message });
+          
+          let activeOrderId;
+          if (activeOrder) {
+            activeOrderId = activeOrder.id;
+            copyItems(activeOrderId);
+          } else {
+            db.run(
+              "INSERT INTO orders (customer_id, status) VALUES (?, 'active')",
+              [customerId],
+              function(err) {
+                if (err) return res.status(500).json({ message: err.message });
+                activeOrderId = this.lastID;
+                copyItems(activeOrderId);
+              }
+            );
+          }
+        }
+      );
+    }
+  );
 
   function copyItems(activeOrderId) {
     // 3. Copy items from original order
-    db.all("SELECT product_id, no_items FROM cart WHERE order_id = ?", [orderId], (err, items) => {
-      if (err) return res.status(500).json({ message: err.message });
-      
-      if (items.length === 0) {
-        return res.status(404).json({ message: 'No items in order to copy' });
-      }
-
-      const values = items.flatMap(item => [activeOrderId, item.product_id, item.no_items]);
-      const placeholders = items.map(() => "(?, ?, ?)").join(", ");
-      
-      db.run(`INSERT INTO cart (order_id, product_id, no_items) VALUES ${placeholders}`, values, function(err) {
+    db.all(
+      "SELECT product_id, no_items FROM cart WHERE order_id = ?",
+      [orderId],
+      (err, items) => {
         if (err) return res.status(500).json({ message: err.message });
-        res.set('X-Session-Id', sessionId);
-        res.json({ success: true, sessionId });
-      });
-    });
+        
+        if (!items.length) {
+          return res.status(404).json({ message: 'No items in order to copy' });
+        }
+
+        // Clear existing cart items first
+        db.run(
+          "DELETE FROM cart WHERE order_id = ?",
+          [activeOrderId],
+          function(err) {
+            if (err) return res.status(500).json({ message: err.message });
+            
+            // Insert new items
+            const placeholders = items.map(() => "(?, ?, ?)").join(", ");
+            const values = items.flatMap(item => [
+              activeOrderId,
+              item.product_id,
+              item.no_items
+            ]);
+
+            db.run(
+              `INSERT INTO cart (order_id, product_id, no_items) VALUES ${placeholders}`,
+              values,
+              function(err) {
+                if (err) return res.status(500).json({ message: err.message });
+                res.json({ success: true });
+              }
+            );
+          }
+        );
+      }
+    );
   }
 });
-
-// app.get('/order-history', (req, res) => {
-//     const userId = req.query.userId;
-    
-//     if (!userId) return res.status(400).json({ message: 'userId is required' });
-
-//     db.all(`
-//         SELECT 
-//             o.id AS order_id,
-//             o.status,
-//             o.order_date,
-//             json_group_array(json_object(
-//                 'product_id', c.product_id,
-//                 'no_items', c.no_items,
-//                 'name', p.name,
-//                 'price', p.price,
-//                 'image_url', p.image_url
-//             )) AS items
-//         FROM orders o
-//         JOIN cart c ON o.id = c.order_id
-//         JOIN products p ON p.id = c.product_id
-//         WHERE o.customer_id = ? AND o.status != 'active'
-//         GROUP BY o.id
-//         ORDER BY o.order_date DESC
-//     `, [userId], (err, rows) => {
-//         if (err) return res.status(500).json({ message: err.message });
-        
-//         const orders = rows.map(row => ({
-//             order_id: row.order_id,
-//             status: row.status,
-//             order_date: row.order_date,
-//             items: JSON.parse(row.items)
-//         }));
-
-//         res.json(orders);
-//     });
-// });
 
 app.post('/newsletter', (req,res) => {
     const { email } = req.body;
