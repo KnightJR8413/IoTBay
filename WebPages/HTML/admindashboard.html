@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IoTBay - Home</title>
     <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
+    <script src="{{ url_for('serve_js', filename='script.js') }}" defer></script>
 </head>
 <body>
     <div class="navbar">
@@ -20,7 +21,7 @@
                 <li><a href="/about">About</a></li>
                 <li><a href="/products">Products</a></li>
                 <li><a href="/contact">Contact</a></li>
-                <li><a href="/admindashboard">Admin Dashboard</a></li>                
+                <li><a href=" /admindashboard" id="adminDashboardLink">Admin Dashboard</a></li>              
             </ul>
         </nav>
         <div class="icon-buttons">
@@ -46,6 +47,57 @@
 </body>
 </html>
 <!--HEADER COPY END HERE-->
+
+<div class="container">
+    <h1>Admin Dashboard</h1>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search users by name or email ... " />
+        <button class="btn" onclick="searchUsers()">Search</button>
+        <button class="btn" onclick="openUserModal()">Add New User</button>
+    </div>
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>User Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+
+<div id="userModal" class="modal-backdrop">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeUserModal()">&times;</span>
+        <h2 id="modalTitle">Add New User</h2>
+        <form id="userForm">
+            <input type="hidden" id="userId">
+            <label for="fullName">Full Name:</label><br>
+            <input type="text" id="fullName" required><br><br>
+            <label for="emailInput">Email:</label><br>
+            <input type="email" id="emailInput" required><br><br>
+            <label for="phoneInput">Phone:</label><br>
+            <input type="text" id="phoneInput"><br><br>
+            <label for="userType">User Type:</label><br>
+            <select id="userType">
+                <option value="c">Customer</option>
+                <option value="staff">Staff</option>
+            </select><br><br>
+            <label for="statusInput">Status:</label><br>
+            <select id="statusInput">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select><br><br>
+            <button type="submit" class="btn">Save</button>
+        </form>
+    </div>
+</div>
 
     <footer>
         <div class="footer-links">

@@ -131,15 +131,15 @@ function renderProducts(products) {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.innerHTML = `
-      <img src="/images/${p.image_url}" alt="${p.name}" style="width:100%">
-      <h3>${p.name}</h3>
-      <p>${p.description}</p>
-      <div class="rating">⭐ ${p.rating || '—'}</div>
-      <div class="price">$${p.price.toFixed(2)}</div>
-      <button class="buy-btn" ${p.stock===0?'disabled':''}
-        onclick="addToCart(${p.id})">
-        ${p.stock===0?'Out of Stock':'Add to Cart'}
-      </button>
+    <img src="/images/${p.image_url}" alt="${p.name}" style="width:100%">
+    <h3>${p.name}</h3>
+    <p>${p.description}</p>
+    <div class="rating">⭐ ${p.rating || '—'}</div>
+    <div class="price">$${p.price.toFixed(2)}</div>
+    <button class="buy-btn" ${p.stock===0?'disabled':''}
+    onclick="addToCart(${p.id})">
+    ${p.stock===0?'Out of Stock':'Add to Cart'}
+    </button>
     `;
     grid.appendChild(card);
   });
@@ -194,17 +194,17 @@ function renderCartItems(items) {
     div.className = 'cart-item';
     div.dataset.productId = it.product_no;
     div.innerHTML = `
-      <img src="/images/${it.image_url}" alt="${it.name}" class="cart-img">
-      <div class="item-details">
-        <h3>${it.name}</h3>
-        <p class="price">$${it.price.toFixed(2)}</p>
-        <div class="quantity-control">
-          <button class="qty-btn" onclick="updateQuantity(this,-1)">-</button>
-          <input type="number" class="qty-input" value="${it.quantity ?? 1}" min="1">
-          <button class="qty-btn" onclick="updateQuantity(this,1)">+</button>
-        </div>
-      </div>
-      <button class="remove-btn" onclick="removeItem(${it.product_no},this)">Remove</button>
+    <img src="/images/${it.image_url}" alt="${it.name}" class="cart-img">
+    <div class="item-details">
+    <h3>${it.name}</h3>
+    <p class="price">$${it.price.toFixed(2)}</p>
+    <div class="quantity-control">
+    <button class="qty-btn" onclick="updateQuantity(this,-1)">-</button>
+    <input type="number" class="qty-input" value="${it.quantity ?? 1}" min="1">
+    <button class="qty-btn" onclick="updateQuantity(this,1)">+</button>
+    </div>
+    </div>
+    <button class="remove-btn" onclick="removeItem(${it.product_no},this)">Remove</button>
     `;
     container.appendChild(div);
   });
@@ -249,5 +249,184 @@ function updateTotals() {
   document.querySelector('.total-amount').textContent = `$${tot.toFixed(2)}`;
 }
 
+//ADMIN STUFF
+const token = localStorage.getItem('token');
 
+// Helper function which automatically includes the Authorization header
+function authFetch(url, options = {}) {
+  options.headers = options.headers || {};
+  options.headers['Authorization'] = 'Bearer ' + token;
+  options.headers['Content-Type'] = 'application/json';
+  return fetch(url, options);
+}
+
+// Loads list of users for the admin 
+async function loadUsers(query = '') {
+  try {
+    let url = `${API_BASE}/admin/users`;
+    if (query) url += `?search=${encodeURIComponent(query)}`;
+    const res = await authFetch(url);
+    const data = await res.json();
+    renderUserTable(data.users);
+  } catch (error) {
+    console.error('Error loading users:', error);
+  }
+}
+
+function renderUserTable(users) {
+  const tbody = document.querySelector('#userTable tbody');
+  tbody.innerHTML = '';
+  users.forEach(user => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${user.full_name}</td>
+      <td>${user.email}</td>
+      <td>${user.phone || 'N/A'}</td>
+      <td>${user.user_type === 'c' ? 'Customer' : 'Staff'}</td>
+      <td>${user.status}</td>
+      <td>
+        <button onclick="openUserModal(${user.userId})">Edit</button>
+        <button onclick="deleteUser(${user.userId})">Delete</button>
+        <button onclick="toggleStatus(${user.userId}, '${user.status}')">
+          ${user.status === 'active' ? 'Deactivate' : 'Activate'}
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function searchUsers() {
+  const query = document.getElementById('searchInput').value;
+  loadUsers(query);
+}
+
+// Allows the adding or editing of users
+function openUserModal(userId = null) {
+  if (userId) {
+    // Edit mode: fetch the user details first
+    authFetch(`${API_BASE}/admin/users/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('modalTitle').innerText = 'Edit User';
+        document.getElementById('userId').value = data.user.userId;
+        document.getElementById('fullName').value = data.user.full_name;
+        document.getElementById('emailInput').value = data.user.email;
+        document.getElementById('phoneInput').value = data.user.phone || '';
+        document.getElementById('userType').value = data.user.user_type;
+        document.getElementById('statusInput').value = data.user.status;
+        document.getElementById('userModal').style.display = 'flex';
+      })
+      .catch(err => console.error('Error fetching user:', err));
+  } else {
+    // Add mode: clear the form and open the modal
+    document.getElementById('modalTitle').innerText = 'Add New User';
+    document.getElementById('userForm').reset();
+    document.getElementById('userId').value = '';
+    document.getElementById('userModal').style.display = 'flex';
+  }
+}
+
+function closeUserModal() {
+  document.getElementById('userModal').style.display = 'none';
+}
+
+// Form for adding/editing a user
+document.getElementById('userForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const id = document.getElementById('userId').value;
+  const payload = {
+    full_name: document.getElementById('fullName').value,
+    email: document.getElementById('emailInput').value,
+    phone: document.getElementById('phoneInput').value,
+    user_type: document.getElementById('userType').value,
+    status: document.getElementById('statusInput').value
+  };
+
+  try {
+    let url = `${API_BASE}/admin/users`;
+    let method = 'POST';
+    if (id) {
+      url += `/${id}`;
+      method = 'PUT';
+    }
+    const res = await authFetch(url, {
+      method,
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      closeUserModal();
+      loadUsers();
+    } else {
+      alert(data.error || data.message);
+    }
+  } catch (err) {
+    console.error('Error saving user:', err);
+  }
+});
+
+async function deleteUser(userId) {
+  if (confirm('Are you sure you want to delete this user?')) {
+    try {
+      const res = await authFetch(`${API_BASE}/admin/users/${userId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        loadUsers();
+      } else {
+        alert(data.error || data.message);
+      }
+    } catch (err) {
+      console.error('Error deleting user:', err);
+    }
+  }
+}
+
+// Toggling user status
+async function toggleStatus(userId, currentStatus) {
+  const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+  try {
+    const res = await authFetch(`${API_BASE}/admin/users/${userId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: newStatus })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      loadUsers();
+    } else {
+      alert(data.error || data.message);
+    }
+  } catch (err) {
+    console.error('Error updating status:', err);
+  }
+}
+
+// Loading users when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  loadUsers();
+});
+
+// Hiding the button for admin dashboart from non-admins
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('token');
+  const adminLink = document.getElementById('adminDashboardLink');
+  
+  if (!adminLink) return;
+  
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Hide the link if the user's role is not admin
+      if (payload.role !== 'admin') {
+        adminLink.style.display = 'none';
+      }
+    } catch (e) {
+      console.error('Error decoding token:', e);
+      adminLink.style.display = 'none';
+    }
+  } else {
+    // If there's no token, hide the admin link
+    adminLink.style.display = 'none';
+  }
+});
 
