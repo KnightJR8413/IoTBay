@@ -1655,3 +1655,40 @@ p.text {
   background-color: #45a049;
 }
 
+/* Edit Button */
+.edit-btn {
+  background-color: #2196F3; /* blue */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.edit-btn:hover {
+  background-color: #0b7dda;
+}
+
+/* Delete Button */
+.delete-btn {
+  background-color: #f44336; /* red */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-right: 6px;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Optional: space buttons horizontally */
+.payment-methods-table td button {
+  margin-right: 6px;
+}

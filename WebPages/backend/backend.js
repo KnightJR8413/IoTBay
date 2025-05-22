@@ -619,6 +619,117 @@ app.post("/logout", (req, res) => {
     res.json({ message: "Logout successful. Clear token on client-side." });
 });
 
+app.post('/payments', authenticateToken, (req, res) => {
+  const { card_no, expiry_date, cvc, name } = req.body;
+  const userId = req.user.userId;
+
+  if (!card_no || !expiry_date || !cvc || !name) {
+    return res.status(400).json({ message: 'Missing required payment fields' });
+  }
+
+  db.run(
+    "INSERT INTO payment (customer_id, card_no, expiry_date, cvc, name) VALUES (?, ?, ?, ?, ?)",
+    [userId, card_no, expiry_date, cvc, name],
+    function (err) {
+      if (err) return res.status(500).json({ message: 'Database error: ' + err.message });
+
+      res.status(201).json({ message: 'Payment method saved successfully', id: this.lastID });
+    }
+  );
+});
+
+// GET all payment methods for the logged-in user
+app.get('/payment-methods', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+
+  db.all("SELECT * FROM payment WHERE customer_id = ?", [userId], (err, rows) => {
+    if (err) return res.status(500).json({ message: err.message });
+    res.json(rows);
+  });
+});
+
+// POST a new payment method for the logged-in user
+app.post('/payments', authenticateToken, (req, res) => {
+  const { card_no, expiry_date, cvc, name } = req.body;
+  const customer_id = req.user.userId;
+
+  if (!card_no || !expiry_date || !cvc || !name) {
+    return res.status(400).json({ message: 'Missing card details' });
+  }
+
+  db.run(
+    "INSERT INTO payment (customer_id, card_no, expiry_date, cvc, name) VALUES (?, ?, ?, ?, ?)",
+    [customer_id, card_no, expiry_date, cvc, name],
+    function(err) {
+      if (err) return res.status(500).json({ message: err.message });
+      res.status(201).json({ message: 'Payment method saved', id: this.lastID });
+    }
+  );
+});
+
+// List all saved payment methods for the logged-in user
+app.get('/payments', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    db.all("SELECT id, name, card_no, expiry_date FROM payment WHERE customer_id = ?", [userId], (err, rows) => {
+        if (err) return res.status(500).json({ message: 'Database error', error: err.message });
+        res.json(rows);
+    });
+});
+
+// Add a new payment method
+app.post('/payments', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const { card_no, expiry_date, cvc, name } = req.body;
+
+    if (!card_no || !expiry_date || !cvc || !name) {
+        return res.status(400).json({ message: "All fields are required." });
+    }
+
+    db.run(
+        "INSERT INTO payment (customer_id, card_no, expiry_date, cvc, name) VALUES (?, ?, ?, ?, ?)",
+        [userId, card_no, expiry_date, cvc, name],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to save card', error: err.message });
+            res.json({ id: this.lastID });
+        }
+    );
+});
+
+// Edit payment method
+app.put('/payments/:id', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const { card_no, expiry_date, cvc, name } = req.body;
+    const paymentId = req.params.id;
+
+    db.run(
+        "UPDATE payment SET card_no = ?, expiry_date = ?, cvc = ?, name = ? WHERE id = ? AND customer_id = ?",
+        [card_no, expiry_date, cvc, name, paymentId, userId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to update card', error: err.message });
+            res.json({ message: "Card updated" });
+        }
+    );
+});
+
+// Delete a payment method
+app.delete('/payments/:id', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const paymentId = req.params.id;
+
+    db.run(
+        "DELETE FROM payment WHERE id = ? AND customer_id = ?",
+        [paymentId, userId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to delete card', error: err.message });
+            if (this.changes === 0) {
+                return res.status(404).json({ message: 'Card not found or not owned by user.' });
+            }
+            res.json({ message: "Card deleted" });
+        }
+    );
+});
+
+
 // Start server
 app.listen(port, () => {
     console.log(`Backend server is running on http://localhost:${port}`);
