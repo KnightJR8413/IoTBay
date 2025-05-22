@@ -208,8 +208,19 @@ document.getElementById('pay-button').addEventListener('click', async () => {
 
     const result = await res.json();
     if (res.ok) {
-      window.location.href = '/paymentconfirmation';
-    } else {
+  // Finalize the cart into a completed order
+  await fetch('http://localhost:3000/update-cart', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ userId: localStorage.getItem('userId') })
+  });
+
+  // Redirect to confirmation page
+  window.location.href = '/paymentconfirmation';
+}
+else {
       alert(result.message || 'Payment failed.');
     }
   } catch (error) {

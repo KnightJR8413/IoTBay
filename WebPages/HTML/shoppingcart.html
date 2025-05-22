@@ -68,56 +68,33 @@
       </div>
     </div>
     <div class="cart-actions">
-      <button class="btn-checkout" onclick="location.href='/checkout'">Checkout</button>
+      <button class="btn-checkout" onclick="location.href='/payment'">Checkout</button>
       <button class="btn-save" onclick="saveCart()">Save Order</button>
+      <button class="btn-save" onclick="location.href='/orderhistory'">View Order History</button>
     </div>
   </div>
 </div>
 </main>
 
 <script>
-    // Quantity Update
-    function updateQuantity(btn, change) {
-        const input = btn.parentElement.querySelector('.qty-input');
-        let newVal = parseInt(input.value) + change;
-        if(newVal < 1) newVal = 1;
-        input.value = newVal;
-        updateTotals();
-    }
-    
-    // Remove Item
-    function removeItem(btn) {
-        btn.closest('.cart-item').remove();
-        updateTotals();
-    }
-    
+
 function saveCart() {
-  // grab the userId
-  const userId = localStorage.getItem('userId');
-  if (!userId) {
-    return alert('No userId found – please add something to your cart first.');
-  }
-  fetch('http://localhost:3000/update-cart', {
-    method: 'POST',
-    headers: { 'Content-Type':'application/json' },
-    body: JSON.stringify({ userId })      // ← only the userId
-  })
-  .then(res => {
-    if (!res.ok) throw res;
-    return res.json();
-  })
-  .then(json => {
-    alert('✅ Cart saved as an order!');
-    // optionally redirect to /order-history
-    // location.href = '/orderhistory';
-  })
-  .catch(async err => {
-    let msg = err instanceof Response
-      ? (await err.json()).message
-      : err.message;
-    console.error('Save-order failed:', msg);
-    alert('❌ Couldn’t save your order: ' + msg);
-  });
+    const userId = localStorage.getItem('userId') || 'guest'; // Get existing or create guest ID
+    
+    // Store guest ID if new
+    if (!localStorage.getItem('userId')) {
+        localStorage.setItem('userId', userId);
+    }
+
+    fetch('http://localhost:3000/update-cart', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ userId })
+    })
+    .then(res => res.json())
+    .then(json => {
+        alert('Order saved!');
+    });
 }
 
     
@@ -202,5 +179,7 @@ function saveCart() {
 <!--FOOTER COPY END HERE-->
 
     <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
+
+    
 </body>
 </html>

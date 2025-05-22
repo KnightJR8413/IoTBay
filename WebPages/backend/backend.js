@@ -421,15 +421,14 @@ app.post('/update-cart', (req, res) => {
   });
 });
 
-
-// GET ORDER HISTORY
 app.get('/order-history', (req, res) => {
   const userId = req.query.userId;
-
+  
   if (!userId) return res.status(400).json({ message: 'userId is required' });
 
+  // Get all orders with items joined (no JSON functions)
   db.all(`
-    SELECT 
+    SELECT
       o.id AS order_id,
       o.status,
       o.order_date,
@@ -442,35 +441,138 @@ app.get('/order-history', (req, res) => {
     JOIN cart c ON o.id = c.order_id
     JOIN products p ON p.id = c.product_id
     WHERE o.customer_id = ? AND o.status != 'active'
-    ORDER BY o.order_date DESC
+    ORDER BY o.order_date DESC, o.id, c.product_id
   `, [userId], (err, rows) => {
     if (err) return res.status(500).json({ message: err.message });
 
-    const orders = {};
+    // Group rows by order_id
+    const ordersMap = new Map();
+
     for (const row of rows) {
-      if (!orders[row.order_id]) {
-        orders[row.order_id] = {
+      if (!ordersMap.has(row.order_id)) {
+        ordersMap.set(row.order_id, {
           order_id: row.order_id,
           status: row.status,
           order_date: row.order_date,
-          items: [],
-        };
+          items: []
+        });
       }
-      orders[row.order_id].items.push({
+      ordersMap.get(row.order_id).items.push({
         product_id: row.product_id,
+        no_items: row.no_items,
         name: row.name,
         price: row.price,
-        image_url: row.image_url,
-        quantity: row.no_items,
+        image_url: row.image_url
       });
     }
 
-    res.json(Object.values(orders));
+    // Convert map to array
+    const orders = Array.from(ordersMap.values());
+
+    res.json(orders);
+  });
+});
+
+// Get items of a specific order
+app.get('/orders/:orderId/items', (req, res) => {
+  const orderId = req.params.orderId;
+
+  db.all(`
+    SELECT product_id, no_items
+    FROM cart
+    WHERE order_id = ?
+  `, [orderId], (err, rows) => {
+    if (err) return res.status(500).json({ message: err.message });
+    res.json(rows || []);
   });
 });
 
 
+// POST: Copy items from an order into a new cart (authenticated version)
+app.post('/order/:orderId/copy-to-cart', (req, res) => {
+  const { orderId } = req.params;
+  const { customerId } = req.body; // Changed from session ID to customerId
 
+  if (!customerId) {
+    return res.status(400).json({ success: false, message: 'Missing customerId.' });
+  }
+
+  // 1. Verify the order belongs to the customer
+  db.get(
+    "SELECT id FROM orders WHERE id = ? AND customer_id = ?",
+    [orderId, customerId],
+    (err, orderRow) => {
+      if (err) return res.status(500).json({ message: err.message });
+      if (!orderRow) return res.status(403).json({ message: 'Order not found' });
+
+      // 2. Find or create active cart
+      db.get(
+        "SELECT id FROM orders WHERE customer_id = ? AND status = 'active'",
+        [customerId],
+        (err, activeOrder) => {
+          if (err) return res.status(500).json({ message: err.message });
+          
+          let activeOrderId;
+          if (activeOrder) {
+            activeOrderId = activeOrder.id;
+            copyItems(activeOrderId);
+          } else {
+            db.run(
+              "INSERT INTO orders (customer_id, status) VALUES (?, 'active')",
+              [customerId],
+              function(err) {
+                if (err) return res.status(500).json({ message: err.message });
+                activeOrderId = this.lastID;
+                copyItems(activeOrderId);
+              }
+            );
+          }
+        }
+      );
+    }
+  );
+
+  function copyItems(activeOrderId) {
+    // 3. Copy items from original order
+    db.all(
+      "SELECT product_id, no_items FROM cart WHERE order_id = ?",
+      [orderId],
+      (err, items) => {
+        if (err) return res.status(500).json({ message: err.message });
+        
+        if (!items.length) {
+          return res.status(404).json({ message: 'No items in order to copy' });
+        }
+
+        // Clear existing cart items first
+        db.run(
+          "DELETE FROM cart WHERE order_id = ?",
+          [activeOrderId],
+          function(err) {
+            if (err) return res.status(500).json({ message: err.message });
+            
+            // Insert new items
+            const placeholders = items.map(() => "(?, ?, ?)").join(", ");
+            const values = items.flatMap(item => [
+              activeOrderId,
+              item.product_id,
+              item.no_items
+            ]);
+
+            db.run(
+              `INSERT INTO cart (order_id, product_id, no_items) VALUES ${placeholders}`,
+              values,
+              function(err) {
+                if (err) return res.status(500).json({ message: err.message });
+                res.json({ success: true });
+              }
+            );
+          }
+        );
+      }
+    );
+  }
+});
 
 app.post('/newsletter', (req,res) => {
     const { email } = req.body;
@@ -516,6 +618,117 @@ app.post("/logout", (req, res) => {
     logAction(email, 'logout');
     res.json({ message: "Logout successful. Clear token on client-side." });
 });
+
+app.post('/payments', authenticateToken, (req, res) => {
+  const { card_no, expiry_date, cvc, name } = req.body;
+  const userId = req.user.userId;
+
+  if (!card_no || !expiry_date || !cvc || !name) {
+    return res.status(400).json({ message: 'Missing required payment fields' });
+  }
+
+  db.run(
+    "INSERT INTO payment (customer_id, card_no, expiry_date, cvc, name) VALUES (?, ?, ?, ?, ?)",
+    [userId, card_no, expiry_date, cvc, name],
+    function (err) {
+      if (err) return res.status(500).json({ message: 'Database error: ' + err.message });
+
+      res.status(201).json({ message: 'Payment method saved successfully', id: this.lastID });
+    }
+  );
+});
+
+// GET all payment methods for the logged-in user
+app.get('/payment-methods', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+
+  db.all("SELECT * FROM payment WHERE customer_id = ?", [userId], (err, rows) => {
+    if (err) return res.status(500).json({ message: err.message });
+    res.json(rows);
+  });
+});
+
+// POST a new payment method for the logged-in user
+app.post('/payments', authenticateToken, (req, res) => {
+  const { card_no, expiry_date, cvc, name } = req.body;
+  const customer_id = req.user.userId;
+
+  if (!card_no || !expiry_date || !cvc || !name) {
+    return res.status(400).json({ message: 'Missing card details' });
+  }
+
+  db.run(
+    "INSERT INTO payment (customer_id, card_no, expiry_date, cvc, name) VALUES (?, ?, ?, ?, ?)",
+    [customer_id, card_no, expiry_date, cvc, name],
+    function(err) {
+      if (err) return res.status(500).json({ message: err.message });
+      res.status(201).json({ message: 'Payment method saved', id: this.lastID });
+    }
+  );
+});
+
+// List all saved payment methods for the logged-in user
+app.get('/payments', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    db.all("SELECT id, name, card_no, expiry_date FROM payment WHERE customer_id = ?", [userId], (err, rows) => {
+        if (err) return res.status(500).json({ message: 'Database error', error: err.message });
+        res.json(rows);
+    });
+});
+
+// Add a new payment method
+app.post('/payments', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const { card_no, expiry_date, cvc, name } = req.body;
+
+    if (!card_no || !expiry_date || !cvc || !name) {
+        return res.status(400).json({ message: "All fields are required." });
+    }
+
+    db.run(
+        "INSERT INTO payment (customer_id, card_no, expiry_date, cvc, name) VALUES (?, ?, ?, ?, ?)",
+        [userId, card_no, expiry_date, cvc, name],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to save card', error: err.message });
+            res.json({ id: this.lastID });
+        }
+    );
+});
+
+// Edit payment method
+app.put('/payments/:id', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const { card_no, expiry_date, cvc, name } = req.body;
+    const paymentId = req.params.id;
+
+    db.run(
+        "UPDATE payment SET card_no = ?, expiry_date = ?, cvc = ?, name = ? WHERE id = ? AND customer_id = ?",
+        [card_no, expiry_date, cvc, name, paymentId, userId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to update card', error: err.message });
+            res.json({ message: "Card updated" });
+        }
+    );
+});
+
+// Delete a payment method
+app.delete('/payments/:id', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const paymentId = req.params.id;
+
+    db.run(
+        "DELETE FROM payment WHERE id = ? AND customer_id = ?",
+        [paymentId, userId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to delete card', error: err.message });
+            if (this.changes === 0) {
+                return res.status(404).json({ message: 'Card not found or not owned by user.' });
+            }
+            res.json({ message: "Card deleted" });
+        }
+    );
+});
+
 
 // Start server
 app.listen(port, () => {

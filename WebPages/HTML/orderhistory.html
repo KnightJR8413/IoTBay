@@ -40,7 +40,7 @@
         <button onclick="searchProduct()">Search</button>
         <button onclick="toggleSearchBar()">Close</button>
     </div>
-
+    <div id="order-history"></div>
     <!-- HERO -->
     <section class="hero">
         <h1>Order History</h1>
@@ -50,8 +50,8 @@
     <main class="order-history">
         <div class="order-history-header">
             <h1>Your Orders</h1>
+            <button class="view-payments-btn" onclick='location.href="/paymenthistory2";'>View Payment History</button>
         </div>
-        <button class="login-button" onclick='location.href="/paymenthistory2";'>View Payment History</button>
 
         <!-- Filters Section -->
         <div class="order-filters">
@@ -85,139 +85,11 @@
                 </tr>
             </thead>
             <tbody id="order-history-body">
-  <!-- will be injected -->
-</tbody>
-
-  <!-- Scripts -->
-  <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const API = 'http://localhost:3000';
-      const userId = localStorage.getItem('userId');
-      if (!userId) return alert('Please log in first.');
-
-      // grab filters
-      const orderInput = document.querySelector('.reference-filter');
-      const fromInput  = document.querySelectorAll('.date-filter')[0];
-      const toInput    = document.querySelectorAll('.date-filter')[1];
-      const tbody       = document.getElementById('order-history-body');
-      let orderData = [];  // will hold full history
-
-      function renderTable(data) {
-        tbody.innerHTML = '';
-        if (!data.length) {
-          tbody.innerHTML = `<tr><td colspan="5">No past orders found.</td></tr>`;
-          return;
-        }
-        data.forEach(order => {
-          const total = order.items
-                        .reduce((sum, i) => sum + i.price * i.quantity, 0)
-                        .toFixed(2);
-          const count = order.items
-                        .reduce((sum, i) => sum + i.quantity, 0);
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>ORD-${order.order_id}</td>
-            <td>${new Date(order.order_date).toLocaleString()}</td>
-            <td>$${total}</td>
-            <td>${count} item${count>1?'s':''}</td>
-            <td class="actions">
-              <button class="btn-view" onclick="viewOrderDetails(${order.order_id})">View Order Details</button>
-              <button class="btn-payment" onclick="viewPaymentDetails(${order.order_id})">View Payment Details</button>
-              <button class="btn-cancel" onclick="cancelOrder(${order.order_id})">Cancel</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      // initial fetch
-      fetch(`${API}/order-history?userId=${userId}`)
-        .then(r => r.json())
-        .then(data => {
-          orderData = data;
-          renderTable(orderData);
-        })
-        .catch(e => console.error('Error fetching order history:', e));
-
-      // filter logic
-      window.applyFilters = () => {
-        let filtered = orderData.slice();
-
-        const num = orderInput.value.trim();
-        if (num) {
-          // strip any leading "ORD-"
-          const id = parseInt(num.replace(/^ORD-?/i,''),10);
-          if (!isNaN(id)) {
-            filtered = filtered.filter(o => o.order_id === id);
-          } else {
-            filtered = [];
-          }
-        }
-
-        const fromDate = fromInput.value;
-        if (fromDate) {
-          const fromT = new Date(fromDate).getTime();
-          filtered = filtered.filter(o => new Date(o.order_date).getTime() >= fromT);
-        }
-
-        const toDate = toInput.value;
-        if (toDate) {
-          // include entire day
-          const toT = new Date(toDate);
-          toT.setHours(23,59,59,999);
-          filtered = filtered.filter(o => new Date(o.order_date).getTime() <= toT.getTime());
-        }
-
-        renderTable(filtered);
-      };
-
-      window.clearFilters = () => {
-        orderInput.value = '';
-        fromInput.value  = '';
-        toInput.value    = '';
-        renderTable(orderData);
-      };
-
-      // hook up your search & clear buttons
-      document.querySelector('.btn-search').addEventListener('click', applyFilters);
-      document.querySelector('.btn-clear' ).addEventListener('click', clearFilters);
-
-      // the rest of your existing globals…
-      window.viewOrderDetails   = id => window.location.href = `/order-details?orderId=${id}`;
-      window.viewPaymentDetails = id => window.location.href = `/paymenthistory2?orderId=${id}`;
-      window.cancelOrder        = id => {
-        if (!confirm(`Cancel order ORD-${id}?`)) return;
-        fetch(`${API}/orders/${id}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type':'application/json' },
-          body: JSON.stringify({ userId })
-        })
-        .then(r => {
-          if (!r.ok) return r.json().then(j=>Promise.reject(j.message));
-          alert(`Order ORD-${id} cancelled.`);
-          // re-fetch entire history to pick up the change
-          return fetch(`${API}/order-history?userId=${userId}`);
-        })
-        .then(r => r.json())
-        .then(data => {
-          orderData = data;
-          renderTable(orderData);
-        })
-        .catch(msg => {
-          console.error('Cancel order failed:', msg);
-          alert('Could not cancel order: ' + msg);
-        });
-      };
-    });
-  </script>
-</body>
-</html>
-
-
+                <!-- will be injected -->
+            </tbody>
         </table>
     </main>
-
+    
     <!-- FOOTER -->
     <div class="footer-newsletter">
         <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
@@ -280,55 +152,161 @@
 
     <!-- Scripts -->
     <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const userId = localStorage.getItem('userId');
-            if (!userId) {
-                alert('Please log in to view your order history.');
-                return;
-            }
+ <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const API = 'http://localhost:3000';
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    alert('Please log in first.');
+    return;
+  }
 
-            fetch(`http://localhost:3000/order-history?userId=${userId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('order-history-body');
-                    tbody.innerHTML = '';
+  // grab filters
+  const orderInput = document.querySelector('.reference-filter');
+  const fromInput  = document.querySelectorAll('.date-filter')[0];
+  const toInput    = document.querySelectorAll('.date-filter')[1];
+  const tbody      = document.getElementById('order-history-body');
+  let orderData = [];  // will hold full history
 
-                    if (!data.length) {
-                        tbody.innerHTML = `<tr><td colspan="5">No past orders found.</td></tr>`;
-                        return;
-                    }
+    function renderTable(data) {
+    tbody.innerHTML = '';
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="5">No past orders found.</td></tr>`;
+      return;
+    }
+    data.forEach(order => {
+      const total = order.items
+                    .reduce((sum, i) => sum + i.price * i.no_items, 0)
+                    .toFixed(2);
+      const count = order.items
+                    .reduce((sum, i) => sum + i.no_items, 0);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>ORD-${order.order_id}</td>
+        <td>${new Date(order.order_date).toLocaleString()}</td>
+        <td>$${total}</td>
+        <td>${count} item${count > 1 ? 's' : ''}</td>
+        <td class="actions">
+          <button class="btn-view" onclick="viewOrderDetails(${order.order_id})">View Order Details</button>
+          <button class="btn-payment" onclick="viewPaymentDetails(${order.order_id})">View Payment Details</button>
+          <button class="btn-view-cart" onclick="copyOrderToCart(${order.order_id})">View Cart</button>
+          <button class="btn-cancel" onclick="cancelOrder(${order.order_id})">Cancel</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 
-                    data.forEach(order => {
-                        const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
-                        const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+  // initial fetch
+  fetch(`${API}/order-history?userId=${userId}`)
+    .then(r => r.json())
+    .then(data => {
+        data.sort((a, b) => a.order_id - b.order_id);
+      orderData = data;
+      renderTable(orderData);
+    })
+    .catch(e => {
+      console.error('Error fetching order history:', e);
+      tbody.innerHTML = `<tr><td colspan="5">Failed to load orders.</td></tr>`;
+    });
 
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>ORD-${order.order_id}</td>
-                            <td>${new Date(order.order_date).toLocaleString()}</td>
-                            <td>$${total}</td>
-                            <td>${itemCount} item${itemCount > 1 ? 's' : ''}</td>
-                            <td class="actions">
-                                <button class="btn-view" onclick="viewOrderDetails('ORD-${order.order_id}')">
-                                    View Order Details
-                                </button>
-                                <button class="btn-payment" onclick="viewPaymentDetails('ORD-${order.order_id}')">
-                                    View Payment Details
-                                </button>
-                                <button class="btn-cancel" onclick="cancelOrder('ORD-${order.order_id}')">
-                                    Cancel
-                                </button>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                })
-                .catch(err => {
-                    console.error('Error fetching order history:', err);
-                });
+  // filter logic
+  window.applyFilters = () => {
+    let filtered = orderData.slice();
+
+    const num = orderInput.value.trim();
+    if (num) {
+      // strip any leading "ORD-"
+      const id = parseInt(num.replace(/^ORD-?/i, ''), 10);
+      if (!isNaN(id)) {
+        filtered = filtered.filter(o => o.order_id === id);
+      } else {
+        filtered = [];
+      }
+    }
+
+    const fromDate = fromInput.value;
+    if (fromDate) {
+      const fromT = new Date(fromDate).getTime();
+      filtered = filtered.filter(o => new Date(o.order_date).getTime() >= fromT);
+    }
+
+    const toDate = toInput.value;
+    if (toDate) {
+      const toT = new Date(toDate);
+      toT.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(o => new Date(o.order_date).getTime() <= toT.getTime());
+    }
+
+    renderTable(filtered);
+  };
+
+  window.clearFilters = () => {
+    orderInput.value = '';
+    fromInput.value = '';
+    toInput.value = '';
+    renderTable(orderData);
+  };
+
+  // Hook up search and clear buttons
+  document.querySelector('.btn-search').addEventListener('click', applyFilters);
+  document.querySelector('.btn-clear').addEventListener('click', clearFilters);
+
+  window.viewOrderDetails = id => { window.location.href = `/order-details?orderId=${id}`; };
+  window.viewPaymentDetails = id => window.location.href = `/paymenthistory2?orderId=${id}`;
+  window.cancelOrder = id => {
+    if (!confirm(`Cancel order ORD-${id}?`)) return;
+    fetch(`${API}/orders/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    })
+    .then(r => {
+      if (!r.ok) return r.json().then(j => Promise.reject(j.message));
+      alert(`Order ORD-${id} cancelled.`);
+      // re-fetch entire history to pick up the change
+      return fetch(`${API}/order-history?userId=${userId}`);
+    })
+    .then(r => r.json())
+    .then(data => {
+      orderData = data;
+      renderTable(orderData);
+    })
+    .catch(msg => {
+      console.error('Cancel order failed:', msg);
+      alert('Could not cancel order: ' + msg);
+    });
+  };
+});
+
+// Add this outside the DOMContentLoaded callback
+window.copyOrderToCart = async (orderId) => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert('Please log in first.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/order/${orderId}/copy-to-cart`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ customerId: userId })
         });
-    </script>
+
+        if (!response.ok) throw new Error('Failed to copy order');
+        
+        const data = await response.json();
+        if (data.success) {
+            window.location.href = '/shoppingcart';
+        } else {
+            alert(data.message || 'Failed to copy order to cart');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Error copying order to cart');
+    }
+};
+</script>
 </body>
 </html>
-

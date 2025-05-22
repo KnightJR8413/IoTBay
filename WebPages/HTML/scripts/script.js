@@ -192,7 +192,7 @@ function renderCartItems(items) {
   items.forEach(it => {
     const div = document.createElement('div');
     div.className = 'cart-item';
-    div.dataset.productId = it.product_no;
+    div.dataset.productId = it.product_id;
     div.innerHTML = `
       <img src="/images/${it.image_url}" alt="${it.name}" class="cart-img">
       <div class="item-details">
@@ -204,7 +204,7 @@ function renderCartItems(items) {
           <button class="qty-btn" onclick="updateQuantity(this,1)">+</button>
         </div>
       </div>
-      <button class="remove-btn" onclick="removeItem(${it.product_no},this)">Remove</button>
+      <button class="remove-btn" onclick="removeItem(${it.product_id},this)">Remove</button>
     `;
     container.appendChild(div);
   });
@@ -216,7 +216,7 @@ async function removeItem(productId, btn) {
     const res = await fetch(`${API_BASE}/cart`, {
       method:'DELETE',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({product_no:productId, userId:getUserId()})
+      body: JSON.stringify({ product_id: productId, userId: getUserId() })
     });
     if (!res.ok) throw await res.json();
     btn.closest('.cart-item').remove();

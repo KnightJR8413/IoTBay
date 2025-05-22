@@ -1354,6 +1354,57 @@ p.text {
         grid-column: 1 / -1;
     }
 }
+
+.view-payments-btn {
+    padding: 0.8rem 1.5rem;
+    background: #8e44ad;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s ease;
+}
+
+.view-payments-btn:hover {
+    background: #732d91;
+}
+
+/* Adjusting spacing inside the order-history-header */
+.order-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.order-details-container {
+  max-width: 1500px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.back-button-container {
+  text-align: left;
+  margin-top: 2rem;
+}
+
+.back-button {
+  background-color: #007bff;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #0056b3;
+}
+
 /*end*/
 
 
@@ -1588,4 +1639,56 @@ p.text {
 .back-link:hover {
   background-color: #d0e5ff;
   color: #0047a0;
+}
+
+.btn-view-cart {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.btn-view-cart:hover {
+  background-color: #45a049;
+}
+
+/* Edit Button */
+.edit-btn {
+  background-color: #2196F3; /* blue */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.edit-btn:hover {
+  background-color: #0b7dda;
+}
+
+/* Delete Button */
+.delete-btn {
+  background-color: #f44336; /* red */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-right: 6px;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Optional: space buttons horizontally */
+.payment-methods-table td button {
+  margin-right: 6px;
 }

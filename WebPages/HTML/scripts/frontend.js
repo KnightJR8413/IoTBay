@@ -114,14 +114,12 @@ function logoutUser() {
       .then(data => {
 
         console.log(data.message);
-  
-        localStorage.removeItem('token');
-        localStorage.removeItem('customer_id');
-        
       })
       .catch(error => {
         console.error('Error logging out:', error);
       });
+      localStorage.removeItem('token');
+      localStorage.removeItem('customer_id');
       window.location.href = '/logout'
   }
 
