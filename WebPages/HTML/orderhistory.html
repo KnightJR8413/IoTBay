@@ -201,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetch(`${API}/order-history?userId=${userId}`)
     .then(r => r.json())
     .then(data => {
+        data.sort((a, b) => a.order_id - b.order_id);
       orderData = data;
       renderTable(orderData);
     })
