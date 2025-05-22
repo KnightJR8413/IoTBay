@@ -100,7 +100,7 @@ function loginUser(email, password){
               localStorage.setItem('role', payload.role);
             }
             // Takes staff and admin users to a different page than customers
-            if (payload.user_type == 'staff') {
+            if (payload.user_type == 'a') {
               if (payload.role == "admin") {
                 window.location.href = '/admindashboard';
               }

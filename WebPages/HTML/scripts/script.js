@@ -123,8 +123,8 @@ function checkLoginAndRedirect() {
   }
   if (payload.user_type === 'c') {
     window.location.href = '/account';
-  } else if (playload.user_type === 's') {
-    window.location.href = '/staffDashboard';
+  } else if (playload.user_type === 's' || playload.user_type === 'a') {
+    window.location.href = '/staffdashboard';
   }
 }
 
