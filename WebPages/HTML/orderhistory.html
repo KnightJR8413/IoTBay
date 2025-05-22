@@ -287,7 +287,7 @@ window.copyOrderToCart = async (orderId) => {
     }
 
     try {
-        const response = await fetch(`/order/${orderId}/copy-to-cart`, {
+        const response = await fetch(`http://localhost:3000/order/${orderId}/copy-to-cart`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ customerId: userId })
