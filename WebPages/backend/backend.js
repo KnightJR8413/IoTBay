@@ -273,11 +273,75 @@ app.post('/products', (req, res) => {
 
 // 2) LIST PRODUCTS
 app.get('/products', (req, res) => {
-  db.all("SELECT * FROM products ORDER BY id DESC", [], (err, rows) => {
-    if (err) return res.status(500).json({ message: err.message });
-    res.json(rows);
+  const nameFilter = req.query.name;
+
+  if (nameFilter) {
+    db.all("SELECT * FROM products WHERE name LIKE ? ORDER BY id DESC", [`%${nameFilter}%`], (err, rows) => {
+      if (err) return res.status(500).json({ message: err.message });
+      res.json(rows);
+    });
+  } else {
+    db.all("SELECT * FROM products ORDER BY id DESC", [], (err, rows) => {
+      if (err) return res.status(500).json({ message: err.message });
+      res.json(rows);
+    });
+  }
+});
+
+// 3) UPDATE PRODUCT
+app.put('/products/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const {
+    name, price, description = '',
+    stock, image_url = '', supplier,
+    brand, model, release_year,
+    specifications, size, colour = ''
+  } = req.body;
+
+  const sql = `
+    UPDATE products
+       SET name=?, price=?, description=?, stock=?,
+           image_url=?, supplier=?, brand=?, model=?,
+           release_year=?, specifications=?, size=?, colour=?
+     WHERE id=?
+  `;
+  const params = [
+    name, price, description, stock,
+    image_url, supplier, brand, model,
+    release_year, specifications, size, colour,
+    id
+  ];
+  db.run(sql, params, function(err) {
+    if (err)   return res.status(500).json({ message: err.message });
+    if (this.changes === 0) 
+               return res.status(404).json({ message: 'Product not found' });
+    res.json({ message: 'Product updated', id, ...req.body });
   });
 });
+
+// 4) DELETE PRODUCT
+app.delete('/products/:id', (req, res) => {
+  const id = Number(req.params.id);
+  db.run('DELETE FROM products WHERE id=?', [id], function(err) {
+    if (err)   return res.status(500).json({ message: err.message });
+    if (this.changes === 0) 
+               return res.status(404).json({ message: 'Product not found' });
+    res.json({ message: 'Product deleted', id });
+  });
+});
+
+// 5) GET SINGLE PRODUCT
+app.get('/products/:id', (req, res) => {
+  const id = Number(req.params.id);
+  db.get('SELECT * FROM products WHERE id = ?', [id], (err, row) => {
+    if (err)   return res.status(500).json({ message: err.message });
+    if (!row)  return res.status(404).json({ message: 'Not found' });
+    res.json(row);
+  });
+});
+
+
+
 
 // ── CART HANDLERS ──
 
