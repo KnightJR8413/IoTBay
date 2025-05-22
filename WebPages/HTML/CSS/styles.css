@@ -1354,6 +1354,57 @@ p.text {
         grid-column: 1 / -1;
     }
 }
+
+.view-payments-btn {
+    padding: 0.8rem 1.5rem;
+    background: #8e44ad;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s ease;
+}
+
+.view-payments-btn:hover {
+    background: #732d91;
+}
+
+/* Adjusting spacing inside the order-history-header */
+.order-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.order-details-container {
+  max-width: 1500px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.back-button-container {
+  text-align: left;
+  margin-top: 2rem;
+}
+
+.back-button {
+  background-color: #007bff;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #0056b3;
+}
+
 /*end*/
 
 
