@@ -92,32 +92,22 @@
     }
     
 function saveCart() {
-  // grab the userId
-  const userId = localStorage.getItem('userId');
-  if (!userId) {
-    return alert('No userId found – please add something to your cart first.');
-  }
-  fetch('http://localhost:3000/update-cart', {
-    method: 'POST',
-    headers: { 'Content-Type':'application/json' },
-    body: JSON.stringify({ userId })      // ← only the userId
-  })
-  .then(res => {
-    if (!res.ok) throw res;
-    return res.json();
-  })
-  .then(json => {
-    alert('✅ Cart saved as an order!');
-    // optionally redirect to /order-history
-    // location.href = '/orderhistory';
-  })
-  .catch(async err => {
-    let msg = err instanceof Response
-      ? (await err.json()).message
-      : err.message;
-    console.error('Save-order failed:', msg);
-    alert('❌ Couldn’t save your order: ' + msg);
-  });
+    const userId = localStorage.getItem('userId') || 'guest'; // Get existing or create guest ID
+    
+    // Store guest ID if new
+    if (!localStorage.getItem('userId')) {
+        localStorage.setItem('userId', userId);
+    }
+
+    fetch('http://localhost:3000/update-cart', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ userId })
+    })
+    .then(res => res.json())
+    .then(json => {
+        alert('Order saved!');
+    });
 }
 
     
@@ -136,6 +126,18 @@ function saveCart() {
     
     // Initial calculation
     updateTotals();
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+  const sessionId = localStorage.getItem('sessionId');
+  if (sessionId) {
+    // Load cart using sessionId
+    fetch(`/cart?sessionId=${sessionId}`)
+      .then(res => res.json())
+      .then(renderCart)
+      .catch(console.error);
+  }
+});
     </script>
 
 <!--FOOTER COPY Start HERE-->
@@ -202,5 +204,6 @@ function saveCart() {
 <!--FOOTER COPY END HERE-->
 
     <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
+
 </body>
 </html>

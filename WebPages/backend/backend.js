@@ -421,15 +421,14 @@ app.post('/update-cart', (req, res) => {
   });
 });
 
-
-// GET ORDER HISTORY
 app.get('/order-history', (req, res) => {
   const userId = req.query.userId;
-
+  
   if (!userId) return res.status(400).json({ message: 'userId is required' });
 
+  // Get all orders with items joined (no JSON functions)
   db.all(`
-    SELECT 
+    SELECT
       o.id AS order_id,
       o.status,
       o.order_date,
@@ -442,35 +441,153 @@ app.get('/order-history', (req, res) => {
     JOIN cart c ON o.id = c.order_id
     JOIN products p ON p.id = c.product_id
     WHERE o.customer_id = ? AND o.status != 'active'
-    ORDER BY o.order_date DESC
+    ORDER BY o.order_date DESC, o.id, c.product_id
   `, [userId], (err, rows) => {
     if (err) return res.status(500).json({ message: err.message });
 
-    const orders = {};
+    // Group rows by order_id
+    const ordersMap = new Map();
+
     for (const row of rows) {
-      if (!orders[row.order_id]) {
-        orders[row.order_id] = {
+      if (!ordersMap.has(row.order_id)) {
+        ordersMap.set(row.order_id, {
           order_id: row.order_id,
           status: row.status,
           order_date: row.order_date,
-          items: [],
-        };
+          items: []
+        });
       }
-      orders[row.order_id].items.push({
+      ordersMap.get(row.order_id).items.push({
         product_id: row.product_id,
+        no_items: row.no_items,
         name: row.name,
         price: row.price,
-        image_url: row.image_url,
-        quantity: row.no_items,
+        image_url: row.image_url
       });
     }
 
-    res.json(Object.values(orders));
+    // Convert map to array
+    const orders = Array.from(ordersMap.values());
+
+    res.json(orders);
+  });
+});
+
+// Get items of a specific order
+app.get('/orders/:orderId/items', (req, res) => {
+  const orderId = req.params.orderId;
+
+  db.all(`
+    SELECT product_id, no_items
+    FROM cart
+    WHERE order_id = ?
+  `, [orderId], (err, rows) => {
+    if (err) return res.status(500).json({ message: err.message });
+    res.json(rows || []);
   });
 });
 
 
+// POST: Copy items from an order into a new cart
+app.post('/order/:orderId/copy-to-cart', (req, res) => {
+  const { orderId } = req.params;
+  
+  // Create temporary session for anonymous user
+  const sessionId = req.headers['x-session-id'] || crypto.randomUUID();
+  
+  // 1. Find or create temporary user
+  db.get("SELECT id FROM users WHERE email = ?", [sessionId], (err, userRow) => {
+    if (err) return res.status(500).json({ message: err.message });
+    
+    let customerId;
+    if (userRow) {
+      customerId = userRow.id;
+      proceedWithOrder(customerId);
+    } else {
+      db.run("INSERT INTO users (user_type, email) VALUES ('g', ?)", [sessionId], function(err) {
+        if (err) return res.status(500).json({ message: err.message });
+        customerId = this.lastID;
+        proceedWithOrder(customerId);
+      });
+    }
+  });
 
+  function proceedWithOrder(customerId) {
+    // 2. Find or create active cart
+    db.get("SELECT id FROM orders WHERE customer_id = ? AND status = 'active'", [customerId], (err, orderRow) => {
+      if (err) return res.status(500).json({ message: err.message });
+      
+      let activeOrderId;
+      if (orderRow) {
+        activeOrderId = orderRow.id;
+        copyItems(activeOrderId);
+      } else {
+        db.run("INSERT INTO orders (customer_id, status) VALUES (?, 'active')", [customerId], function(err) {
+          if (err) return res.status(500).json({ message: err.message });
+          activeOrderId = this.lastID;
+          copyItems(activeOrderId);
+        });
+      }
+    });
+  }
+
+  function copyItems(activeOrderId) {
+    // 3. Copy items from original order
+    db.all("SELECT product_id, no_items FROM cart WHERE order_id = ?", [orderId], (err, items) => {
+      if (err) return res.status(500).json({ message: err.message });
+      
+      if (items.length === 0) {
+        return res.status(404).json({ message: 'No items in order to copy' });
+      }
+
+      const values = items.flatMap(item => [activeOrderId, item.product_id, item.no_items]);
+      const placeholders = items.map(() => "(?, ?, ?)").join(", ");
+      
+      db.run(`INSERT INTO cart (order_id, product_id, no_items) VALUES ${placeholders}`, values, function(err) {
+        if (err) return res.status(500).json({ message: err.message });
+        res.set('X-Session-Id', sessionId);
+        res.json({ success: true, sessionId });
+      });
+    });
+  }
+});
+
+// app.get('/order-history', (req, res) => {
+//     const userId = req.query.userId;
+    
+//     if (!userId) return res.status(400).json({ message: 'userId is required' });
+
+//     db.all(`
+//         SELECT 
+//             o.id AS order_id,
+//             o.status,
+//             o.order_date,
+//             json_group_array(json_object(
+//                 'product_id', c.product_id,
+//                 'no_items', c.no_items,
+//                 'name', p.name,
+//                 'price', p.price,
+//                 'image_url', p.image_url
+//             )) AS items
+//         FROM orders o
+//         JOIN cart c ON o.id = c.order_id
+//         JOIN products p ON p.id = c.product_id
+//         WHERE o.customer_id = ? AND o.status != 'active'
+//         GROUP BY o.id
+//         ORDER BY o.order_date DESC
+//     `, [userId], (err, rows) => {
+//         if (err) return res.status(500).json({ message: err.message });
+        
+//         const orders = rows.map(row => ({
+//             order_id: row.order_id,
+//             status: row.status,
+//             order_date: row.order_date,
+//             items: JSON.parse(row.items)
+//         }));
+
+//         res.json(orders);
+//     });
+// });
 
 app.post('/newsletter', (req,res) => {
     const { email } = req.body;

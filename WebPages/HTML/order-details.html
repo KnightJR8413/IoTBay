@@ -1,5 +1,3 @@
-<!-- order-details.html -->
-<!--HEADER COPY START HERE-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,7 +38,6 @@
     <button onclick="toggleSearchBar()">Close</button>
   </div>
   <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
-<!--HEADER COPY END HERE-->
 
 <section class="hero">
   <h1>Order Details</h1>
@@ -52,10 +49,10 @@
   </div>
   <div style="margin-top:1rem;">
     <button onclick="window.history.back()">← Back to Order History</button>
+    <button class="btn-add-to-cart" onclick="viewOrderInCart()">View in Cart</button>
   </div>
 </main>
 
-<!--FOOTER COPY Start HERE-->
 <div class="footer-newsletter">
   <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
   <div class="newsletter-form">
@@ -65,6 +62,7 @@
     </form>
   </div>
 </div>
+
 <div class="footer-links">
   <div class="footer-column">
     <h3>ABOUT</h3>
@@ -99,92 +97,117 @@
     <a href="/contact" class="contact-button">Contact Us</a>
   </div>
 </div>
+
 <div class="footer-copyright">
   <p>Copyright © 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
 </div>
-<!--FOOTER COPY END HERE-->
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const API     = 'http://localhost:3000';
-    const params  = new URLSearchParams(window.location.search);
-    const orderId = parseInt(params.get('orderId'), 10);
-
+    const API = 'http://localhost:3000';
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId');
     const container = document.getElementById('details-content');
 
-    // --- get userId from token, not localStorage.userId ---
-    const token = localStorage.getItem('token');
-    if (!token) {
-      container.innerHTML = '<p style="color:red">Please log in to view this page.</p>';
-      return;
-    }
-    let payload;
-    try {
-      payload = JSON.parse(atob(token.split('.')[1]));
-    } catch {
-      container.innerHTML = '<p style="color:red">Invalid token—please log in again.</p>';
-      return;
-    }
-    const userId = payload.userId;
-
-    if (isNaN(orderId)) {
-      container.innerHTML = '<p style="color:red">Invalid order ID.</p>';
-      return;
+    async function fetchFromOrderHistory(orderId) {
+      try {
+        const response = await fetch(`${API}/order-history?userId=${localStorage.getItem('userId')}`);
+        if (!response.ok) throw new Error('Could not fetch order history');
+        
+        const orders = await response.json();
+        return orders.find(o => o.order_id == orderId);
+      } catch (error) {
+        console.error('Error fetching order history:', error);
+        return null;
+      }
     }
 
-    // fetch all past orders, then pick out the one we need
-    fetch(`${API}/order-history?userId=${userId}`)
-      .then(r => {
-        if (!r.ok) throw new Error(`Server responded ${r.status}`);
-        return r.json();
-      })
-      .then(orders => {
-        const order = orders.find(o => o.order_id === orderId);
-        if (!order) {
-          container.innerHTML = '<p>No such order found.</p>';
-          return;
-        }
-        // render it...
-        let html = `
-          <h2>Order ORD-${orderId}</h2>
-          <p><strong>Date:</strong> ${new Date(order.order_date).toLocaleString()}</p>
-          <table class="orders-table" style="width:100%;border-collapse:collapse;">
-            <thead>
-              <tr>
-                <th>Product</th><th>Price</th><th>Quantity</th><th>Subtotal</th>
-              </tr>
-            </thead><tbody>
-        `;
-        let total = 0;
-        order.items.forEach(item => {
-          const sub = item.price * item.quantity;
-          total += sub;
-          html += `
-            <tr>
-              <td>${item.name}</td>
-              <td>$${item.price.toFixed(2)}</td>
-              <td>${item.quantity}</td>
-              <td>$${sub.toFixed(2)}</td>
-            </tr>`;
-        });
+    function renderOrder(order) {
+      let html = `
+        <h2>Order ORD-${order.order_id}</h2>
+        <p><strong>Date:</strong> ${new Date(order.order_date).toLocaleString()}</p>
+        <table class="orders-table" style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Subtotal</th></tr>
+          </thead>
+          <tbody>`;
+      
+      let total = 0;
+      order.items.forEach(item => {
+        const sub = item.price * item.no_items;
+        total += sub;
         html += `
-            </tbody>
-            <tfoot>
-              <tr>
-                <th colspan="3" style="text-align:right">Total:</th>
-                <th>$${total.toFixed(2)}</th>
-              </tr>
-            </tfoot>
-          </table>
-        `;
-        container.innerHTML = html;
+          <tr>
+            <td>${item.name}</td>
+            <td>$${item.price.toFixed(2)}</td>
+            <td>${item.no_items}</td>
+            <td>$${sub.toFixed(2)}</td>
+          </tr>`;
+      });
+      
+      html += `</tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" style="text-align:right">Total:</th>
+            <th>$${total.toFixed(2)}</th>
+          </tr>
+        </tfoot>
+      </table>`;
+      container.innerHTML = html;
+    }
+
+    if (!orderId) {
+      container.innerHTML = '<p style="color:red">Missing order ID in URL parameters</p>';
+      return;
+    }
+
+    fetchFromOrderHistory(orderId)
+      .then(order => {
+        if (order) {
+          renderOrder(order);
+        } else {
+          container.innerHTML = '<p style="color:red">Order not found in your history</p>';
+        }
       })
       .catch(err => {
-        console.error('Error loading order details:', err);
-        container.innerHTML = '<p style="color:red">Failed to load order details.</p>';
+        console.error('Error:', err);
+        container.innerHTML = '<p style="color:red">Error loading order details</p>';
       });
   });
 </script>
 
+
+<script>
+function viewOrderInCart(orderId) {
+  const customerId = localStorage.getItem('customerId'); // or however you store it
+
+  if (!customerId) {
+    alert("You need to be logged in as a customer to use this feature.");
+    return;
+  }
+
+  fetch(`http://localhost:3000/order/${orderId}/copy-to-cart`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ customerId })
+  })
+  .then(res => res.json())
+  .then(json => {
+    if (json.success) {
+      localStorage.setItem("currentOrderId", json.newOrderId); // optional
+      window.location.href = "/shoppingcart";
+    } else {
+      alert(json.message || "Error copying to cart");
+    }
+  })
+  .catch(err => {
+    console.error("Error copying items to cart:", err);
+    alert("Something went wrong.");
+  });
+}
+</script>
+
 </body>
 </html>
+
+
