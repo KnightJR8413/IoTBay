@@ -280,7 +280,7 @@ app.get("/admin/users", authenticateToken, async (req, res) => {
   try {
     const searchParam = req.query.search ? `%${req.query.search}%` : '%';
 
-     const customersSql = `
+     const sql = `
       SELECT 
         u.id as userId, 
         u.email,
@@ -289,8 +289,10 @@ app.get("/admin/users", authenticateToken, async (req, res) => {
         u.user_type, 
         u.status
       FROM users u
-      INNER JOIN customer c ON u.id = c.id
-      WHERE u.user_type = 'c'
+      LEFT JOIN customer c ON u.id = c.id
+      LEFT JOIN staff s ON u.id = s.id
+      WHERE (user_type = 'c' 
+      OR user_type ='s')
         AND (
           u.email LIKE ?
           OR c.first_name LIKE ?
@@ -299,30 +301,9 @@ app.get("/admin/users", authenticateToken, async (req, res) => {
         )
     `;
 
-    const staffSql = `
-      SELECT 
-        u.id as userId, 
-        u.email,
-        (s.first_name || ' ' || s.last_name) AS full_name,
-        '' AS phone, 
-        u.user_type, 
-        u.status
-      FROM users u
-      INNER JOIN staff s ON u.id = s.id
-      WHERE u.user_type = 'staff'
-        AND (
-          u.email LIKE ?
-          OR s.first_name LIKE ?
-          OR s.last_name LIKE ?
-        )
-    `;
+    const params = [searchParam, searchParam, searchParam, searchParam];
+    const users = await getALLAsync(sql, params);
 
-    const customerParams = [searchParam, searchParam, searchParam, searchParam];
-    const staffParams = [searchParam, searchParam, searchParam];
-    const customers = await getALLAsync(customersSql, customerParams);
-    const staff     = await getALLAsync(staffSql, staffParams);
-
-    const users = customers.concat(staff);
     res.json({ users });
   } catch (err) {
     console.error('Error fetching users:', err);
