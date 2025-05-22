@@ -126,18 +126,6 @@ function saveCart() {
     
     // Initial calculation
     updateTotals();
-
-
-    document.addEventListener('DOMContentLoaded', () => {
-  const sessionId = localStorage.getItem('sessionId');
-  if (sessionId) {
-    // Load cart using sessionId
-    fetch(`/cart?sessionId=${sessionId}`)
-      .then(res => res.json())
-      .then(renderCart)
-      .catch(console.error);
-  }
-});
     </script>
 
 <!--FOOTER COPY Start HERE-->
@@ -205,5 +193,6 @@ function saveCart() {
 
     <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
 
+    
 </body>
 </html>
