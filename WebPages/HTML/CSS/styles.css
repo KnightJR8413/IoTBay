@@ -1692,3 +1692,47 @@ p.text {
 .payment-methods-table td button {
   margin-right: 6px;
 }
+
+/* 2-column grid for the product form */
+.product-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: auto;
+    gap: 16px;
+    align-items: center;
+  }
+  
+  /* Make any .full element span both columns */
+  .product-form-grid .full {
+    grid-column: 1 / -1;
+  }
+
+  .product-form-grid input,
+  .product-form-grid textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+  
+  /* Keep buttons grouped */
+  .product-form-grid .login-button-div {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+  
+  /* adjust button sizes */
+  .product-form-grid .login-button {
+    padding: 12px 24px;
+  }
+
+  .manage-products-button-div {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* adds space between buttons */
+    width: 100%;
+    grid-column: span 2; /* makes it span full width if in grid */
+  }
