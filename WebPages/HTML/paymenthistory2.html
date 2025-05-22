@@ -108,19 +108,23 @@
   </footer>
 
   <!-- JavaScript -->
-  <script>
-    const searchInput = document.getElementById("searchInput");
-    const tableRows = document.querySelectorAll("#paymentTable tr");
+<script>
+  const searchInput = document.getElementById("searchInput");
 
-    searchInput.addEventListener("keyup", function () {
-      const query = searchInput.value.toLowerCase();
-      tableRows.forEach(row => {
-        const cells = row.getElementsByTagName("td");
-        const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(query));
-        row.style.display = match ? "" : "none";
-      });
+  searchInput.addEventListener("keyup", function () {
+    const query = searchInput.value.toLowerCase();
+    const rows = document.querySelectorAll("#paymentTable tr");
+
+    rows.forEach(row => {
+      const cells = row.querySelectorAll("td");
+      const match = Array.from(cells).some(cell =>
+        cell.textContent.toLowerCase().includes(query)
+      );
+      row.style.display = match ? "" : "none";
     });
-  </script>
+  });
+</script>
+
 
 <script>
   async function editCard(id) {
@@ -215,7 +219,8 @@
         paymentTable.innerHTML = '';
 
         data.forEach(order => {
-          const totalAmount = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
+          const totalAmount = order.items.reduce((sum, item) => sum + item.price * item.no_items, 0).toFixed(2);
+
           const cardType = order.items[0].name.includes('Visa') ? 'Visa' : 'Card';
           const cardEnding = '**** ' + ('' + order.items[0].product_id).slice(-4);
 
