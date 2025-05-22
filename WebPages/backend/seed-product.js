@@ -54,26 +54,27 @@ const sql = `
 `;
 
 // Use serialize to guarantee sequential execution
-db.serialize(() => {
-  products.forEach((p, idx) => {
-    const params = [
-      p.name, p.price, p.description, p.stock, p.image_url,
-      p.supplier, p.brand, p.model, p.release_year,
-      p.specifications, p.size, p.colour
-    ];
+module.exports = function seedProducts(db) { 
+  db.serialize(() => {
+    products.forEach((p, idx) => {
+      const params = [
+        p.name, p.price, p.description, p.stock, p.image_url,
+        p.supplier, p.brand, p.model, p.release_year,
+        p.specifications, p.size, p.colour
+      ];
 
-    db.run(sql, params, function(err) {
-      if (err) {
-        console.error(`❌ [#${idx + 1}] Insert failed:`, err.message);
-      } else {
-        console.log(`✅ [#${idx + 1}] Inserted ID ${this.lastID}: ${p.name}`);
-      }
+      db.run(sql, params, function(err) {
+        if (err) {
+          console.error(`❌ [#${idx + 1}] Insert failed:`, err.message);
+        } else {
+          console.log(`✅ [#${idx + 1}] Inserted ID ${this.lastID}: ${p.name}`);
+        }
 
-      // After the last product, exit
-      if (idx === products.length - 1) {
-        console.log('All done!');
-        process.exit(0);
-      }
+        // After the last product, exit
+        if (idx === products.length - 1) {
+          console.log('All done!');
+        }
+      });
     });
   });
-});
+}

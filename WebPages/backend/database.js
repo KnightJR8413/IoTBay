@@ -2,6 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const path = require('path');
 const seedUsers = require('./seed-users');
+const seedProducts = require('./seed-product');
 
 // Create database connection
 const db = new sqlite3.Database(path.join(__dirname, 'database.sqlite'));
@@ -24,6 +25,7 @@ const initializeDatabase = (callback) => {
 
 initializeDatabase(() => {
     seedUsers(db);
+    seedProducts(db);
 });
 module.exports = db;
 
