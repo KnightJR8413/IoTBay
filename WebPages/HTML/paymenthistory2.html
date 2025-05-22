@@ -52,7 +52,7 @@
   <!-- Search -->
   <div class="search-bar-container">
     <label class="search-label" for="searchInput">Search Order ID or Date Sent:</label>
-    <input type="text" id="searchInput" class="search-input" placeholder="e.g. 002134 or 2025-05-01">
+    <input type="text" id="searchInput" class="search-input" placeholder="e.g. 000001 or 2025-05-22">
   </div>
 
   <!-- Payment History Table -->
@@ -186,7 +186,7 @@
         const row = document.createElement("tr");
         row.innerHTML = `
   <td>${c.name}</td>
-  <td>Visa</td>
+  <td>Debit</td>
   <td>**** ${c.card_no.slice(-4)}</td>
   <td>${c.expiry_date}</td>
   <td>
