@@ -131,14 +131,12 @@ function logoutUser() {
       .then(data => {
 
         console.log(data.message);
-  
-        localStorage.removeItem('token');
-        localStorage.removeItem('customer_id');
-        
       })
       .catch(error => {
         console.error('Error logging out:', error);
       });
+      localStorage.removeItem('token');
+      localStorage.removeItem('customer_id');
       window.location.href = '/logout'
   }
 
@@ -146,7 +144,7 @@ function logoutUser() {
 document.addEventListener("DOMContentLoaded", function () {
     const logoutButton = document.getElementById("logoutButton");
     if (logoutButton) {
-        logoutButton.addEventListener("click", logout);
+        logoutButton.addEventListener("click", logoutUser());
     }
 });
 

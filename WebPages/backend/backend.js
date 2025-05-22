@@ -138,6 +138,7 @@ app.post('/login', (req, res) => {
         res.status(200).json({ message: 'Login successful!', token });
         logAction(email, 'login');
       });
+      return;
     }
     
     db.get("SELECT * FROM customer INNER JOIN users ON users.id = customer.id WHERE email = ? AND user_type ='c'", [email], (err, row) => {
@@ -174,32 +175,42 @@ app.post('/update-customer', authenticateToken, async (req, res) => {
 });
 
 app.get('/user-details', authenticateToken, async (req, res) => {
-    const userId = req.user.userId;
-    try {
-        const user = await getAsync('SELECT email FROM users WHERE id = ?', [userId]);
-
-        const customer = await getAsync(`
-            SELECT first_name, last_name, phone_no, address_line_1, address_line_2
-            FROM customer WHERE id = ?
-        `, [userId]);
-
-        if (!user || !customer) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        res.json({
-            email: user.email,
-            first_name: customer.first_name,
-            last_name: customer.last_name,
-            phone_no: customer.phone_no,
-            address_line_1: customer.address_line_1,
-            address_line_2: customer.address_line_2
-        });
-
-    } catch (err) {
-        console.error('Error fetching user details:', err);
-        res.status(500).json({ error: 'Internal server error' });
+  const userId = req.user.userId;
+  try {
+    const user = await getAsync('SELECT email FROM users WHERE id = ?', [userId]);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
+
+    let details;
+    // Check the role from the token—if it's admin, query the staff table.
+    if (req.user.role && req.user.role === 'admin') {
+      details = await getAsync(`
+        SELECT first_name, last_name, phone_no
+        FROM staff
+        WHERE id = ?
+      `, [userId]);
+    } else {
+      // Otherwise, assume customer and query the customer table.
+      details = await getAsync(`
+        SELECT first_name, last_name, phone_no, address_line_1, address_line_2
+        FROM customer
+        WHERE id = ?
+      `, [userId]);
+    }
+
+    if (!details) {
+      return res.status(404).json({ error: 'User details not found' });
+    }
+
+    res.json({
+      email: user.email,
+      ...details
+    });
+  } catch (err) {
+    console.error('Error fetching user details:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.get('/user-logs', authenticateToken, async (req, res) => {
@@ -261,42 +272,61 @@ app.delete('/delete-account', authenticateToken, async (req, res) => {
 
 // GETTING USERS FOR ADMIN
 app.get("/admin/users", authenticateToken, async (req, res) => {
-  if (!req.user || req.user.role != 'admin') {
-    logAction(email, 'Unauthorised Access');
+  if (!req.user || req.user.role !== 'admin') {
+    logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
-  try {
-    // Query for customers
-    const customersSql = `
-      SELECT u.id as userId, u.email,
-            c.first_name || ' ' || c.last_name AS full_name,
-            c.phone_no AS phone, u.user_type, 'active' as status
-      FROM users u
-      INNER JOIN customer c ON u.id = c.id
-      WHERE u.email LIKE ?
-        AND u.user_type = 'c'
-    `;
-    // Query for staff
-    const staffSql = `
-      SELECT u.id as userId, u.email,
-            s.first_name || ' ' || s.last_name AS full_name,
-            '' AS phone, u.user_type, 'active' as status
-      FROM users u
-      INNER JOIN staff s ON u.id = s.id
-      WHERE u.email LIKE ?
-        AND u.user_type = 'staff'
-    `;
 
+  try {
     const searchParam = req.query.search ? `%${req.query.search}%` : '%';
 
-    const customers = await getALLAsync(customersSql, [searchParam]);
-    const staff = await getALLAsync(staffSql, [searchParam]);
+     const customersSql = `
+      SELECT 
+        u.id as userId, 
+        u.email,
+        (c.first_name || ' ' || c.last_name) AS full_name,
+        c.phone_no AS phone, 
+        u.user_type, 
+        u.status
+      FROM users u
+      INNER JOIN customer c ON u.id = c.id
+      WHERE u.user_type = 'c'
+        AND (
+          u.email LIKE ?
+          OR c.first_name LIKE ?
+          OR c.last_name LIKE ?
+          OR c.phone_no LIKE ?
+        )
+    `;
+
+    const staffSql = `
+      SELECT 
+        u.id as userId, 
+        u.email,
+        (s.first_name || ' ' || s.last_name) AS full_name,
+        '' AS phone, 
+        u.user_type, 
+        u.status
+      FROM users u
+      INNER JOIN staff s ON u.id = s.id
+      WHERE u.user_type = 'staff'
+        AND (
+          u.email LIKE ?
+          OR s.first_name LIKE ?
+          OR s.last_name LIKE ?
+        )
+    `;
+
+    const customerParams = [searchParam, searchParam, searchParam, searchParam];
+    const staffParams = [searchParam, searchParam, searchParam];
+    const customers = await getALLAsync(customersSql, customerParams);
+    const staff     = await getALLAsync(staffSql, staffParams);
 
     const users = customers.concat(staff);
     res.json({ users });
   } catch (err) {
     console.error('Error fetching users:', err);
-    res.status(500).json({ error: 'Internal server error'});
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -339,7 +369,7 @@ app.post('/admin/users', authenticateToken, async (req, res) => {
   const { full_name, email, phone, user_type } = req.body;
   const names = full_name.split(' ');
   const first_name = names[0];
-  const last_name = names.slice(1).joint(' ') || '';
+  const last_name = names.slice(1).join(' ') || '';
 
   //Insert into users table
   db.run(
@@ -386,7 +416,7 @@ app.put('/admin/users/:id', authenticateToken, async (req, res) => {
   const { full_name, email, phone, user_type } = req.body;
   const names = full_name.split(' ');
   const first_name = names[0];
-  const last_name = names.slice(1).joint(' ') || '';
+  const last_name = names.slice(1).join(' ') || '';
 
   db.run(
     "UPDATE users SET email = ?, user_type = ? WHERE id = ?",
@@ -420,17 +450,31 @@ app.put('/admin/users/:id', authenticateToken, async (req, res) => {
 
 // TOGGLING USER STATUS (active/inactive)
 app.put('/admin/users/:id/status', authenticateToken, async (req, res) => {
-  if (!req.user || req.user.role != 'admin') {
-    logAction(email, 'Unauthorised Access');
+  if (!req.user || req.user.role !== 'admin') {
+    logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
+
   const userId = req.params.id;
-  const { status } = req.body;
-  db.run("UPDATE users SET status = ? WHERE id = ?", [status, userId], function (err) {
-    if (err) return res.status(500).json({ error: "Database error: " + err.message });
-    res.json({ message: 'Status updated' });
-  });
+  const { status } = req.body; 
+
+  try {
+    const user = await getAsync("SELECT email FROM users WHERE id = ?", [userId]);
+    if (user && user.email.toLowerCase() === "admin@iotbay.com") {
+      return res.status(403).json({ error: "Admin status cannot be changed." });
+    }
+    
+    db.run("UPDATE users SET status = ? WHERE id = ?", [status, userId], function (err) {
+      if (err) return res.status(500).json({ error: "Database error: " + err.message });
+      res.json({ message: 'Status updated.' });
+    });
+  } catch (error) {
+    console.error("Error updating status:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
+
+
 
 app.delete('/admin/users/:id', authenticateToken, async (req, res) => {
   if (!req.user || req.user.role != 'admin') {
