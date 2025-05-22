@@ -97,7 +97,11 @@ function checkLoginAndRedirect() {
     localStorage.removeItem('token');
     return window.location.href = '/login';
   }
-  window.location.href = '/account';
+  if (payload.user_type === 'c') {
+    window.location.href = '/account';
+  } else if (playload.user_type === 's') {
+    window.location.href = '/staffDashboard';
+  }
 }
 
 // ─────────────────────────────────────────────
