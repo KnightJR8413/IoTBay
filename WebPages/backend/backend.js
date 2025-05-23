@@ -223,7 +223,7 @@ app.get('/user-logs', authenticateToken, async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    const logs = await getAsync(
+    const logs = await getALLAsync(
       'SELECT type, date FROM user_logs WHERE user_id = ? AND (type = "login" OR type = "logout") ORDER BY date DESC',
       [userId]
     );

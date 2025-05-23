@@ -76,6 +76,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         const logs = await response.json();
+        console.log("User logs response:", logs);
+        
         const tbody = document.getElementById("logTableBody");
         tbody.innerHTML = "";
 
