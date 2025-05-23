@@ -295,6 +295,7 @@ async function loadUsers(query = '') {
     if (query) url += `?search=${encodeURIComponent(query)}`;
     const res = await authFetch(url);
     const data = await res.json();
+    console.log("api response:", data);
     renderUserTable(data.users);
   } catch (error) {
     console.error('Error loading users:', error);
