@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // DELETE
     if (e.target.classList.contains("delete")) {
-      if (!confirm(`Really delete "${name}"?`)) return;
+      if (!confirm(`Delete "${name}"?`)) return;
       const res  = await fetch(`${baseUrl}/products/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) {
