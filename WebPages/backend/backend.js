@@ -108,54 +108,60 @@ app.post('/register', (req, res) => {
     });
 });
 
-// Customer login
-app.post('/login', (req, res) => {
-    const { email, password } = req.body;
+// login
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required." });
+  }
 
-    if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required." });
+  try {
+    const user = await getAsync("SELECT * FROM users WHERE email = ?", [email]);
+    if (!user) {
+      logAction(email, 'Unsuccessful login - user not found');
+      return res.status(401).json({ message: "Invalid email or password." });
     }
-    
-    //CHECKING IF THEY'RE THE ADMIN
-    if (email.toLowerCase() == "admin@iotbay.com") {
-      if (!bcrypt.compareSync(password, "$2a$12$4dffGL/MnFj5ch0oYF50QO4ZyajjHAlOzhw5ve93wVs4rDtR8vxq2")) {
-          logAction(email, 'Unsuccessful login');
-          return res.status(401).json({ message: 'Invalid email or password.' });
-      }
-      
-      db.get("SELECT * FROM staff INNER JOIN users ON users.id = staff.id WHERE email = ?", [email], (err, adminRow) => {
-        if (err) {
-            logAction(email, 'error logging in');
-            return res.status(500).json({ message: 'Database error: ' + err.message });
-        }
 
-        if (!adminRow) {
-            logAction(email, 'Unsuccessful login');
-            return res.status(404).json({ message: 'Admin record not found.' });
-        }
-
-        const token = jwt.sign({ userId: adminRow.id, email: adminRow.email, first_name: adminRow.first_name, last_name: adminRow.last_name, user_type: adminRow.user_type, role: "admin" }, SECRET_KEY, { expiresIn: '1h' });
-        res.status(200).json({ message: 'Login successful!', token });
-        logAction(email, 'login');
-      });
-      return;
+    let row;
+    if (user.user_type === 'c') {
+      row = await getAsync(
+        "SELECT * FROM users INNER JOIN customer ON users.id = customer.id WHERE email = ?",
+        [email]
+      );
+    } else if (user.user_type === 's' || user.user_type === 'a') {
+      row = await getAsync(
+        "SELECT * FROM users INNER JOIN staff ON users.id = staff.id WHERE email = ?",
+        [email]
+      );
     }
-    
-    db.get("SELECT * FROM customer INNER JOIN users ON users.id = customer.id WHERE email = ? AND user_type ='c'", [email], (err, row) => {
-        if (err) {
-            logAction(email, 'error logging in');
-            return res.status(500).json({ message: 'Database error: ' + err.message });
-        }
-        
-        if (!row || !bcrypt.compareSync(password, row.password_hash)) {
-            logAction(email, 'Unsuccessful login');
-            return res.status(401).json({ message: 'Invalid email or password.' });
-        }
-        
-        const token = jwt.sign({ userId: row.id, email: row.email, first_name: row.first_name, last_name: row.last_name, user_type: row.user_type}, SECRET_KEY, { expiresIn: '1h' });
-        res.status(200).json({ message: 'Login successful!', token });
-        logAction(email, 'login');
-    });
+    console.log("Entered password:", password);
+    console.log("Password hash:", row?.password_hash);
+    console.log("Stored hash:", JSON.stringify(row.password_hash));
+    console.log('Row for login:', row, bcrypt.compareSync(password, row.password_hash));
+    if (!row || !bcrypt.compareSync(password, row.password_hash)) {
+      logAction(email, 'Unsuccessful login - wrong password');
+      return res.status(401).json({ message: 'Invalid email or password.' });
+    }
+
+    const token = jwt.sign(
+      {
+        userId: row.id,
+        email: row.email,
+        first_name: row.first_name,
+        last_name: row.last_name,
+        user_type: row.user_type
+      },
+      SECRET_KEY,
+      { expiresIn: '1h' }
+    );
+
+    logAction(email, 'login');
+    return res.status(200).json({ message: 'Login successful!', token });
+
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({ message: "Internal server error." });
+  }
 });
 
 app.post('/update-customer', authenticateToken, async (req, res) => {
@@ -184,7 +190,7 @@ app.get('/user-details', authenticateToken, async (req, res) => {
 
     let details;
     // Check the role from the token—if it's admin, query the staff table.
-    if (req.user.role && req.user.role === 'admin') {
+    if (req.user.user_type  === 'a' || req.user.user_type  === 's') {
       details = await getAsync(`
         SELECT first_name, last_name, phone_no
         FROM staff
@@ -272,7 +278,7 @@ app.delete('/delete-account', authenticateToken, async (req, res) => {
 
 // GETTING USERS FOR ADMIN
 app.get("/admin/users", authenticateToken, async (req, res) => {
-  if (!req.user || req.user.role !== 'admin') {
+  if (!req.user || req.user.user_type !== 'a') {
     logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
@@ -280,26 +286,26 @@ app.get("/admin/users", authenticateToken, async (req, res) => {
   try {
     const searchParam = req.query.search ? `%${req.query.search}%` : '%';
 
-     const sql = `
+    const sql = `
       SELECT 
-        u.id as userId, 
+        u.id AS userId, 
         u.email,
-        (c.first_name || ' ' || c.last_name) AS full_name,
-        c.phone_no AS phone, 
+        COALESCE(c.first_name, s.first_name) || ' ' || COALESCE(c.last_name, s.last_name) AS full_name,
+        COALESCE(c.phone_no, s.phone_no) AS phone,
         u.user_type, 
         u.status
       FROM users u
       LEFT JOIN customer c ON u.id = c.id
       LEFT JOIN staff s ON u.id = s.id
-      WHERE (user_type = 'c' 
-      OR user_type ='s')
+      WHERE (u.user_type = 'c' OR u.user_type = 's')
         AND (
           u.email LIKE ?
-          OR c.first_name LIKE ?
-          OR c.last_name LIKE ?
-          OR c.phone_no LIKE ?
+          OR COALESCE(c.first_name, s.first_name) LIKE ?
+          OR COALESCE(c.last_name, s.last_name) LIKE ?
+          OR COALESCE(c.phone_no, s.phone_no) LIKE ?
         )
     `;
+
 
     const params = [searchParam, searchParam, searchParam, searchParam];
     const users = await getALLAsync(sql, params);
@@ -313,8 +319,8 @@ app.get("/admin/users", authenticateToken, async (req, res) => {
 
 // GETTING SPECIFIC USER DETAILS
 app.get('/admin/users/:id', authenticateToken, async (req, res) => {
-  if (!req.user || req.user.role != 'admin') {
-    logAction(email, 'Unauthorised Access');
+  if (!req.user || req.user.user_type !== 'a') {
+    logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
   const userId = req.params.id;
@@ -343,8 +349,8 @@ app.get('/admin/users/:id', authenticateToken, async (req, res) => {
 
 // CREATE USER
 app.post('/admin/users', authenticateToken, async (req, res) => {
-  if (!req.user || req.user.role != 'admin') {
-    logAction(email, 'Unauthorised Access');
+  if (!req.user || req.user.user_type !== 'a') {
+    logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
   const { full_name, email, phone, user_type } = req.body;
@@ -370,7 +376,7 @@ app.post('/admin/users', authenticateToken, async (req, res) => {
             res.json({ message: 'Customer created', userId: newUserId });
           }
         );
-      } else if (user_type == 'staff') {
+      } else if (user_type == 's') {
         const defaultPasswordHash = bcrypt.hashSync('default123', 10);
         db.run(
           "INSERT INTO staff (id, first_name, last_name, password_hash) VALUES (?, ?, ?, ?)",
@@ -389,8 +395,9 @@ app.post('/admin/users', authenticateToken, async (req, res) => {
 
 // UPDATING USER DETAILS
 app.put('/admin/users/:id', authenticateToken, async (req, res) => {
-  if (!req.user || req.user.role != 'admin') {
-    logAction(email, 'Unauthorised Access');
+
+  if (!req.user || req.user.user_type !== 'a') {
+    logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
   const userId = req.params.id;
@@ -404,7 +411,7 @@ app.put('/admin/users/:id', authenticateToken, async (req, res) => {
     [email, user_type, userId],
     function (err) {
       if (err) return res.status(500).json({ error: "Database error: " + err.message });
-      if (user_type == 'c') {
+      if (user_type === 'c') {
         db.run(
           "UPDATE customer SET first_name = ?, last_name = ?, phone_no = ? WHERE id = ?",
           [first_name, last_name, phone, userId],
@@ -413,7 +420,7 @@ app.put('/admin/users/:id', authenticateToken, async (req, res) => {
             res.json({ message: 'Customer updated' });
           }
         );
-      } else if (user_type == 'staff') {
+      } else if (user_type === 's') {
         db.run(
           "UPDATE staff SET first_name = ?, last_name = ? WHERE id = ?",
           [first_name, last_name, userId],
@@ -431,7 +438,7 @@ app.put('/admin/users/:id', authenticateToken, async (req, res) => {
 
 // TOGGLING USER STATUS (active/inactive)
 app.put('/admin/users/:id/status', authenticateToken, async (req, res) => {
-  if (!req.user || req.user.role !== 'admin') {
+  if (!req.user || req.user.user_type !== 'a') {
     logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
@@ -458,8 +465,8 @@ app.put('/admin/users/:id/status', authenticateToken, async (req, res) => {
 
 
 app.delete('/admin/users/:id', authenticateToken, async (req, res) => {
-  if (!req.user || req.user.role != 'admin') {
-    logAction(email, 'Unauthorised Access');
+  if (!req.user || req.user.user_type !== 'a') {
+    logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
   const userId = req.params.id;
@@ -471,7 +478,7 @@ app.delete('/admin/users/:id', authenticateToken, async (req, res) => {
 
     if (user.user_type == 'c') {
       await getAsync("DELETE FROM customer WHERE id = ?", [userId]);
-    } else if (user.user_type == 'staff') {
+    } else if (user.user_type == 's') {
       await getAsync("DELETE FROM staff WHERE id = ?", [userId]);
     }
 

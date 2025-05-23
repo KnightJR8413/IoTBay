@@ -94,23 +94,7 @@ function loginUser(email, password){
             console.log("Decoded token payload: ", payload);
             const customer_id = payload.userId;
             localStorage.setItem('customer_id', customer_id);
-
-            localStorage.setItem('user_type', payload.user_type);
-            if (payload.role) {
-              localStorage.setItem('role', payload.role);
-            }
-            // Takes staff and admin users to a different page than customers
-            if (payload.user_type == 'a') {
-              if (payload.role == "admin") {
-                window.location.href = '/admindashboard';
-              }
-              else {
-                //Redirect staff to staff dashboard when that's created
-              }
-            }
-            else {
-              window.location.href = '/welcome';
-            }
+            window.location.href = '/welcome';
         } else {
             alert(data.error || 'Login failed');
         }

@@ -15,58 +15,53 @@ const users = [
   }
 ];
 
-const staff = [
-  {
-    phone_no: '1122334455',
-    first_name:  "i'm not",
-    last_name: "creative",
-    password_hash: "$2b$10$1q88CJzz5vV3TzEzmSWZuuYbFYuMF5pjqPYGU60F042lIwEjVdXHe" //example
-  },
-  {
-    first_name:  "Store",
+const staff = {
+  "admin@iotbay.com": {
+    phone_no: null,
+    first_name: "Store",
     last_name: "Admin",
-    password_hash: "$2b$10$m8ZKUobtZrO4Jqw87jNXF.bJ4CrPTFBBN9eqsGcy9ABXWQ5SHO72W" //admin
+    password_hash: "$2b$10$m8ZKUobtZrO4Jqw87jNXF.bJ4CrPTFBBN9eqsGcy9ABXWQ5SHO72W" // admin
+  },
+  "staff@iotbay.com": {
+    phone_no: "1122334455",
+    first_name: "i'm not",
+    last_name: "creative",
+    password_hash: "$2b$10$1q88CJzz5vV3TzEzmSWZuuYbFYuMF5pjqPYGU60F042lIwEjVdXHe" // example
   }
-];
+};
+
 const customer = {
   phone_no: '5544332211',
   first_name: "creative",
   last_name: "i'm not",
   address_line_1: "there is no checking the address here",
   address_line_2: "or here",
-  password_hash: "$2b$10$1q88CJzz5vV3TzEzmSWZuuYbFYuMF5pjqPYGU60F042lIwEjVdXHe" //example
+  password_hash: "$2b$10$1q88CJzz5vV3TzEzmSWZuuYbFYuMF5pjqPYGU60F042lIwEjVdXHe" // example
 };
-
 
 module.exports = function seedUsers(db) {
   db.serialize(() => {
     db.run("BEGIN TRANSACTION");
 
-    // Insert users and get their IDs
     const userInsert = db.prepare(`INSERT INTO users (email, user_type) VALUES (?, ?)`);
-
-    const userIds = []; // holds auto-generated IDs
-
-    users.forEach((user, index) => {
+    users.forEach((user) => {
       userInsert.run([user.email, user.user_type], function (err) {
         if (err) return console.error("Error inserting user:", err);
-        userIds[index] = this.lastID;
-
-        // Now insert into staff or customer based on user_type
         const id = this.lastID;
 
         if (user.user_type === 's' || user.user_type === 'a') {
-          const s = staff.shift(); // assume order matches
+          const s = staff[user.email];
           db.run(
             `INSERT INTO staff (id, phone_no, first_name, last_name, password_hash) VALUES (?, ?, ?, ?, ?)`,
-            [id, s.phone_no || null, s.first_name, s.last_name, s.password_hash],
+            [id, s.phone_no, s.first_name, s.last_name, s.password_hash],
             (err) => {
               if (err) console.error("Error inserting staff:", err);
             }
           );
         } else if (user.user_type === 'c') {
           db.run(
-            `INSERT INTO customer (id, phone_no, first_name, last_name, password_hash, address_line_1, address_line_2) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO customer (id, phone_no, first_name, last_name, password_hash, address_line_1, address_line_2)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
               id,
               customer.phone_no,

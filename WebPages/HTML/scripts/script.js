@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       // Check that the role is 'admin'
-      if (payload.role !== 'admin') {
+      if (payload.user_type !== 'a') {
         // If the user is not an admin, redirect away (e.g. to the home page)
         window.location.href = '/';
       }
@@ -116,15 +116,24 @@ document.addEventListener('DOMContentLoaded', () => {
 function checkLoginAndRedirect() {
   const token = localStorage.getItem('token');
   if (!token) return window.location.href = '/login';
-  const payload = JSON.parse(atob(token.split('.')[1]));
-  if (Date.now() >= payload.exp*1000) {
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    
+    if (Date.now() >= payload.exp * 1000) {
+      localStorage.removeItem('token');
+      return window.location.href = '/login';
+    }
+
+    if (payload.user_type === 's' || payload.user_type === 'a') {
+      window.location.href = '/staffdashboard';
+    } else {
+      window.location.href = '/account';
+    }
+  } catch (e) {
+    console.error("Invalid token:", e);
     localStorage.removeItem('token');
-    return window.location.href = '/login';
-  }
-  if (payload.user_type === 'c') {
-    window.location.href = '/account';
-  } else if (playload.user_type === 's' || playload.user_type === 'a') {
-    window.location.href = '/staffdashboard';
+    window.location.href = '/login';
   }
 }
 
@@ -295,7 +304,6 @@ async function loadUsers(query = '') {
     if (query) url += `?search=${encodeURIComponent(query)}`;
     const res = await authFetch(url);
     const data = await res.json();
-    console.log("api response:", data);
     renderUserTable(data.users);
   } catch (error) {
     console.error('Error loading users:', error);
@@ -350,8 +358,8 @@ function openUserModal(userId = null) {
       document.getElementById('emailInput').value = data.user.email;
       document.getElementById('phoneInput').value = data.user.phone || '';
       document.getElementById('userType').value = data.user.user_type;
-        document.getElementById('statusInput').value = data.user.status;
-        document.getElementById('userModal').style.display = 'flex';
+      document.getElementById('statusInput').value = data.user.status;
+      document.getElementById('userModal').style.display = 'flex';
       })
       .catch(err => console.error('Error fetching user:', err));
     } else {
@@ -464,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (token) {
     try { 
       const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.role == 'admin') {
+      if (payload.user_type === 'a') {
         adminLink.style.setProperty('display', 'block', 'important')
       }
     } catch (error) {
