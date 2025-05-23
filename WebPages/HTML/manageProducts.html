@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Manage Products - IoTBay</title>
+  <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css') }}">
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="logo">
+      <a href="/index">
+        <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
+      </a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/index">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/products" class="active">Products</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="icon-buttons">
+      <button class="icon-btn" onclick="toggleSearchBar()">
+        <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
+      </button>
+      <button class="icon-btn" onclick="checkLoginAndRedirect()">
+        <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
+      </button>
+      <button class="icon-btn" onclick="location.href='/shoppingcart'">
+        <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="cart" class="icon-img">
+      </button>
+    </div>
+  </div>
+  <div id="search-bar" class="search-bar">
+    <input type="text" placeholder="Search products..." id="search-input">
+    <button onclick="searchProduct()">Search</button>
+    <button onclick="toggleSearchBar()">Close</button>
+  </div>
+
+
+  <section class="hero">
+    <h1>Manage Products</h1>
+    <p>Add, edit or delete products</p>
+  </section>
+
+  <main>
+    <!-- ADD / EDIT FORM -->
+    <section class="contact-container">
+        <h2 id="form-title">Add / Edit Product</h2>
+        <form id="productForm" class="product-form-grid">
+          <input type="hidden" id="productId">
+      
+          <input type="text"     id="name"           name="name"           placeholder="Product Name" required>
+          <input type="number"   id="price"          name="price"          placeholder="Price" step="0.01" required>
+      
+          <textarea id="description" name="description" placeholder="Description" class="full" rows="3"></textarea>
+      
+          <input type="number"   id="stock"          name="stock"          placeholder="Stock Qty" required>
+          <input type="text"     id="image_url"      name="image_url"      placeholder="Image URL">
+      
+          <input type="text"     id="supplier"       name="supplier"       placeholder="Supplier" required>
+          <input type="text"     id="brand"          name="brand"          placeholder="Brand"    required>
+      
+          <input type="text"     id="model"          name="model"          placeholder="Model"    required>
+          <input type="number"   id="release_year"   name="release_year"   placeholder="Release Year">
+      
+          <textarea id="specifications" name="specifications" placeholder="Specifications" class="full" rows="3" required></textarea>
+      
+          <input type="text"     id="size"           name="size"           placeholder="Size"     required>
+          <input type="text"     id="colour"         name="colour"         placeholder="Colour">
+      
+          <div class="manage-products-button-div">
+            <button type="submit" id="saveBtn" class="login-button">Save</button>
+            <button type="button" id="cancelBtn" class="login-button" style="display:none">Cancel</button>
+          </div>
+        </form>
+        <p id="status"></p>
+      </section>
+
+    <!-- SEARCH & LIST SECTION -->
+    <section class="contact-container">
+      <h2>Search Products</h2>
+      <div class="login-form-input-div">
+        <input class="login-form-input-box" type="text" id="searchBox" placeholder="Enter product name">
+        <div class="login-button-div">
+          <button id="searchBtn" class="login-button">Search</button>
+          <button id="clearBtn"  class="login-button">Clear</button>
+        </div>
+      </div>
+
+      <div id="catalogue" class="products-grid">
+        <!-- cards injected here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <div class="footer-column">
+        <h3>ABOUT</h3>
+        <ul>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+          <li><a href="#">Store Locations</a></li>
+          <li><a href="#">Payment Methods</a></li>
+          <li><a href="#">Shipping Methods</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>HELP</h3>
+        <ul>
+          <li><a href="#">Support</a></li>
+          <li><a href="#">Warranty & Returns</a></li>
+          <li><a href="#">Services</a></li>
+          <li><a href="#">Site Map</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>OTHER</h3>
+        <ul>
+          <li><a href="#">Announcements</a></li>
+          <li><a href="#">Merchandise</a></li>
+          <li><a href="/termconditions">Terms & Conditions</a></li>
+          <li><a href="/privacypolicy">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-contact">
+      <h3>Need advice?</h3>
+      <p>Speak to our friendly staff</p>
+      <a href="/contact" class="contact-button">Contact Us</a>
+    </div>
+    <div class="footer-copyright">
+      <p>&copy; 2025 IoTBay. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+  <script src="{{ url_for('serve_js', filename='manageProducts.js') }}"></script>
+</body>
+</html>

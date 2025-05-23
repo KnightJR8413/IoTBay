@@ -2,7 +2,8 @@ CREATE TABLE if NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     email TEXT,
-    user_type TEXT
+    user_type TEXT,
+    status TEXT NOT NULL DEFAULT 'active'
 );
 
 CREATE TABLE if NOT EXISTS customer (
