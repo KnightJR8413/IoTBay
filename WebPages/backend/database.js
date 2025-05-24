@@ -24,8 +24,8 @@ const initializeDatabase = (callback) => {
 };
 
 initializeDatabase(() => {
-    // seedUsers(db);
-    // seedProducts(db);
+    seedUsers(db);
+    seedProducts(db);
 });
 module.exports = db;
 
