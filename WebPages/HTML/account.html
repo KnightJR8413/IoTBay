@@ -43,7 +43,6 @@
 
     <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
     <script src="{{ url_for('serve_js', filename='frontend.js') }}"></script>
-    <script src="{{ url_for('serve_js', filename='welcome.js') }}"></script>
     <script src="{{ url_for('serve_js', filename='accountEdit.js') }}"></script>
 </body>
 </html>
@@ -106,7 +105,7 @@
                     <div class="spacer"></div>
                     <div class="spacer"></div>
                 </div>
-                
+
                 <div class="info-actions">
                     <button id="deleteAccountBtn" class="delete-btn" style="display: none;">Delete Account</button>
                     <button id="editBtn" class="edit-btn" data-mode="view">Edit</button>
@@ -122,9 +121,10 @@
 
     <script>
         // Fetch user data from server if needed
+        const API_BASE = 'http://localhost:3000';
         document.addEventListener("DOMContentLoaded", async function() {
             try {
-                const response = await fetch('http://localhost:3000/user-details', {
+                const response = await fetch(`${API_BASE}/user-details`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`

@@ -72,18 +72,6 @@ CREATE TABLE if NOT EXISTS product_tags (
     FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 
--- CREATE TABLE if NOT EXISTS address (
---     id INTEGER PRIMARY KEY AUTOINCREMENT,
---     user_id,
---     address_line_1 TEXT NOT NULL,
---     address_line_2 TEXT,
---     city TEXT NOT NULL,
---     state TEXT NOT NULL,
---     country TEXT NOT NULL,
---     postcode INTEGER NOT NULL,
---     FOREIGN KEY (user_id) REFERENCES users(id)
--- );
-
 CREATE TABLE if NOT EXISTS payment (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     customer_id INTEGER NOT NULL,

@@ -1,4 +1,30 @@
+function checkLoginAndRedirectMP() {
+    const token = localStorage.getItem('token');
+    if (!token) return window.location.href = '/login';
+  
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+  
+      if (Date.now() >= payload.exp * 1000) {
+        localStorage.removeItem('token');
+        return window.location.href = '/login';
+      }
+  
+      if (payload.user_type !== 's' && payload.user_type !== 'a') {
+        return window.location.href = '/account';
+      }
+    } catch (e) {
+      console.error("Invalid token:", e);
+      localStorage.removeItem('token');
+      return window.location.href = '/login';
+    }
+  }
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
+    checkLoginAndRedirectMP();
+
     const baseUrl   = "http://localhost:3000";
     const token     = localStorage.getItem("token");
     const form      = document.getElementById("productForm");

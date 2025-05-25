@@ -61,53 +61,55 @@
             </tr>
         </thead>
         <tbody id="logTableBody">
-            <!-- Rows will be injected here by JavaScript -->
+            <!-- Rows will be injected here -->
         </tbody>
     </table>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        const response = await fetch("http://localhost:3000/user-logs", {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        });
+    const API_BASE = 'http://localhost:3000';
 
-        const logs = await response.json();
-        console.log("User logs response:", logs);
-        
-        const tbody = document.getElementById("logTableBody");
-        tbody.innerHTML = "";
-
-        if (Array.isArray(logs) && logs.length > 0) {
-            logs.forEach(log => {
-                const row = document.createElement("tr");
-
-                const typeCell = document.createElement("td");
-                typeCell.textContent = log.type;
-
-                const dateCell = document.createElement("td");
-                dateCell.textContent = new Date(log.date).toLocaleString();
-
-                row.appendChild(typeCell);
-                row.appendChild(dateCell);
-                tbody.appendChild(row);
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            const response = await fetch(`${API_BASE}/user-logs`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
             });
-        } else {
-            const row = document.createElement("tr");
-            const cell = document.createElement("td");
-            cell.colSpan = 2;
-            cell.textContent = "No logs found.";
-            cell.style.textAlign = "center";
-            row.appendChild(cell);
-            tbody.appendChild(row);
+
+            const logs = await response.json();
+            console.log("User logs response:", logs);
+            
+            const tbody = document.getElementById("logTableBody");
+            tbody.innerHTML = "";
+
+            if (Array.isArray(logs) && logs.length > 0) {
+                logs.forEach(log => {
+                    const row = document.createElement("tr");
+
+                    const typeCell = document.createElement("td");
+                    typeCell.textContent = log.type;
+
+                    const dateCell = document.createElement("td");
+                    dateCell.textContent = new Date(log.date).toLocaleString();
+
+                    row.appendChild(typeCell);
+                    row.appendChild(dateCell);
+                    tbody.appendChild(row);
+                });
+            } else {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.colSpan = 2;
+                cell.textContent = "No logs found.";
+                cell.style.textAlign = "center";
+                row.appendChild(cell);
+                tbody.appendChild(row);
+            }
+        } catch (error) {
+            console.error("Failed to fetch user logs:", error);
         }
-    } catch (error) {
-        console.error("Failed to fetch user logs:", error);
-    }
-});
+    });
 </script>
 
 <!--FOOTER COPY Start HERE-->

@@ -1565,17 +1565,17 @@ p.text {
 }
 
 .delete-btn {
-  float: left;          /* Moves the button to the right */
-  color: red;            /* Red text color */
-  background: transparent; /* Transparent background */
-  border: none;          /* No border */
-  cursor: pointer;       /* Pointer cursor on hover */
-  font-weight: bold;     /* Bold text */
-  padding: 6px 12px;     /* Some padding */
+  float: left;
+  color: red;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 6px 12px;
 }
 
 .delete-btn:hover {
-  text-decoration: underline; /* Optional: underline on hover */
+  text-decoration: underline;
 }
 
 .edit-payment-container {
