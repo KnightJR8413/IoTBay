@@ -1,4 +1,4 @@
-function checkLoginAndRedirect() {
+function checkLoginAndRedirectMP() {
     const token = localStorage.getItem('token');
     if (!token) return window.location.href = '/login';
   
@@ -23,7 +23,7 @@ function checkLoginAndRedirect() {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    checkLoginAndRedirect();
+    checkLoginAndRedirectMP();
 
     const baseUrl   = "http://localhost:3000";
     const token     = localStorage.getItem("token");
