@@ -1,4 +1,3 @@
-const API_BASE = 'http://localhost:3000';
 document.addEventListener("DOMContentLoaded", function () {
     const editBtn = document.getElementById('editBtn');
     const deleteBtn = document.getElementById('deleteAccountBtn');

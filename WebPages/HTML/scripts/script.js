@@ -1,5 +1,4 @@
 // script.js
-const API_BASE = 'http://localhost:3000';
 
 // Redirecting unauthorised users away from the Admin Dashboard
 document.addEventListener('DOMContentLoaded', () => {
