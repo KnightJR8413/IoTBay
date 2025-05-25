@@ -8,7 +8,6 @@ An e-commerce plaftorm built ising Node.js, Flask, SQLite, and Python. this was 
 2. Setup
 3. Frontend
 4. Backend
-5. API
 
 
 ## Installation
