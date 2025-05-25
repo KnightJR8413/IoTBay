@@ -1680,12 +1680,12 @@ select {
     z-index: 1000;
     box-shadow: 0 0 20px rgba(0,0,0,0.2);
     text-align: center;
-    width: 50%;
+    width: 25%;
     justify-content: center;
 }
 
 .modal .modal-content {
-    width: 75%;
+    width: 100%;
 }
 
 .admin-title {
