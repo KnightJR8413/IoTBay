@@ -1,3 +1,4 @@
+const API_BASE = 'http://localhost:3000';
 document.addEventListener("DOMContentLoaded", function () {
     const editBtn = document.getElementById('editBtn');
     const deleteBtn = document.getElementById('deleteAccountBtn');
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
             input.parentNode.replaceChild(span, input);
             });
 
-        fetch('http://localhost:3000/update-customer', {
+        fetch(`${API_BASE}/update-customer`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -70,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const confirmed = confirm("Are you sure you want to delete your account? This cannot be undone.");
         if (confirmed) {
             try {
-                const res = await fetch('http://localhost:3000/delete-account', {
+                const res = await fetch(`${API_BASE}/delete-account`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`

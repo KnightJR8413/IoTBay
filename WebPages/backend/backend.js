@@ -189,7 +189,7 @@ app.get('/user-details', authenticateToken, async (req, res) => {
     }
 
     let details;
-    // Check the role from the token—if it's admin, query the staff table.
+    // Check the role from the token—if it's admin or staff, query the staff table.
     if (req.user.user_type  === 'a' || req.user.user_type  === 's') {
       details = await getAsync(`
         SELECT first_name, last_name, phone_no

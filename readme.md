@@ -60,9 +60,9 @@ Before you begin, ensure you have the following installed:
 
 ### Access the apllication
 In your browser you can access the application 
-    * localhost:5000 (local machine)
-    * 127.0.0.1:5000 (local machine)
-    * *ip*:5000 (any machine on the network)
+* localhost:5000 (local machine)
+* 127.0.0.1:5000 (local machine)
+* *ip*:5000 (any machine on the network)
 
 ## Frontend
 * The frontend is built using Flask and serves HTML pages.
@@ -76,10 +76,33 @@ The backend server runs on port 3000 by default.
 ### Endpoints
 POST /register: Registers a new user.
 POST /login: Logs a user in and returns a JWT token.
-GET /check-session: checks if a user is logged in
+POST /update-customer: Updates customer information
+POST /admin/users: adds user into table with default password
+POST /products: create a product
+POST /cart: add to cart
+POST /update-cart: save order
+POST /order/:orderId/copy-to-cart: copy items for order to cart
+POST /newsletter: adds user to marketing list
 POST /logout: currently not used but is there if needed for future application
-
-## API
-### Authentication
-* Register User: Sends user data (email, first name, surname, password) and creates a new user with encrypted password stored in SQLite.
-* Login: Accepts email and password, generates and returns a JWT token if successful.
+POST /payments: inserts payment information into database
+GET /user-details: get the users deatils
+GET /user-logs: gets the login and logout logs for a user
+GET /check-session: checks if a user is logged in
+GET /admin/users: get a list of all non admin users
+GET /admin/users/:id: get specific user informatuon
+GET /products: gets all products
+GET /product/:id: get single product
+GET /cart: get cart
+GET /order-history: gets order history
+GET /orders/:orderId/items: get items for specific order
+GET /payments: gets all payment methods for logged in user
+DELETE /delete-account: deletes all useer information but keeps their user ID in the system
+DELETE /product/:id: delete product completely
+DELETE /admin/users/:id: deletes user from table completely
+DELETE /cart: remove item from cart
+DELETE /orders/:id: delete order completely
+DELETE /payments/:id: delete payment method
+PUT /admin/users/:id: updates user details
+PUT /admin/users/:id/status: toggles account as active/inactive
+PUT /product/:id: update product information
+PUT /payments/:id: edit payment mothod

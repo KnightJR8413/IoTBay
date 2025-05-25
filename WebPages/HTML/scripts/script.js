@@ -1,4 +1,5 @@
 // script.js
+const API_BASE = 'http://localhost:3000';
 
 // Redirecting unauthorised users away from the Admin Dashboard
 document.addEventListener('DOMContentLoaded', () => {
@@ -58,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!pattern.test(email)) return alert('Enter a valid email');
 
     try {
-      await fetch('http://localhost:3000/newsletter', {
+      await fetch(`${API_BASE}/newsletter`, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({email})
@@ -140,7 +141,6 @@ function checkLoginAndRedirect() {
 // ─────────────────────────────────────────────
 // 4) PRODUCTS LISTING + ADD TO CART START
 // ─────────────────────────────────────────────
-const API_BASE = 'http://localhost:3000';
 
 window.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('products-grid')) {
@@ -435,7 +435,7 @@ async function toggleStatus(userId, currentStatus) {
   const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
   
   try {
-    const response = await fetch(`http://localhost:3000/admin/users/${userId}/status`, {
+    const response = await fetch(`${API_BASE}/admin/users/${userId}/status`, {
       method: 'PUT',
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,
