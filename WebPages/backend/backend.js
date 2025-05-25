@@ -164,6 +164,19 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Check Login Status 
+app.get("/check-session", authenticateToken, (req, res) => {
+    res.json({ user: req.user.email });
+});
+
+// Logs logout
+app.post("/logout", (req, res) => {
+    const {email} = req.body;
+    logAction(email, 'logout');
+    res.json({ message: "Logout successful. Clear token on client-side." });
+});
+
+// updates customer details from /account page
 app.post('/update-customer', authenticateToken, async (req, res) => {
     const { first_name, last_name, email, address_line_1, address_line_2, phone_no } = req.body;
     const userId = req.user.userId; 
@@ -180,6 +193,7 @@ app.post('/update-customer', authenticateToken, async (req, res) => {
     }
 });
 
+// gets user details
 app.get('/user-details', authenticateToken, async (req, res) => {
   const userId = req.user.userId;
   try {
@@ -219,6 +233,7 @@ app.get('/user-details', authenticateToken, async (req, res) => {
   }
 });
 
+// gets user logs
 app.get('/user-logs', authenticateToken, async (req, res) => {
   const userId = req.user.userId;
 
@@ -235,6 +250,7 @@ app.get('/user-logs', authenticateToken, async (req, res) => {
   }
 });
 
+// sets all user values except id to null
 app.delete('/delete-account', authenticateToken, async (req, res) => {
     const userId = req.user.userId;
     function runAsync(db, sql, params = []) {
@@ -917,19 +933,6 @@ app.post('/newsletter', (req,res) => {
             }
         });
     });
-});
-
-
-// Check Login Status (for session persistence)
-app.get("/check-session", authenticateToken, (req, res) => {
-    res.json({ user: req.user.email });
-});
-
-// Check Login Status (for session persistence)
-app.post("/logout", (req, res) => {
-    const {email} = req.body;
-    logAction(email, 'logout');
-    res.json({ message: "Logout successful. Clear token on client-side." });
 });
 
 app.post('/payments', authenticateToken, (req, res) => {

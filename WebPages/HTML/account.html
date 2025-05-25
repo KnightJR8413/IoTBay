@@ -122,9 +122,10 @@
 
     <script>
         // Fetch user data from server if needed
+        const API_BASE = 'http://localhost:3000';
         document.addEventListener("DOMContentLoaded", async function() {
             try {
-                const response = await fetch('http://localhost:3000/user-details', {
+                const response = await fetch(`${API_BASE}/user-details`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
