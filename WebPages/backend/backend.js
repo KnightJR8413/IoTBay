@@ -74,18 +74,19 @@ app.post('/register', (req, res) => {
                     logAction(email, 'unsuccessful register');
                     return res.status(500).json({ message: 'Error registering user: ' + err2.message });
                 }
-                let id;
-                db.run("SELECT last_insert_rowid()", (err3, row2) => {
-                    if (err3) {
-                        logAction(email, 'unsuccessful register');
-                        return res.status(500).json({ message: 'Database error: ' + err3.message });
-                    }
-                    if (row2) {
-                        id = row2;
-                    }
-                });
+                // let id;
+                // db.run("SELECT last_insert_rowid()", (err3, row2) => {
+                //     if (err3) {
+                //         logAction(email, 'unsuccessful register');
+                //         return res.status(500).json({ message: 'Database error: ' + err3.message });
+                //     }
+                //     if (row2) {
+                //         id = row2;
+                //     }
+                // });
+                const userId = this.lastID;
                 db.run("INSERT INTO customer (id, first_name, last_name, password_hash, marketing) values (?,?,?,?,?)",
-                    [id, first_name, last_name, hashedPassword, marketing], function (err3) {
+                    [userId, first_name, last_name, hashedPassword, marketing], function (err3) {
                         if (err3){
                             logAction(email, 'unsuccessful register');
                             return res.status(500).json({ message: 'Error registering user: ' + err3.message });
@@ -122,12 +123,6 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
-    //Checks if the users account is deactived and stops them from logging in if they are.
-    if (user.status.toLowerCase() !== 'active') {
-      logAction(email, 'Unsuccessful login - User account deactivated');
-      return res.status(403).json({ message: "Your account has been deactivated."});
-    }
-
     let row;
     if (user.user_type === 'c') {
       row = await getAsync(
@@ -140,6 +135,10 @@ app.post('/login', async (req, res) => {
         [email]
       );
     }
+    console.log("Entered password:", password);
+    console.log("Password hash:", row?.password_hash);
+    console.log("Stored hash:", JSON.stringify(row.password_hash));
+    console.log('Row for login:', row, bcrypt.compareSync(password, row.password_hash));
     if (!row || !bcrypt.compareSync(password, row.password_hash)) {
       logAction(email, 'Unsuccessful login - wrong password');
       return res.status(401).json({ message: 'Invalid email or password.' });
@@ -166,19 +165,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Check Login Status 
-app.get("/check-session", authenticateToken, (req, res) => {
-    res.json({ user: req.user.email });
-});
-
-// Logs logout
-app.post("/logout", (req, res) => {
-    const {email} = req.body;
-    logAction(email, 'logout');
-    res.json({ message: "Logout successful. Clear token on client-side." });
-});
-
-// updates customer details from /account page
 app.post('/update-customer', authenticateToken, async (req, res) => {
     const { first_name, last_name, email, address_line_1, address_line_2, phone_no } = req.body;
     const userId = req.user.userId; 
@@ -195,7 +181,6 @@ app.post('/update-customer', authenticateToken, async (req, res) => {
     }
 });
 
-// gets user details
 app.get('/user-details', authenticateToken, async (req, res) => {
   const userId = req.user.userId;
   try {
@@ -205,7 +190,7 @@ app.get('/user-details', authenticateToken, async (req, res) => {
     }
 
     let details;
-    // Check the role from the token—if it's admin or staff, query the staff table.
+    // Check the role from the token—if it's admin, query the staff table.
     if (req.user.user_type  === 'a' || req.user.user_type  === 's') {
       details = await getAsync(`
         SELECT first_name, last_name, phone_no
@@ -235,7 +220,6 @@ app.get('/user-details', authenticateToken, async (req, res) => {
   }
 });
 
-// gets user logs
 app.get('/user-logs', authenticateToken, async (req, res) => {
   const userId = req.user.userId;
 
@@ -252,7 +236,6 @@ app.get('/user-logs', authenticateToken, async (req, res) => {
   }
 });
 
-// sets all user values except id to null
 app.delete('/delete-account', authenticateToken, async (req, res) => {
     const userId = req.user.userId;
     function runAsync(db, sql, params = []) {
@@ -309,7 +292,7 @@ app.get("/admin/users", authenticateToken, async (req, res) => {
         u.id AS userId, 
         u.email,
         COALESCE(c.first_name, s.first_name) || ' ' || COALESCE(c.last_name, s.last_name) AS full_name,
-        COALESCE(c.phone_no, s.phone_no, '') AS phone,
+        COALESCE(c.phone_no, s.phone_no) AS phone,
         u.user_type, 
         u.status
       FROM users u
@@ -346,7 +329,7 @@ app.get('/admin/users/:id', authenticateToken, async (req, res) => {
     const query = `
       SELECT u.id as userId, u.email,
           COALESCE(c.first_name || ' ' || c.last_name, s.first_name || ' ' || s.last_name) AS full_name,
-          COALESCE(c.phone_no, s.phone_no, '') as phone,
+          COALESCE(c.phone_no, '') as phone,
           u.user_type, 'active' as status
       FROM users u
       LEFT JOIN customer c ON u.id = c.id
@@ -371,15 +354,15 @@ app.post('/admin/users', authenticateToken, async (req, res) => {
     logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
-  const { full_name, email, phone, user_type, status } = req.body;
+  const { full_name, email, phone, user_type } = req.body;
   const names = full_name.split(' ');
   const first_name = names[0];
   const last_name = names.slice(1).join(' ') || '';
 
   //Insert into users table
   db.run(
-    "INSERT INTO users (email, user_type, status) VALUES (?, ?, ?)",
-    [email, user_type, status],
+    "INSERT INTO users (email, user_type) VALUES (?, ?)",
+    [email, user_type],
     function (err) {
       if (err) return res.status(500).json({ error: "Database error: " + err.message });
       const newUserId = this.lastID;
@@ -397,8 +380,8 @@ app.post('/admin/users', authenticateToken, async (req, res) => {
       } else if (user_type == 's') {
         const defaultPasswordHash = bcrypt.hashSync('default123', 10);
         db.run(
-          "INSERT INTO staff (id, first_name, last_name, phone_no, password_hash) VALUES (?, ?, ?, ?, ?)",
-          [newUserId, first_name, last_name, phone, defaultPasswordHash],
+          "INSERT INTO staff (id, first_name, last_name, password_hash) VALUES (?, ?, ?, ?)",
+          [newUserId, first_name, last_name, defaultPasswordHash],
           (err) => {
             if (err) return res.status(500).json({ error: "Database error: " + err.message });
             res.json({ message: 'Staff created', userId: newUserId });
@@ -419,14 +402,14 @@ app.put('/admin/users/:id', authenticateToken, async (req, res) => {
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
   const userId = req.params.id;
-  const { full_name, email, phone, user_type, status } = req.body;
+  const { full_name, email, phone, user_type } = req.body;
   const names = full_name.split(' ');
   const first_name = names[0];
   const last_name = names.slice(1).join(' ') || '';
 
   db.run(
-    "UPDATE users SET email = ?, user_type = ?, status = ? WHERE id = ?",
-    [email, user_type, status, userId],
+    "UPDATE users SET email = ?, user_type = ? WHERE id = ?",
+    [email, user_type, userId],
     function (err) {
       if (err) return res.status(500).json({ error: "Database error: " + err.message });
       if (user_type === 'c') {
@@ -440,8 +423,8 @@ app.put('/admin/users/:id', authenticateToken, async (req, res) => {
         );
       } else if (user_type === 's') {
         db.run(
-          "UPDATE staff SET first_name = ?, last_name = ?, phone_no = ? WHERE id = ?",
-          [first_name, last_name, phone, userId],
+          "UPDATE staff SET first_name = ?, last_name = ? WHERE id = ?",
+          [first_name, last_name, userId],
           function (err) {
             if (err) return res.status(500).json({ error: "Database error: " + err.message });
             res.json({ message: 'Staff updated' });
@@ -481,7 +464,7 @@ app.put('/admin/users/:id/status', authenticateToken, async (req, res) => {
 });
 
 
-// DELETING USERS
+
 app.delete('/admin/users/:id', authenticateToken, async (req, res) => {
   if (!req.user || req.user.user_type !== 'a') {
     logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
@@ -620,7 +603,11 @@ app.get('/products/:id', (req, res) => {
   });
 });
 
-// SHOPPING CART SECTION START
+
+
+
+// ── CART HANDLERS ──
+
 // ADD TO CART
 app.post('/cart', (req, res) => {
   const { product_id, userId } = req.body;
@@ -636,7 +623,7 @@ app.post('/cart', (req, res) => {
           [orderId, product_id],
           function(err) {
             if (err) return res.status(500).json({ message: err.message });
-            res.status(200).json({ message: 'Item added to cart', customer_id });
+            res.status(200).json({ message: 'Item added to cart', customer_id, orderId });
           }
         );
       };
@@ -710,7 +697,38 @@ app.delete('/cart', (req, res) => {
   });
 });
 
-// SAVE ORDER
+// CANCEL / DELETE AN ORDER
+app.delete('/orders/:id', (req, res) => {
+  const userId  = req.body.userId;
+  const orderId = parseInt(req.params.id, 10);
+
+  if (!userId) {
+    return res.status(400).json({ message: 'userId is required' });
+  }
+
+  // ensure that order belongs to this user
+  db.get(
+    "SELECT id FROM orders WHERE id = ? AND customer_id = ? AND status != 'active'",
+    [orderId, userId],
+    (err, row) => {
+      if (err) return res.status(500).json({ message: err.message });
+      if (!row) return res.status(404).json({ message: 'Order not found or cannot be cancelled' });
+
+      // delete the cart items
+      db.run("DELETE FROM cart WHERE order_id = ?", [orderId], function(err2) {
+        if (err2) return res.status(500).json({ message: err2.message });
+
+        // delete the order itself
+        db.run("DELETE FROM orders WHERE id = ?", [orderId], function(err3) {
+          if (err3) return res.status(500).json({ message: err3.message });
+          res.json({ message: 'Order cancelled successfully' });
+        });
+      });
+    }
+  );
+});
+
+// SAVE ORDER: Finalize the active order and mark it as completed
 app.post('/update-cart', (req, res) => {
     console.log('Received request on /update-cart with body:', req.body);
     const { userId } = req.body;
@@ -729,14 +747,13 @@ app.post('/update-cart', (req, res) => {
     });
   });
 });
-// SHOPPING CART SECTION END
 
-// ORDER HISTORY AND ORDER DETAILS SECTION START
 app.get('/order-history', (req, res) => {
   const userId = req.query.userId;
   
   if (!userId) return res.status(400).json({ message: 'userId is required' });
 
+  // Get all orders with items joined (no JSON functions)
   db.all(`
     SELECT
       o.id AS order_id,
@@ -755,6 +772,7 @@ app.get('/order-history', (req, res) => {
   `, [userId], (err, rows) => {
     if (err) return res.status(500).json({ message: err.message });
 
+    // Group rows by order_id
     const ordersMap = new Map();
 
     for (const row of rows) {
@@ -775,13 +793,14 @@ app.get('/order-history', (req, res) => {
       });
     }
 
+    // Convert map to array
     const orders = Array.from(ordersMap.values());
 
     res.json(orders);
   });
 });
 
-// GET ITEMS FOR A SPECIFIC ORDER
+// Get items of a specific order
 app.get('/orders/:orderId/items', (req, res) => {
   const orderId = req.params.orderId;
 
@@ -795,43 +814,17 @@ app.get('/orders/:orderId/items', (req, res) => {
   });
 });
 
-// CANCEL / DELETE AN ORDER
-app.delete('/orders/:id', (req, res) => {
-  const userId  = req.body.userId;
-  const orderId = parseInt(req.params.id, 10);
 
-  if (!userId) {
-    return res.status(400).json({ message: 'userId is required' });
-  }
-
-  db.get(
-    "SELECT id FROM orders WHERE id = ? AND customer_id = ? AND status != 'active'",
-    [orderId, userId],
-    (err, row) => {
-      if (err) return res.status(500).json({ message: err.message });
-      if (!row) return res.status(404).json({ message: 'Order not found or cannot be cancelled' });
-
-      db.run("DELETE FROM cart WHERE order_id = ?", [orderId], function(err2) {
-        if (err2) return res.status(500).json({ message: err2.message });
-
-        db.run("DELETE FROM orders WHERE id = ?", [orderId], function(err3) {
-          if (err3) return res.status(500).json({ message: err3.message });
-          res.json({ message: 'Order cancelled successfully' });
-        });
-      });
-    }
-  );
-});
-
-// COPY ITEMS FROM ORDER TO CART
+// POST: Copy items from an order into a new cart (authenticated version)
 app.post('/order/:orderId/copy-to-cart', (req, res) => {
   const { orderId } = req.params;
-  const { customerId } = req.body;
+  const { customerId } = req.body; // Changed from session ID to customerId
 
   if (!customerId) {
     return res.status(400).json({ success: false, message: 'Missing customerId.' });
   }
 
+  // 1. Verify the order belongs to the customer
   db.get(
     "SELECT id FROM orders WHERE id = ? AND customer_id = ?",
     [orderId, customerId],
@@ -839,6 +832,7 @@ app.post('/order/:orderId/copy-to-cart', (req, res) => {
       if (err) return res.status(500).json({ message: err.message });
       if (!orderRow) return res.status(403).json({ message: 'Order not found' });
 
+      // 2. Find or create active cart
       db.get(
         "SELECT id FROM orders WHERE customer_id = ? AND status = 'active'",
         [customerId],
@@ -866,6 +860,7 @@ app.post('/order/:orderId/copy-to-cart', (req, res) => {
   );
 
   function copyItems(activeOrderId) {
+    // 3. Copy items from original order
     db.all(
       "SELECT product_id, no_items FROM cart WHERE order_id = ?",
       [orderId],
@@ -876,12 +871,14 @@ app.post('/order/:orderId/copy-to-cart', (req, res) => {
           return res.status(404).json({ message: 'No items in order to copy' });
         }
 
+        // Clear existing cart items first
         db.run(
           "DELETE FROM cart WHERE order_id = ?",
           [activeOrderId],
           function(err) {
             if (err) return res.status(500).json({ message: err.message });
             
+            // Insert new items
             const placeholders = items.map(() => "(?, ?, ?)").join(", ");
             const values = items.flatMap(item => [
               activeOrderId,
@@ -903,7 +900,6 @@ app.post('/order/:orderId/copy-to-cart', (req, res) => {
     );
   }
 });
-// ORDER HISTORY AND ORDER DETAILS SECTION END
 
 app.post('/newsletter', (req,res) => {
     const { email } = req.body;
@@ -935,6 +931,19 @@ app.post('/newsletter', (req,res) => {
             }
         });
     });
+});
+
+
+// Check Login Status (for session persistence)
+app.get("/check-session", authenticateToken, (req, res) => {
+    res.json({ user: req.user.email });
+});
+
+// Check Login Status (for session persistence)
+app.post("/logout", (req, res) => {
+    const {email} = req.body;
+    logAction(email, 'logout');
+    res.json({ message: "Logout successful. Clear token on client-side." });
 });
 
 app.post('/payments', authenticateToken, (req, res) => {
@@ -1043,6 +1052,194 @@ app.delete('/payments/:id', authenticateToken, (req, res) => {
                 return res.status(404).json({ message: 'Card not found or not owned by user.' });
             }
             res.json({ message: "Card deleted" });
+        }
+    );
+});
+
+// List all shipments
+app.get('/shipments', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    db.all(`SELECT s.id, o.id AS 'order_id', shipment_method, shipment_date, shipment_address 
+      FROM shipments s
+      JOIN orders o ON o.shipment_id = s.id
+      WHERE o.customer_id = ?`, [userId], 
+      (err, rows) => {
+        if (err) return res.status(500).json({ message: 'Database error', error: err.message });
+        res.json(rows);
+    });
+});
+
+// Add shipment
+app.post('/shipments', authenticateToken, (req, res) => {
+    const { shipment_method, shipment_date, shipment_address } = req.body;
+
+    if (!shipment_method || !shipment_date || !shipment_address) {
+        return res.status(400).json({ message: "All fields are required." });
+    }
+
+    db.run(
+        "INSERT INTO shipments (shipment_method, shipment_date, shipment_address) VALUES (?, ?, ?)",
+        [shipment_method, shipment_date, shipment_address],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to add shipment', error: err.message });
+            res.json({ id: this.lastID });
+        }
+    );
+});
+
+// Update Shipment ID in Orders Table
+app.put('/orders/:orderId/shipment', authenticateToken, (req, res) => {
+    const { shipmentId } = req.body;
+    const orderId = req.params.orderId;
+
+    if (!shipmentId) {
+        return res.status(400).json({ message: "Shipment ID is required." });
+    }
+
+    db.run(
+        "UPDATE orders SET shipment_id = ? WHERE id = ?",
+        [shipmentId, orderId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to update order with shipment', error: err.message });
+            res.json({ message: "Order updated with shipment ID" });
+        }
+    );
+});
+
+// Get specific shipment
+app.get('/shipments/:id', authenticateToken, (req, res) => {
+    const shipmentId = req.params.id;
+    db.get(`SELECT shipment_method, shipment_date, shipment_address 
+      FROM shipments
+      WHERE id = ?`, [shipmentId], 
+      (err, rows) => {
+        if (err) return res.status(500).json({ message: 'Database error', error: err.message });
+        res.json(rows);
+    });
+});
+
+// Edit shipment
+app.put('/shipments/:id', authenticateToken, (req, res) => {
+    const { shipment_method, shipment_date, shipment_address } = req.body;
+    const shipmentId = req.params.id;
+
+    db.run(
+        "UPDATE shipments SET shipment_method = ?, shipment_date = ?, shipment_address = ? WHERE id = ?",
+        [shipment_method, shipment_date, shipment_address, shipmentId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to update shipment', error: err.message });
+            res.json({ message: "Shipment details updated" });
+        }
+    );
+});
+
+// Delete a shipment
+app.delete('/shipments/:id', authenticateToken, (req, res) => {
+    const shipmentId = req.params.id;
+
+    db.run(
+        "DELETE FROM shipments WHERE id = ?",
+        [shipmentId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to delete shipment', error: err.message });
+            if (this.changes === 0) {
+                return res.status(404).json({ message: 'Shipment not found.' });
+            }
+            res.json({ message: "Shipment deleted" });
+        }
+    );
+});
+
+// List all shipments
+app.get('/shipments', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    db.all(`SELECT s.id, o.id AS 'order_id', shipment_method, shipment_date, shipment_address 
+      FROM shipments s
+      JOIN orders o ON o.shipment_id = s.id
+      WHERE o.customer_id = ?`, [userId], 
+      (err, rows) => {
+        if (err) return res.status(500).json({ message: 'Database error', error: err.message });
+        res.json(rows);
+    });
+});
+
+// Add shipment
+app.post('/shipments', authenticateToken, (req, res) => {
+    const { shipment_method, shipment_date, shipment_address } = req.body;
+
+    if (!shipment_method || !shipment_date || !shipment_address) {
+        return res.status(400).json({ message: "All fields are required." });
+    }
+
+    db.run(
+        "INSERT INTO shipments (shipment_method, shipment_date, shipment_address) VALUES (?, ?, ?)",
+        [shipment_method, shipment_date, shipment_address],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to add shipment', error: err.message });
+            res.json({ id: this.lastID });
+        }
+    );
+});
+
+// Update Shipment ID in Orders Table
+app.put('/orders/:orderId/shipment', authenticateToken, (req, res) => {
+    const { shipmentId } = req.body;
+    const orderId = req.params.orderId;
+
+    if (!shipmentId) {
+        return res.status(400).json({ message: "Shipment ID is required." });
+    }
+
+    db.run(
+        "UPDATE orders SET shipment_id = ? WHERE id = ?",
+        [shipmentId, orderId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to update order with shipment', error: err.message });
+            res.json({ message: "Order updated with shipment ID" });
+        }
+    );
+});
+
+// Get specific shipment
+app.get('/shipments/:id', authenticateToken, (req, res) => {
+    const shipmentId = req.params.id;
+    db.get(`SELECT shipment_method, shipment_date, shipment_address 
+      FROM shipments
+      WHERE id = ?`, [shipmentId], 
+      (err, rows) => {
+        if (err) return res.status(500).json({ message: 'Database error', error: err.message });
+        res.json(rows);
+    });
+});
+
+// Edit shipment
+app.put('/shipments/:id', authenticateToken, (req, res) => {
+    const { shipment_method, shipment_date, shipment_address } = req.body;
+    const shipmentId = req.params.id;
+
+    db.run(
+        "UPDATE shipments SET shipment_method = ?, shipment_date = ?, shipment_address = ? WHERE id = ?",
+        [shipment_method, shipment_date, shipment_address, shipmentId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to update shipment', error: err.message });
+            res.json({ message: "Shipment details updated" });
+        }
+    );
+});
+
+// Delete a shipment
+app.delete('/shipments/:id', authenticateToken, (req, res) => {
+    const shipmentId = req.params.id;
+
+    db.run(
+        "DELETE FROM shipments WHERE id = ?",
+        [shipmentId],
+        function (err) {
+            if (err) return res.status(500).json({ message: 'Failed to delete shipment', error: err.message });
+            if (this.changes === 0) {
+                return res.status(404).json({ message: 'Shipment not found.' });
+            }
+            res.json({ message: "Shipment deleted" });
         }
     );
 });
