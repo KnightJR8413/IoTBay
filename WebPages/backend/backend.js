@@ -481,7 +481,7 @@ app.put('/admin/users/:id/status', authenticateToken, async (req, res) => {
 });
 
 
-
+// DELETING USERS
 app.delete('/admin/users/:id', authenticateToken, async (req, res) => {
   if (!req.user || req.user.user_type !== 'a') {
     logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
