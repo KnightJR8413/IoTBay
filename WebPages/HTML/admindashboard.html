@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IoTBay - Home</title>
     <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
-    <script src="{{ url_for('serve_js', filename='script.js') }}" defer></script>
 </head>
 <body>
     <div class="navbar">
@@ -20,8 +19,7 @@
                 <li><a href="/index">Home</a></li>
                 <li><a href="/about">About</a></li>
                 <li><a href="/products">Products</a></li>
-                <li><a href="/contact">Contact</a></li>
-                <li><a href="/admindashboard" id="adminDashboardLink">Admin Dashboard</a></li>
+                <li><a href="/contact">Contact</a></li>                
             </ul>
         </nav>
         <div class="icon-buttons">
@@ -43,105 +41,171 @@
         <button onclick="toggleSearchBar()">Close</button>
     </div>
 
+    <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+    <script src="{{ url_for('serve_js', filename='frontend.js') }}"></script>
+    <script src="{{ url_for('serve_js', filename='welcome.js') }}"></script>
+    <script src="{{ url_for('serve_js', filename='accountEdit.js') }}"></script>
 </body>
 </html>
 <!--HEADER COPY END HERE-->
 
-<div class="hero">
-    <h1>Admin Dashboard</h1>
-    <div>
-        <input type="text" id="searchInput" placeholder="Search users by name or email ... " />
-        <button class="adm-btn" onclick="searchUsers()">Search</button>
-        <button class="adm-btn" onclick="openUserModal()">Add New User</button>
+<section class="hero">
+    <div class="account-header">
+        <h1>My Account</h1>
     </div>
-    <table id="userTable">
-        <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>User Type</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
+</section>
+    <main>
+<section class="hero1">
+    <div class="account-container">
+        <div class="account-layout">
+            <!-- Left Navigation -->
+            <nav class="account-nav">
+                <ul>
+                    <li><a href="/staffdashboard"><i class="icon-heart"></i>Details</a></li>
+                    <li><a href="/userlogs"><i class="icon-eye"></i>User Logs</a></li>
+                    <li><a href="/manageProducts"><i class="icon-eye"></i>Manage Products</a></li>
+                    <li><a href="/manageUsers"><i class="icon-eye"></i>Manage Users</a></li>
 
-        </tbody>
-    </table>
-</div>
+                    <li><a href="#" onclick="logoutUser();" class="logout-link"><i class="icon-log-out"></i>Log Out</a></li>
+                </ul>
+            </nav>
 
-<div id="userModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeUserModal()">&times;</span>
-        <h2 id="modalTitle">Add New User</h2>
-        <form id="userForm">
-            <input type="hidden" id="userId">
-            <label for="fullName">Full Name:</label><br>
-            <input type="text" id="fullName" required><br><br>
-            <label for="emailInput">Email:</label><br>
-            <input type="email" id="emailInput" required><br><br>
-            <label for="phoneInput">Phone:</label><br>
-            <input type="text" id="phoneInput"><br><br>
-            <label for="userType">User Type:</label><br>
-            <select id="userType">
-                <option value="c">Customer</option>
-                <option value="s">Staff</option>
-            </select><br><br>
-            <label for="statusInput">Status:</label><br>
-            <select id="statusInput">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select><br><br>
-            <button type="submit" class="adm-btn">Save</button>
+        <!-- Profile Details Section -->
+        <div class="profile-details">
+            <div class="profile-info-box">
+                <div class="info-header">
+                    <h2>Profile Information</h2>
+                </div>
+                
+                <div class="info-content">
+                    <div class="info-row">
+                        <span class="info-label">First Name:</span>
+                        <span class="info-value" id="first_name">User</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Last Name:</span>
+                        <span class="info-value" id="last_name"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="email">Email</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Contact Number:</span>
+                        <span class="info-value" id="phone_no"></span>
+                    </div>
+                                      
+                    <!-- Additional Spacing Elements -->
+                    <div class="spacer"></div>
+                    <div class="spacer"></div>
+                </div>
+                
+                <div class="info-actions">
+                    <button id="deleteAccountBtn" class="delete-btn" style="display: none;">Delete Account</button>
+                    <button id="editBtn" class="edit-btn" data-mode="view">Edit</button>
+                    <!-- <a href="/changeDetails" onclick="changeDetails();" class="btn">Edit Details</a> -->
+                </div>
+            </div>
+              
+        </div>
+    </div>
+</section>
+<div style="height: 150px;"></div>
+</main>
+
+    <script>
+        // Fetch user data from server if needed
+        document.addEventListener("DOMContentLoaded", async function() {
+            try {
+                const response = await fetch('http://localhost:3000/user-details', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById("first_name").textContent = data.first_name;
+                    document.getElementById("last_name").textContent = data.last_name;
+                    document.getElementById("email").textContent = data.email;
+                    document.getElementById("phone_no").textContent = data.phone_no;
+                } else {
+                    alert("Error fetching user data.");
+                }
+            } 
+            catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        });
+        </script>
+</section>
+</html>
+
+
+<!--FOOTER COPY Start HERE-->
+<div class="footer-newsletter">
+    <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
+    <div class="newsletter-form">
+        <form>
+            <input type="email" placeholder="Only an email away..." required>
+            <button type="submit">Sign me up!</button>
         </form>
     </div>
 </div>
 
-    <footer>
-        <div class="footer-links">
-            <div class="footer-column">
-                <h3>ABOUT</h3>
-                <ul>
-                    <li><a href="/about">About Us</a></li>
-                    <li><a href="/contact">Contact Us</a></li>
-                    <li><a href="#">Store Locations</a></li>
-                    <li><a href="#">Payment Methods</a></li>
-                    <li><a href="#">Shipping Methods</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>HELP</h3>
-                <ul>
-                    <li><a href="#">Support</a></li>
-                    <li><a href="#">Warranty & Returns</a></li>
-                    <li><a href="#">Services</a></li>
-                    <li><a href="#">Omitie Services</a></li>
-                    <li><a href="#">Site Map</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>OTHER</h3>
-                <ul>
-                    <li><a href="#">Announcements</a></li>
-                    <li><a href="#">Merchandise</a></li>
-                    <li><a href="#">Careers at IoTBay</a></li>
-                    <li><a href="/termscontions">Terms & Conditions</a></li>
-                    <li><a href="/privacypolicy">Privacy Policy</a></li>
-                </ul>
-            </div>
-        </div>
-    
-        <div class="footer-contact">
-            <h3>Need advice?</h3>
-            <p>Speak to our friendly staff</p>
-            <a href="/contact" class="contact-button">Contact Us</a>
-        </div>
-    
-        <div class="footer-copyright">
-            <p>&copy; 2025 IoTBay. All rights reserved.</p>
-        </div>
-    </footer>
+<div class="footer-links">
+    <div class="footer-column">
+        <h3>ABOUT</h3>
+        <ul>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="#">Payment Methods</a></li>
+            <li><a href="#">Shipping Methods</a></li>
+        </ul>
+    </div>
+    <div class="footer-column">
+        <h3>HELP</h3>
+        <ul>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Support</a></li>
+            <li><a href="#">Warranty & Returns</a></li>
+            <li><a href="#">Services</a></li>
+        </ul>
+    </div>
+    <div class="footer-column">
+        <h3>OTHER</h3>
+        <ul>
+            <li><a href="#">Announcements</a></li>
+            <li><a href="#">Careers at IoTBay</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Privacy & Cookies</a></li>
+        </ul>
+    </div>
 
+    <div class="footer-column">
+        <h3>Need advice?</h3>
+        <p style="color: white"> Speak to our friendly staff</p>
+        <a href="/contact" class="contact-button">Contact Us</a>
+    </div>
+</div>
+
+<div class="footer-copyright">
+    <p> Copyright &copy; 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
+</div>
+</footer>
+
+<div class="subscription-modal">
+<div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h3>Thank you for subscribing!</h3>
+    <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
+</div>
+</div>
+<div class="modal-backdrop"></div>
+
+<!--FOOTER COPY END HERE-->
+
+    <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
 </body>
 </html>

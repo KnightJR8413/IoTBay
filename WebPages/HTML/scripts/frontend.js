@@ -94,7 +94,15 @@ function loginUser(email, password){
             console.log("Decoded token payload: ", payload);
             const customer_id = payload.userId;
             localStorage.setItem('customer_id', customer_id);
-            window.location.href = '/welcome';
+            //If the user is an admin/staff. redirect them to the admin/staffdashboard.
+            //Take customers/everyone else to the welcome page.
+            if (payload.user_type === 'a') {
+              window.location.href = '/admindashboard';
+            } else if (payload.user_type === 's') {
+              window.location.href = '/staffdashboard';
+            } else {
+              window.location.href = '/welcome';
+            }
         } else {
             alert(data.error || 'Login failed');
         }

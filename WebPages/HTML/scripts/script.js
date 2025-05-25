@@ -1,29 +1,5 @@
 // script.js
 
-// Redirecting unauthorised users away from the Admin Dashboard
-document.addEventListener('DOMContentLoaded', () => {
-  // Only run this check on the admin dashboard page.
-  if (window.location.pathname === '/admindashboard') {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      window.location.href = '/login';
-      return;
-    }
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      // Check that the role is 'admin'
-      if (payload.user_type !== 'a') {
-        // If the user is not an admin, redirect away (e.g. to the home page)
-        window.location.href = '/';
-      }
-    } catch (err) {
-      // If decoding fails, clear the token and redirect to the login page.
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-  }
-});
-
 // ─────────────────────────────────────────────
 // 1) SEARCH BAR
 // ─────────────────────────────────────────────
@@ -87,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ─────────────────────────────────────────────
-// 3) SMOOTH SCROLL & LOGIN REDIRECT
+// 3) SMOOTH SCROLL & LOGIN & ADMIN REDIRECT
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   // smooth nav scrolling
@@ -125,8 +101,10 @@ function checkLoginAndRedirect() {
       return window.location.href = '/login';
     }
 
-    if (payload.user_type === 's' || payload.user_type === 'a') {
+    if (payload.user_type === 's') {
       window.location.href = '/staffdashboard';
+    } else if (payload.user_type === 'a') {
+      window.location.href = '/admindashboard';
     } else {
       window.location.href = '/account';
     }
@@ -136,6 +114,30 @@ function checkLoginAndRedirect() {
     window.location.href = '/login';
   }
 }
+
+// Redirecting unauthorised users away from the Admin Dashboard for security reasons
+document.addEventListener('DOMContentLoaded', () => {
+  // Only run this check on the admin dashboard page.
+  if (window.location.pathname === '/admindashboard') {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Check that the role is 'admin'
+      if (payload.user_type !== 'a') {
+        // If the user is not an admin, redirect away (e.g. to the home page)
+        window.location.href = '/';
+      }
+    } catch (err) {
+      // If decoding fails, clear the token and redirect to the login page.
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+  }
+});
 
 // ─────────────────────────────────────────────
 // 4) PRODUCTS LISTING + ADD TO CART START
@@ -462,26 +464,5 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Loading users ...');
     loadUsers();
   }  
-});
-
-// Hiding the button for admin dashboart from non-admins
-document.addEventListener('DOMContentLoaded', () => {
-  const token = localStorage.getItem('token');
-  const adminLink = document.getElementById('adminDashboardLink');
-  
-  if (!adminLink) return;
-
-  adminLink.style.setProperty('display', 'none', 'important');
-
-  if (token) {
-    try { 
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.user_type === 'a') {
-        adminLink.style.setProperty('display', 'block', 'important')
-      }
-    } catch (error) {
-      console.error('Error decoding token:', error);
-    }
-  }
 });
 

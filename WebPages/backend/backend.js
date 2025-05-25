@@ -122,6 +122,12 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
+    //Checks if the users account is deactived and stops them from logging in if they are.
+    if (user.status.toLowerCase() !== 'active') {
+      logAction(email, 'Unsuccessful login - User account deactivated');
+      return res.status(403).json({ message: "Your account has been deactivated."});
+    }
+
     let row;
     if (user.user_type === 'c') {
       row = await getAsync(
@@ -291,7 +297,7 @@ app.get("/admin/users", authenticateToken, async (req, res) => {
         u.id AS userId, 
         u.email,
         COALESCE(c.first_name, s.first_name) || ' ' || COALESCE(c.last_name, s.last_name) AS full_name,
-        COALESCE(c.phone_no, s.phone_no) AS phone,
+        COALESCE(c.phone_no, s.phone_no, '') AS phone,
         u.user_type, 
         u.status
       FROM users u
@@ -328,7 +334,7 @@ app.get('/admin/users/:id', authenticateToken, async (req, res) => {
     const query = `
       SELECT u.id as userId, u.email,
           COALESCE(c.first_name || ' ' || c.last_name, s.first_name || ' ' || s.last_name) AS full_name,
-          COALESCE(c.phone_no, '') as phone,
+          COALESCE(c.phone_no, s.phone_no, '') as phone,
           u.user_type, 'active' as status
       FROM users u
       LEFT JOIN customer c ON u.id = c.id
@@ -353,15 +359,15 @@ app.post('/admin/users', authenticateToken, async (req, res) => {
     logAction(req.user ? req.user.email : "unknown", 'Unauthorised Access');
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
-  const { full_name, email, phone, user_type } = req.body;
+  const { full_name, email, phone, user_type, status } = req.body;
   const names = full_name.split(' ');
   const first_name = names[0];
   const last_name = names.slice(1).join(' ') || '';
 
   //Insert into users table
   db.run(
-    "INSERT INTO users (email, user_type) VALUES (?, ?)",
-    [email, user_type],
+    "INSERT INTO users (email, user_type, status) VALUES (?, ?, ?)",
+    [email, user_type, status],
     function (err) {
       if (err) return res.status(500).json({ error: "Database error: " + err.message });
       const newUserId = this.lastID;
@@ -379,8 +385,8 @@ app.post('/admin/users', authenticateToken, async (req, res) => {
       } else if (user_type == 's') {
         const defaultPasswordHash = bcrypt.hashSync('default123', 10);
         db.run(
-          "INSERT INTO staff (id, first_name, last_name, password_hash) VALUES (?, ?, ?, ?)",
-          [newUserId, first_name, last_name, defaultPasswordHash],
+          "INSERT INTO staff (id, first_name, last_name, phone_no, password_hash) VALUES (?, ?, ?, ?, ?)",
+          [newUserId, first_name, last_name, phone, defaultPasswordHash],
           (err) => {
             if (err) return res.status(500).json({ error: "Database error: " + err.message });
             res.json({ message: 'Staff created', userId: newUserId });
@@ -401,14 +407,14 @@ app.put('/admin/users/:id', authenticateToken, async (req, res) => {
     return res.status(403).json({ error: 'Access denied. Admins only.' });
   }
   const userId = req.params.id;
-  const { full_name, email, phone, user_type } = req.body;
+  const { full_name, email, phone, user_type, status } = req.body;
   const names = full_name.split(' ');
   const first_name = names[0];
   const last_name = names.slice(1).join(' ') || '';
 
   db.run(
-    "UPDATE users SET email = ?, user_type = ? WHERE id = ?",
-    [email, user_type, userId],
+    "UPDATE users SET email = ?, user_type = ?, status = ? WHERE id = ?",
+    [email, user_type, status, userId],
     function (err) {
       if (err) return res.status(500).json({ error: "Database error: " + err.message });
       if (user_type === 'c') {
@@ -422,8 +428,8 @@ app.put('/admin/users/:id', authenticateToken, async (req, res) => {
         );
       } else if (user_type === 's') {
         db.run(
-          "UPDATE staff SET first_name = ?, last_name = ? WHERE id = ?",
-          [first_name, last_name, userId],
+          "UPDATE staff SET first_name = ?, last_name = ?, phone_no = ? WHERE id = ?",
+          [first_name, last_name, phone, userId],
           function (err) {
             if (err) return res.status(500).json({ error: "Database error: " + err.message });
             res.json({ message: 'Staff updated' });
