@@ -1,178 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>IoTBay - Order Details</title>
-  <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoTBay - Order History</title>
+    <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
 </head>
 <body>
-  <div class="navbar">
-    <div class="logo">
-      <a href="/index"><img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo"></a>
+    <!-- HEADER -->
+    <div class="navbar">
+        <div class="logo">
+            <a href="/index">
+                <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/index">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/contact">Contact</a></li>    
+                <li><a href=" /admindashboard" id="adminDashboardLink">Admin Dashboard</a></li>            
+            </ul>
+        </nav>
+        <div class="icon-buttons">
+            <button class="icon-btn" onclick="toggleSearchBar();">
+                <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
+            </button>
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
+                <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
+            </button>                
+            <button class="icon-btn" onclick="location.href='/shoppingcart';">
+                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shoppingcart" class="icon-img">
+            </button>
+        </div>
     </div>
-    <nav>
-      <ul>
-        <li><a href="/index">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/products">Products</a></li>
-        <li><a href="/contact">Contact</a></li>
-      </ul>
-    </nav>
-    <div class="icon-buttons">
-      <button class="icon-btn" onclick="toggleSearchBar();">
-        <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
-      </button>
-      <button class="icon-btn" onclick="checkLoginAndRedirect();">
-        <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
-      </button>
-      <button class="icon-btn" onclick="location.href='/shoppingcart';">
-        <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shoppingcart" class="icon-img">
-      </button>
+
+    <div id="search-bar" class="search-bar">
+        <input type="text" placeholder="Search products..." id="search-input">
+        <button onclick="searchProduct()">Search</button>
+        <button onclick="toggleSearchBar()">Close</button>
     </div>
-  </div>
+    <div id="order-history"></div>
+    <!-- HERO -->
+    <section class="hero">
+        <h1>Order History</h1>
+    </section>
 
-  <div id="search-bar" class="search-bar">
-    <input type="text" placeholder="Search products..." id="search-input">
-    <button onclick="searchProduct()">Search</button>
-    <button onclick="toggleSearchBar()">Close</button>
-  </div>
-  <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
-
-<section class="hero">
-  <h1>Order Details</h1>
-</section>
-
-<main class="order-details-container">
-  <div id="details-content">
-    <!-- JS will inject the order info or a “not found” message -->
-  </div>
-  <div class="back-button-container">
-    <button class="back-button" onclick="window.history.back()">← Back to Order History</button>
-  </div>
-</main>
-
-<div class="footer-newsletter">
-  <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
-  <div class="newsletter-form">
-    <form>
-      <input type="email" placeholder="Only an email away..." required>
-      <button type="submit">Sign me up!</button>
-    </form>
-  </div>
-</div>
-
-<div class="footer-links">
-  <div class="footer-column">
-    <h3>ABOUT</h3>
-    <ul>
-      <li><a href="/about">About Us</a></li>
-      <li><a href="/contact">Contact Us</a></li>
-      <li><a href="#">Payment Methods</a></li>
-      <li><a href="#">Shipping Methods</a></li>
-    </ul>
-  </div>
-  <div class="footer-column">
-    <h3>HELP</h3>
-    <ul>
-      <li><a href="#">FAQ</a></li>
-      <li><a href="#">Support</a></li>
-      <li><a href="#">Warranty & Returns</a></li>
-      <li><a href="#">Services</a></li>
-    </ul>
-  </div>
-  <div class="footer-column">
-    <h3>OTHER</h3>
-    <ul>
-      <li><a href="#">Announcements</a></li>
-      <li><a href="#">Careers at IoTBay</a></li>
-      <li><a href="/termconditions">Terms & Conditions</a></li>
-      <li><a href="/privacypolicy">Privacy Policy</a></li>
-    </ul>
-  </div>
-  <div class="footer-column">
-    <h3>Need advice?</h3>
-    <p style="color: white">Speak to our friendly staff</p>
-    <a href="/contact" class="contact-button">Contact Us</a>
-  </div>
-</div>
-
-<div class="footer-copyright">
-  <p>Copyright © 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const API = 'http://localhost:3000';
-    const params = new URLSearchParams(window.location.search);
-    const orderId = params.get('orderId');
-    const container = document.getElementById('details-content');
-
-    async function fetchFromOrderHistory(orderId) {
-      try {
-        const response = await fetch(`${API}/order-history?userId=${localStorage.getItem('userId')}`);
-        if (!response.ok) throw new Error('Could not fetch order history');
+    <!-- MAIN ORDER HISTORY SECTION -->
+    <main class="order-history">
+        <div class="order-history-header">
+            <h1>Your Orders</h1>
+            <div>
+                <button class="view-payments-btn" onclick='location.href="/paymenthistory2";'>View Payment History</button>
+                <button class="view-shipments-btn" onclick='location.href="/shipmenthistory";'>View Shipment History</button>
+            </div>
         
-        const orders = await response.json();
-        return orders.find(o => o.order_id == orderId);
-      } catch (error) {
-        console.error('Error fetching order history:', error);
-        return null;
+        </div>
+
+        <!-- Filters Section -->
+        <div class="order-filters">
+            <div class="filter-group">
+                <label>Order #</label>
+                <input type="text" placeholder="Order Number" class="reference-filter">
+            </div>
+            <div class="filter-group">
+                <label>FROM DATE</label>
+                <input type="date" class="date-filter">
+            </div>
+            <div class="filter-group">
+                <label>TO DATE</label>
+                <input type="date" class="date-filter">
+            </div>
+            <div class="filter-actions">
+                <button class="btn-clear" onclick="clearFilters()">CLEAR</button>
+                <button class="btn-search" onclick="applyFilters()">SEARCH</button>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Items</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="order-history-body">
+                <!-- will be injected -->
+            </tbody>
+        </table>
+    </main>
+    
+    <!-- FOOTER -->
+    <div class="footer-newsletter">
+        <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
+        <div class="newsletter-form">
+            <form>
+                <input type="email" placeholder="Only an email away..." required>
+                <button type="submit">Sign me up!</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer-links">
+        <div class="footer-column">
+            <h3>ABOUT</h3>
+            <ul>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+                <li><a href="#">Payment Methods</a></li>
+                <li><a href="#">Shipping Methods</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>HELP</h3>
+            <ul>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Support</a></li>
+                <li><a href="#">Warranty & Returns</a></li>
+                <li><a href="#">Services</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>OTHER</h3>
+            <ul>
+                <li><a href="#">Announcements</a></li>
+                <li><a href="#">Careers at IoTBay</a></li>
+                <li><a href="/termconditions">Terms & Conditions</a></li>
+                <li><a href="/privacypolicy">Privacy Policy</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>Need advice?</h3>
+            <p style="color: white"> Speak to our friendly staff</p>
+            <a href="/contact" class="contact-button">Contact Us</a>
+        </div>
+    </div>
+
+    <div class="footer-copyright">
+        <p> Copyright &copy; 1999-2025. IoTBay. ABN #68 345 917 426. All Rights Reserved. All prices include GST.</p>
+    </div>
+
+    <div class="subscription-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Thank you for subscribing!</h3>
+            <p>Your email address <span class="subscribed-email"></span> has been added to the IoTBay mailing list.</p>
+        </div>
+    </div>
+    <div class="modal-backdrop"></div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
+ <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const API = 'http://localhost:3000';
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    alert('Please log in first.');
+    return;
+  }
+
+  // grab filters
+  const orderInput = document.querySelector('.reference-filter');
+  const fromInput  = document.querySelectorAll('.date-filter')[0];
+  const toInput    = document.querySelectorAll('.date-filter')[1];
+  const tbody      = document.getElementById('order-history-body');
+  let orderData = [];  // will hold full history
+
+    function renderTable(data) {
+    tbody.innerHTML = '';
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="5">No past orders found.</td></tr>`;
+      return;
+    }
+    data.forEach(order => {
+      const total = order.items
+                    .reduce((sum, i) => sum + i.price * i.no_items, 0)
+                    .toFixed(2);
+      const count = order.items
+                    .reduce((sum, i) => sum + i.no_items, 0);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>ORD-${order.order_id}</td>
+        <td>${new Date(order.order_date).toLocaleString()}</td>
+        <td>$${total}</td>
+        <td>${count} item${count > 1 ? 's' : ''}</td>
+        <td class="actions">
+          <button class="btn-view" onclick="viewOrderDetails(${order.order_id})">View Order Details</button>
+          <button class="btn-payment" onclick="viewPaymentDetails(${order.order_id})">View Payment Details</button>
+          <button class="btn-view-cart" onclick="copyOrderToCart(${order.order_id})">View Cart</button>
+          <button class="btn-cancel" onclick="cancelOrder(${order.order_id})">Cancel</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // initial fetch
+  fetch(`${API}/order-history?userId=${userId}`)
+    .then(r => r.json())
+    .then(data => {
+        data.sort((a, b) => a.order_id - b.order_id);
+      orderData = data;
+      renderTable(orderData);
+    })
+    .catch(e => {
+      console.error('Error fetching order history:', e);
+      tbody.innerHTML = `<tr><td colspan="5">Failed to load orders.</td></tr>`;
+    });
+
+  // filter logic
+  window.applyFilters = () => {
+    let filtered = orderData.slice();
+
+    const num = orderInput.value.trim();
+    if (num) {
+      // strip any leading "ORD-"
+      const id = parseInt(num.replace(/^ORD-?/i, ''), 10);
+      if (!isNaN(id)) {
+        filtered = filtered.filter(o => o.order_id === id);
+      } else {
+        filtered = [];
       }
     }
 
-    function renderOrder(order) {
-      let html = `
-        <h2>Order ORD-${order.order_id}</h2>
-        <p><strong>Date:</strong> ${new Date(order.order_date).toLocaleString()}</p>
-        <table class="orders-table" style="width:100%;border-collapse:collapse;">
-          <thead>
-            <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Subtotal</th></tr>
-          </thead>
-          <tbody>`;
-      
-      let total = 0;
-      order.items.forEach(item => {
-        const sub = item.price * item.no_items;
-        total += sub;
-        html += `
-          <tr>
-            <td>${item.name}</td>
-            <td>$${item.price.toFixed(2)}</td>
-            <td>${item.no_items}</td>
-            <td>$${sub.toFixed(2)}</td>
-          </tr>`;
-      });
-      
-      html += `</tbody>
-        <tfoot>
-          <tr>
-            <th colspan="3" style="text-align:right">Total:</th>
-            <th>$${total.toFixed(2)}</th>
-          </tr>
-        </tfoot>
-      </table>`;
-      container.innerHTML = html;
+    const fromDate = fromInput.value;
+    if (fromDate) {
+      const fromT = new Date(fromDate).getTime();
+      filtered = filtered.filter(o => new Date(o.order_date).getTime() >= fromT);
     }
 
-    if (!orderId) {
-      container.innerHTML = '<p style="color:red">Missing order ID in URL parameters</p>';
-      return;
+    const toDate = toInput.value;
+    if (toDate) {
+      const toT = new Date(toDate);
+      toT.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(o => new Date(o.order_date).getTime() <= toT.getTime());
     }
 
-    fetchFromOrderHistory(orderId)
-      .then(order => {
-        if (order) {
-          renderOrder(order);
+    renderTable(filtered);
+  };
+
+  window.clearFilters = () => {
+    orderInput.value = '';
+    fromInput.value = '';
+    toInput.value = '';
+    renderTable(orderData);
+  };
+
+  // Hook up search and clear buttons
+  document.querySelector('.btn-search').addEventListener('click', applyFilters);
+  document.querySelector('.btn-clear').addEventListener('click', clearFilters);
+
+  window.viewOrderDetails = id => { window.location.href = `/order-details?orderId=${id}`; };
+  window.viewPaymentDetails = id => window.location.href = `/paymenthistory2?orderId=${id}`;
+  window.cancelOrder = id => {
+    if (!confirm(`Cancel order ORD-${id}?`)) return;
+    fetch(`${API}/orders/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    })
+    .then(r => {
+      if (!r.ok) return r.json().then(j => Promise.reject(j.message));
+      alert(`Order ORD-${id} cancelled.`);
+      // re-fetch entire history to pick up the change
+      return fetch(`${API}/order-history?userId=${userId}`);
+    })
+    .then(r => r.json())
+    .then(data => {
+      orderData = data;
+      renderTable(orderData);
+    })
+    .catch(msg => {
+      console.error('Cancel order failed:', msg);
+      alert('Could not cancel order: ' + msg);
+    });
+  };
+});
+
+// Add this outside the DOMContentLoaded callback
+window.copyOrderToCart = async (orderId) => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert('Please log in first.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/order/${orderId}/copy-to-cart`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ customerId: userId })
+        });
+
+        if (!response.ok) throw new Error('Failed to copy order');
+        
+        const data = await response.json();
+        if (data.success) {
+            window.location.href = '/shoppingcart';
         } else {
-          container.innerHTML = '<p style="color:red">Order not found in your history</p>';
+            alert(data.message || 'Failed to copy order to cart');
         }
-      })
-      .catch(err => {
-        console.error('Error:', err);
-        container.innerHTML = '<p style="color:red">Error loading order details</p>';
-      });
-  });
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Error copying order to cart');
+    }
+};
 </script>
 </body>
 </html>
