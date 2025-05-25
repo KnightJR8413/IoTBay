@@ -138,7 +138,7 @@ function checkLoginAndRedirect() {
 }
 
 // ─────────────────────────────────────────────
-// 4) PRODUCTS LISTING + ADD TO CART
+// 4) PRODUCTS LISTING + ADD TO CART START
 // ─────────────────────────────────────────────
 const API_BASE = 'http://localhost:3000';
 
@@ -192,7 +192,7 @@ async function addToCart(productId) {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        product_id: productId,      // ✅ FIXED KEY
+        product_id: productId,
         userId: getUserId()
       })
     });
@@ -208,10 +208,12 @@ async function addToCart(productId) {
     alert('❌ Could not add to cart (see console)');
   }
 }
-
+// ─────────────────────────────────────────────
+// 4) PRODUCTS LISTING + ADD TO CART END
+// ─────────────────────────────────────────────
 
 // ─────────────────────────────────────────────
-// 5) SHOPPING CART PAGE
+// 5) SHOPPING CART PAGE START
 // ─────────────────────────────────────────────
 async function loadCart() {
   try {
@@ -270,7 +272,6 @@ function updateQuantity(btn, delta) {
   if (v<1) v=1;
   input.value = v;
   updateTotals();
-  // optionally PATCH to backend here
 }
 
 function updateTotals() {
@@ -285,6 +286,9 @@ function updateTotals() {
   document.querySelector('.tax').textContent          = `$${tax.toFixed(2)}`;
   document.querySelector('.total-amount').textContent = `$${tot.toFixed(2)}`;
 }
+// ─────────────────────────────────────────────
+// 5) SHOPPING CART PAGE END
+// ─────────────────────────────────────────────
 
 //ADMIN STUFF
 const token = localStorage.getItem('token');
