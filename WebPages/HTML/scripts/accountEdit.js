@@ -19,8 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
             input.type = 'text';
             input.value = value;
             input.className = 'info-input';
-            // Optional: give name attributes so you can serialize later
-            input.name = span.id || '';  // e.g. first_name, last_name, etc.
+            input.name = span.id || '';
             span.parentNode.replaceChild(input, span);
             });
         }

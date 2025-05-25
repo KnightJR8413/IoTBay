@@ -1,4 +1,3 @@
-const API_BASE = 'http://localhost:3000';
 document.addEventListener("DOMContentLoaded", function () {
     const registerForm = document.getElementById("registerForm");
     if (registerForm) {
@@ -47,9 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
         loginUser (email, password);
         });
     }
-
-    // Check login status on page load
-    // checkLoginStatus();
 });
 
 // Check if user is logged in
