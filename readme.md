@@ -1,7 +1,7 @@
 # IoTBay
 #### A UTS Project
 
-An e-commerce plaftorm built ising Node.js, Flask, SQLite, and Python. this was made of a assessment at UTS in the subject Introduction to Software development
+An e-commerce platform built using Node.js, Flask, SQLite, and Python. this was made of a assessment at UTS in the subject Introduction to Software development
 
 ## Table of Contents
 1. Installation
@@ -57,7 +57,7 @@ Before you begin, ensure you have the following installed:
     python3 webserver.py #systems where python3 is installed alongside python2
     ```
 
-### Access the apllication
+### Access the application
 In your browser you can access the application 
 * localhost:5000 (local machine)
 * 127.0.0.1:5000 (local machine)
@@ -87,11 +87,11 @@ In your browser you can access the application
     * POST /payments: inserts payment information into database
 
 2. GET
-    * GET /user-details: get the users deatils
+    * GET /user-details: get the users details
     * GET /user-logs: gets the login and logout logs for a user
     * GET /check-session: checks if a user is logged in
     * GET /admin/users: get a list of all non admin users
-    * GET /admin/users/:id: get specific user informatuon
+    * GET /admin/users/:id: get specific user information
     * GET /products: gets all products
     * GET /product/:id: get single product
     * GET /cart: get cart
@@ -100,7 +100,7 @@ In your browser you can access the application
     * GET /payments: gets all payment methods for logged in user
 
 3. DELETE
-    * DELETE /delete-account: deletes all useer information but keeps their user ID in the system
+    * DELETE /delete-account: deletes all user information but keeps their user ID in the system
     * DELETE /product/:id: delete product completely
     * DELETE /admin/users/:id: deletes user from table completely
     * DELETE /cart: remove item from cart
@@ -111,4 +111,4 @@ In your browser you can access the application
     * PUT /admin/users/:id: updates user details
     * PUT /admin/users/:id/status: toggles account as active/inactive
     * PUT /product/:id: update product information
-    * PUT /payments/:id: edit payment mothod
+    * PUT /payments/:id: edit payment method
