@@ -85,6 +85,7 @@ The backend server runs on port 3000 by default.
     * POST /newsletter: adds user to marketing list
     * POST /logout: currently not used but is there if needed for future application
     * POST /payments: inserts payment information into database
+    
 2. GET
     * GET /user-details: get the users deatils
     * GET /user-logs: gets the login and logout logs for a user
@@ -97,6 +98,7 @@ The backend server runs on port 3000 by default.
     * GET /order-history: gets order history
     * GET /orders/:orderId/items: get items for specific order
     * GET /payments: gets all payment methods for logged in user
+
 3. DELETE
     * DELETE /delete-account: deletes all useer information but keeps their user ID in the system
     * DELETE /product/:id: delete product completely
@@ -104,6 +106,7 @@ The backend server runs on port 3000 by default.
     * DELETE /cart: remove item from cart
     * DELETE /orders/:id: delete order completely
     * DELETE /payments/:id: delete payment method
+
 4. PUT
     * PUT /admin/users/:id: updates user details
     * PUT /admin/users/:id/status: toggles account as active/inactive
