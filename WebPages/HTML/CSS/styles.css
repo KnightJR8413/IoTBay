@@ -1214,7 +1214,7 @@ p.text {
 }
 /*shopping cart end*/
 
-/*order history*/
+/*order history and order details start*/
 .order-history {
     max-width: 1400px;
     margin: 2rem auto;
@@ -1229,7 +1229,6 @@ p.text {
     margin-bottom: 2rem;
 }
 
-/* Container for all filters and action buttons */
 .order-filters {
   display: flex;
   flex-wrap: wrap;
@@ -1241,7 +1240,6 @@ p.text {
   margin-bottom: 2rem;
 }
 
-/* Each label+input combo */
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -1249,14 +1247,12 @@ p.text {
   flex: 1;
 }
 
-/* Label styling */
 .filter-group label {
   font-size: 0.85rem;
   color: #7f8c8d;
   margin-bottom: 0.25rem;
 }
 
-/* Inputs spacing */
 .reference-filter,
 .date-filter {
   padding: 0.6rem 0.8rem;
@@ -1267,14 +1263,12 @@ p.text {
   box-sizing: border-box;
 }
 
-/* Action buttons container sits at end */
 .filter-actions {
   display: flex;
   gap: 0.5rem;
   margin-left: auto;
 }
 
-/* Buttons styling */
 .btn-clear,
 .btn-search {
   padding: 0.7rem 1.4rem;
@@ -1331,7 +1325,6 @@ p.text {
     flex-wrap: wrap;
 }
 
-
 .btn-view, .btn-cancel, .btn-payment {
     padding: 0.6rem 1rem;
     border: none;
@@ -1376,7 +1369,6 @@ p.text {
     background: #732d91;
 }
 
-/* Adjusting spacing inside the order-history-header */
 .order-history-header {
     display: flex;
     justify-content: space-between;
@@ -1410,8 +1402,7 @@ p.text {
 .back-button:hover {
   background-color: #0056b3;
 }
-
-/*end*/
+/*order history and order details end*/
 
 
 .payment-container {
