@@ -852,15 +852,6 @@ padding: 40px;
 }
 /*End of privacy page stuff*/
 
-/* 
-classes
-login-form
-login-form-input-div
-login-form-input-box
-login-reset-register-links-div
-login-button
-login-button-div
-*/
 form.login-form, .register-form, .forgotpass-form {
     /*border: 3px solid #f1f1f1;*/
     padding: 8px;
@@ -1082,7 +1073,7 @@ p.text {
     }
 }
 
-/*shopping cart*/
+/*shopping cart start*/
 .cart-container {
     max-width: 1200px;
     margin: 2rem auto;
@@ -1221,7 +1212,7 @@ p.text {
         flex-direction: column;
     }
 }
-/*end*/
+/*shopping cart end*/
 
 /*order history*/
 .order-history {
