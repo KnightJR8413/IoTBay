@@ -68,9 +68,9 @@ In your browser you can access the application
 * All frontend assets (CSS, images, scripts) are in the WebPages/html directory.
 
 ## Backend
-The backend is built using Node.js and SQLite.
-API endpoints handle user registration, login, and product management.
-The backend server runs on port 3000 by default.
+* The backend is built using Node.js and SQLite.
+* API endpoints handle user registration, login, and product management.
+* The backend server runs on port 3000 by default.
 
 ### Endpoints
 1. POST
@@ -85,7 +85,7 @@ The backend server runs on port 3000 by default.
     * POST /newsletter: adds user to marketing list
     * POST /logout: currently not used but is there if needed for future application
     * POST /payments: inserts payment information into database
-    
+
 2. GET
     * GET /user-details: get the users deatils
     * GET /user-logs: gets the login and logout logs for a user
