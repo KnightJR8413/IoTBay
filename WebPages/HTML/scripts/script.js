@@ -1,4 +1,5 @@
 // script.js
+const base_url = 'http://localhost:3000';
 
 // ─────────────────────────────────────────────
 // 1) SEARCH BAR
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!pattern.test(email)) return alert('Enter a valid email');
 
     try {
-      await fetch(`${API_BASE}/newsletter`, {
+      await fetch(`${base_url}/newsletter`, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({email})
@@ -154,7 +155,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function loadProducts() {
   try {
-    const res = await fetch(`${API_BASE}/products`);
+    const res = await fetch(`${base_url}/products`);
     const data = await res.json();
     renderProducts(data);
   } catch (e) {
@@ -189,7 +190,7 @@ function getUserId() {
 
 async function addToCart(productId) {
   try {
-    const res = await fetch(`${API_BASE}/cart`, {
+    const res = await fetch(`${base_url}/cart`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -218,7 +219,7 @@ async function addToCart(productId) {
 // ─────────────────────────────────────────────
 async function loadCart() {
   try {
-    const res = await fetch(`${API_BASE}/cart?userId=${getUserId()}`);
+    const res = await fetch(`${base_url}/cart?userId=${getUserId()}`);
     const items = await res.json();
     renderCartItems(items);
   } catch (e) {
@@ -253,7 +254,7 @@ function renderCartItems(items) {
 
 async function removeItem(productId, btn) {
   try {
-    const res = await fetch(`${API_BASE}/cart`, {
+    const res = await fetch(`${base_url}/cart`, {
       method:'DELETE',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ product_id: productId, userId: getUserId() })
@@ -305,7 +306,7 @@ function authFetch(url, options = {}) {
 // Loads list of users for the admin 
 async function loadUsers(query = '') {
   try {
-    let url = `${API_BASE}/admin/users`;
+    let url = `${base_url}/admin/users`;
     if (query) url += `?search=${encodeURIComponent(query)}`;
     const res = await authFetch(url);
     const data = await res.json();
@@ -354,7 +355,7 @@ function searchUsers() {
 function openUserModal(userId = null) {
   if (userId) {
     // Edit mode: fetch the user details first
-    authFetch(`${API_BASE}/admin/users/${userId}`)
+    authFetch(`${base_url}/admin/users/${userId}`)
     .then(res => res.json())
     .then(data => {
       document.getElementById('modalTitle').innerText = 'Edit User';
@@ -393,7 +394,7 @@ function openUserModal(userId = null) {
     };
     
     try {
-      let url = `${API_BASE}/admin/users`;
+      let url = `${base_url}/admin/users`;
       let method = 'POST';
       if (id) {
         url += `/${id}`;
@@ -418,7 +419,7 @@ function openUserModal(userId = null) {
 async function deleteUser(userId) {
   if (confirm('Are you sure you want to delete this user?')) {
     try {
-      const res = await authFetch(`${API_BASE}/admin/users/${userId}`, { method: 'DELETE' });
+      const res = await authFetch(`${base_url}/admin/users/${userId}`, { method: 'DELETE' });
       const data = await res.json();
       if (res.ok) {
         loadUsers();
@@ -436,7 +437,7 @@ async function toggleStatus(userId, currentStatus) {
   const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
   
   try {
-    const response = await fetch(`${API_BASE}/admin/users/${userId}/status`, {
+    const response = await fetch(`${base_url}/admin/users/${userId}/status`, {
       method: 'PUT',
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,

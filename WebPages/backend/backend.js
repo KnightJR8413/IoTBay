@@ -140,10 +140,6 @@ app.post('/login', async (req, res) => {
         [email]
       );
     }
-    console.log("Entered password:", password);
-    console.log("Password hash:", row?.password_hash);
-    console.log("Stored hash:", JSON.stringify(row.password_hash));
-    console.log('Row for login:', row, bcrypt.compareSync(password, row.password_hash));
     if (!row || !bcrypt.compareSync(password, row.password_hash)) {
       logAction(email, 'Unsuccessful login - wrong password');
       return res.status(401).json({ message: 'Invalid email or password.' });

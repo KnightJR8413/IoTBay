@@ -1,3 +1,4 @@
+const url_base = 'http://localhost:3000';
 document.addEventListener("DOMContentLoaded", function () {
     const registerForm = document.getElementById("registerForm");
     if (registerForm) {
@@ -13,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
             };
 
             try {
-                const response = await fetch(`${API_BASE}/register`, {
+                const response = await fetch(`${url_base}/register`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(formData)
@@ -57,7 +58,7 @@ async function checkLoginStatus() {
     }
 
     try {
-        const response = await fetch(`${API_BASE}/check-session`, {
+        const response = await fetch(`${url_base}/check-session`, {
             method: "GET",
             headers: { "Authorization": "Bearer " + token }
         });
@@ -77,7 +78,7 @@ async function checkLoginStatus() {
 
 
 function loginUser(email, password){ 
-    fetch(`${API_BASE}/login`, {
+    fetch(`${url_base}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -111,7 +112,7 @@ function loginUser(email, password){
 function logoutUser() {
     const email = JSON.parse(atob(localStorage.getItem('token').split('.')[1])).email;
     console.log(email);
-    fetch(`${API_BASE}/logout`, {
+    fetch(`${url_base}/logout`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json',},
       body: JSON.stringify({email})
