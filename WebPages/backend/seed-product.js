@@ -211,6 +211,48 @@ const products = [
     specifications: '6.2" OLED, Tensor G3, 128GB',
     size: '14.9x7.1x0.8cm',
     colour: 'Black'
+  },
+  {
+    name: 'AMD Ryzen 7 9800X3D',
+    price: 699.00,
+    description: 'High-performance desktop processor with 3D V-Cache technology',
+    stock: 15,
+    image_url: 'Ryzen79800X3D.png',
+    supplier: 'AMD',
+    brand: 'AMD',
+    model: 'Ryzen 7 9800X3D',
+    release_year: 2025,
+    specifications: '8-Core, 16-Thread, 3D V-Cache, AM5, 5nm',
+    size: '4.0x4.0x0.6cm',
+    colour: 'Silver/Orange'
+  },
+  {
+    name: 'Ubiquiti UniFi Protect G4 PRO',
+    price: 819.95,
+    description: '4K Ultra HD security camera with optical zoom and IR',
+    stock: 30,
+    image_url: 'UniFiG4PRO.png',
+    supplier: 'Ubiquiti',
+    brand: 'Ubiquiti',
+    model: 'UniFi Protect G4 PRO',
+    release_year: 2024,
+    specifications: '4K Ultra HD, 3x Optical Zoom, IR LEDs, PoE',
+    size: '7.5x7.5x14.0cm',
+    colour: 'White'
+  },
+  {
+    name: 'QNAP 12+4 Bay NAS',
+    price: 2949.00,
+    description: 'High-capacity NAS with Intel Atom 8-Core CPU and 2.5GbE networking',
+    stock: 8,
+    image_url: 'QNAP12Plus4BayNAS.png',
+    supplier: 'QNAP',
+    brand: 'QNAP',
+    model: 'TS-H1277AXU-RP',
+    release_year: 2025,
+    specifications: 'Atom 8-Core 2.8GHz, 8GB RAM, 2x 2.5GbE, 2x M.2, No Disks, 3YR Warranty',
+    size: '48.2x42.5x8.9cm',
+    colour: 'Black'
   }
   // ← add more products here as needed
 ];
