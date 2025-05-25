@@ -322,11 +322,11 @@ function renderUserTable(users) {
   
   users.forEach(user => {
     const isAdmin = user.email.toLowerCase() === "admin@iotbay.com";
-    let actionButtons = `<button class="adm-btn btn btn-edit" onclick="openUserModal(${user.userId})">Edit</button>`;
+    let actionButtons = `<button class="adm-btn btn-edit" onclick="openUserModal(${user.userId})">Edit</button>`;
     
     if (!isAdmin) {
-      actionButtons += `<button class="adm-btn btn btn-delete" onclick="deleteUser(${user.userId})">Delete</button>`;
-      actionButtons += `<button class="adm-btn btn btn-toggle" data-user-id="${user.userId}" onclick="toggleStatus(${user.userId}, '${user.status}')">
+      actionButtons += `<button class="adm-btn btn-delete" onclick="deleteUser(${user.userId})">Delete</button>`;
+      actionButtons += `<button class="adm-btn btn-toggle" data-user-id="${user.userId}" onclick="toggleStatus(${user.userId}, '${user.status}')">
                            ${user.status === 'active' ? 'Deactivate' : 'Activate'}
                         </button>`;
     }
