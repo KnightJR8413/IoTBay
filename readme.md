@@ -73,35 +73,39 @@ API endpoints handle user registration, login, and product management.
 The backend server runs on port 3000 by default.
 
 ### Endpoints
-POST /register: Registers a new user.
-POST /login: Logs a user in and returns a JWT token.
-POST /update-customer: Updates customer information
-POST /admin/users: adds user into table with default password
-POST /products: create a product
-POST /cart: add to cart
-POST /update-cart: save order
-POST /order/:orderId/copy-to-cart: copy items for order to cart
-POST /newsletter: adds user to marketing list
-POST /logout: currently not used but is there if needed for future application
-POST /payments: inserts payment information into database
-GET /user-details: get the users deatils
-GET /user-logs: gets the login and logout logs for a user
-GET /check-session: checks if a user is logged in
-GET /admin/users: get a list of all non admin users
-GET /admin/users/:id: get specific user informatuon
-GET /products: gets all products
-GET /product/:id: get single product
-GET /cart: get cart
-GET /order-history: gets order history
-GET /orders/:orderId/items: get items for specific order
-GET /payments: gets all payment methods for logged in user
-DELETE /delete-account: deletes all useer information but keeps their user ID in the system
-DELETE /product/:id: delete product completely
-DELETE /admin/users/:id: deletes user from table completely
-DELETE /cart: remove item from cart
-DELETE /orders/:id: delete order completely
-DELETE /payments/:id: delete payment method
-PUT /admin/users/:id: updates user details
-PUT /admin/users/:id/status: toggles account as active/inactive
-PUT /product/:id: update product information
-PUT /payments/:id: edit payment mothod
+1. POST
+    * POST /register: Registers a new user.
+    * POST /login: Logs a user in and returns a JWT token.
+    * POST /update-customer: Updates customer information
+    * POST /admin/users: adds user into table with default password
+    * POST /products: create a product
+    * POST /cart: add to cart
+    * POST /update-cart: save order
+    * POST /order/:orderId/copy-to-cart: copy items for order to cart
+    * POST /newsletter: adds user to marketing list
+    * POST /logout: currently not used but is there if needed for future application
+    * POST /payments: inserts payment information into database
+2. GET
+    * GET /user-details: get the users deatils
+    * GET /user-logs: gets the login and logout logs for a user
+    * GET /check-session: checks if a user is logged in
+    * GET /admin/users: get a list of all non admin users
+    * GET /admin/users/:id: get specific user informatuon
+    * GET /products: gets all products
+    * GET /product/:id: get single product
+    * GET /cart: get cart
+    * GET /order-history: gets order history
+    * GET /orders/:orderId/items: get items for specific order
+    * GET /payments: gets all payment methods for logged in user
+3. DELETE
+    * DELETE /delete-account: deletes all useer information but keeps their user ID in the system
+    * DELETE /product/:id: delete product completely
+    * DELETE /admin/users/:id: deletes user from table completely
+    * DELETE /cart: remove item from cart
+    * DELETE /orders/:id: delete order completely
+    * DELETE /payments/:id: delete payment method
+4. PUT
+    * PUT /admin/users/:id: updates user details
+    * PUT /admin/users/:id/status: toggles account as active/inactive
+    * PUT /product/:id: update product information
+    * PUT /payments/:id: edit payment mothod
