@@ -1238,55 +1238,81 @@ p.text {
     margin-bottom: 2rem;
 }
 
+/* Container for all filters and action buttons */
 .order-filters {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-    background: #f8f9fa;
-    padding: 1rem;
-    border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
 }
 
+/* Each label+input combo */
 .filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  flex: 1;
 }
 
+/* Label styling */
 .filter-group label {
-    font-size: 0.9rem;
-    color: #7f8c8d;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin-bottom: 0.25rem;
 }
 
-.date-filter, .reference-filter {
-    padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100%;
+/* Inputs spacing */
+.reference-filter,
+.date-filter {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Action buttons container sits at end */
 .filter-actions {
-    display: flex;
-    gap: 0.5rem;
-    align-self: flex-end;
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
 }
 
-.btn-clear, .btn-search {
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+/* Buttons styling */
+.btn-clear,
+.btn-search {
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 .btn-clear {
-    background: #95a5a6;
-    color: white;
+  background: #95a5a6;
+  color: #fff;
 }
 
 .btn-search {
-    background: #2ecc71;
-    color: white;
+  background: #2ecc71;
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .order-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-actions {
+    justify-content: flex-start;
+    margin-left: 0;
+  }
 }
 
 .orders-table {
@@ -1342,17 +1368,6 @@ p.text {
 
 .btn-view:hover, .btn-cancel:hover, .btn-payment:hover {
     opacity: 0.9;
-}
-
-@media (max-width: 768px) {
-    .orders-table {
-        display: block;
-        overflow-x: auto;
-    }
-    
-    .filter-actions {
-        grid-column: 1 / -1;
-    }
 }
 
 .view-payments-btn {

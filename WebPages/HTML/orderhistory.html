@@ -152,21 +152,21 @@
 
     <!-- Scripts -->
     <script src="{{ url_for('serve_js', filename='script.js')}}"></script>
- <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const API = 'http://localhost:3000';
-  const userId = localStorage.getItem('userId');
-  if (!userId) {
-    alert('Please log in first.');
-    return;
-  }
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const API = 'http://localhost:3000';
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert('Please log in first.');
+        return;
+    }
 
-  // grab filters
-  const orderInput = document.querySelector('.reference-filter');
-  const fromInput  = document.querySelectorAll('.date-filter')[0];
-  const toInput    = document.querySelectorAll('.date-filter')[1];
-  const tbody      = document.getElementById('order-history-body');
-  let orderData = [];  // will hold full history
+    // grab filters
+    const orderInput = document.querySelector('.reference-filter');
+    const fromInput  = document.querySelectorAll('.date-filter')[0];
+    const toInput    = document.querySelectorAll('.date-filter')[1];
+    const tbody      = document.getElementById('order-history-body');
+    let orderData = [];  // will hold full history
 
     function renderTable(data) {
     tbody.innerHTML = '';
