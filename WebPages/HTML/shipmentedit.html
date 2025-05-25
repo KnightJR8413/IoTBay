@@ -1,0 +1,166 @@
+<!--HEADER COPY START HERE-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoTBay - Home</title>
+    <link rel="stylesheet" href="{{ url_for('serve_css', filename='styles.css')}}">
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <a href="/index">
+                <img src="{{ url_for('serve_images', filename='logo.png') }}" width="125px" alt="IoTBay Logo">
+            </a>
+        </div>
+        <nav>  
+            <ul>
+                <li><a href="/index">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/contact">Contact</a></li>   
+                <li><a href=" /admindashboard" id="adminDashboardLink">Admin Dashboard</a></li>             
+            </ul>
+        </nav>
+        <div class="icon-buttons">
+            <button class="icon-btn" onclick="toggleSearchBar();">
+                <img src="{{ url_for('serve_images', filename='search.png') }}" alt="search" class="icon-img">
+            </button>
+            <button class="icon-btn" onclick="checkLoginAndRedirect();">
+                <img src="{{ url_for('serve_images', filename='login.png') }}" alt="login" class="icon-img">
+            </button>                
+            <button class="icon-btn" onclick="location.href='/shoppingcart';">
+                <img src="{{ url_for('serve_images', filename='cart.png') }}" alt="shoppingcart" class="icon-img">
+            </button>
+        </div>
+    </div>
+
+    <div id="search-bar" class="search-bar">
+        <input type="text" placeholder="Search products..." id="search-input">
+        <button onclick="searchProduct()">Search</button>
+        <button onclick="toggleSearchBar()">Close</button>
+    </div>
+
+    <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+
+<!--HEADER COPY END HERE-->
+
+  <section class="hero">
+    <h1>Edit Shipment Details</h1>
+    <p>Update your shipment details.</p>
+  </section>
+
+  <div class="edit-payment-container">
+    <h2>Update Your Shipment Details</h2>
+    <form class="edit-payment-form" id="edit-shipment-form">
+      <label for="shipment_method">Shipment Method</label>
+      <input type="text" id="shipment_method" name="shipment_method" placeholder="Shipment Method" required>
+
+      <label for="shipment_address">Shipment Address</label>
+      <input type="text" id="shipment_address" name="shipment_address" placeholder="Shipment Address" required>
+
+      <label for="shipment_date">Shipment Date</label>
+      <input type="date" id="shipment_date" name="shipment_date" required>
+
+      <button type="submit">Save Changes</button>
+    </form>
+    <a href="shipmenthistory" class="back-link">← Back to Shipment History</a>
+  </div>
+
+  <footer>
+    <div class="footer-newsletter">
+      <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
+      <div class="newsletter-form">
+        <form>
+          <input type="email" placeholder="Only an email away..." required>
+          <button type="submit">Sign me up!</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-links">
+      <!-- You can reuse your existing footer columns here -->
+    </div>
+    <div class="footer-contact">
+      <h3>Contact Our Support Team</h3>
+      <p>Need help? Reach out to us any time.</p>
+      <a href="contact.html" class="contact-button">Contact Us</a>
+    </div>
+    <div class="footer-copyright">
+      <p>&copy; 2025 IoTBay. All rights reserved.</p>
+    </div>
+  </footer>
+
+<script>
+  const id = localStorage.getItem('edit_shipment_id');
+  const shipmentMethodField =  document.getElementById('shipment_method');
+  const shipmentAddressField = document.getElementById('shipment_address');
+  const shipmentDateField = document.getElementById('shipment_date');
+
+  window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch(`http://localhost:3000/shipments/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    });
+
+    const result = await res.json();
+
+
+    if (res.ok) {
+      console.log("Fetched Shipment Details:", result);
+      shipmentMethodField.value = result.shipment_method || '';
+      shipmentAddressField.value = result.shipment_address || '';
+      shipmentDateField.value = result.shipment_date
+        ? new Date(result.shipment_date).toISOString().split('T')[0]
+        : '';
+    } else {
+      console.error("Issue with fetching.", result.message);
+    }
+  } catch (err) {
+    console.error("Couldn't fetch the details.", err);
+    alert("Something went wrong.");
+  }
+});
+
+document.getElementById('edit-shipment-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  console.log("Editing Shipment ID:", id);
+
+  const data = {
+    shipment_method: shipmentMethodField.value,
+    shipment_address: shipmentAddressField.value,
+    shipment_date: shipmentDateField.value,
+  };
+
+  try {
+    const res = await fetch(`http://localhost:3000/shipments/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    console.log("Update response:", result);
+
+    if (res.ok) {
+      window.location.href = 'shipmenthistory';
+    } else {
+      alert(result.message);
+    }
+  } catch (err) {
+    console.error("Update failed:", err);
+    alert("Something went wrong.");
+  }
+});
+</script>
+
+
+</body>
+</html>

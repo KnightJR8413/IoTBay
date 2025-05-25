@@ -1,0 +1,212 @@
+<!--HEADER COPY START HERE-->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>IoTBay - Home</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('serve_css', filename='styles.css')}}"
+        />
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="logo">
+                <a href="/index">
+                    <img
+                        src="{{ url_for('serve_images', filename='logo.png') }}"
+                        width="125px"
+                        alt="IoTBay Logo"
+                    />
+                </a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/index">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/products">Products</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li>
+                        <a href=" /admindashboard" id="adminDashboardLink"
+                            >Admin Dashboard</a
+                        >
+                    </li>
+                </ul>
+            </nav>
+            <div class="icon-buttons">
+                <button class="icon-btn" onclick="toggleSearchBar();">
+                    <img
+                        src="{{ url_for('serve_images', filename='search.png') }}"
+                        alt="search"
+                        class="icon-img"
+                    />
+                </button>
+                <button class="icon-btn" onclick="checkLoginAndRedirect();">
+                    <img
+                        src="{{ url_for('serve_images', filename='login.png') }}"
+                        alt="login"
+                        class="icon-img"
+                    />
+                </button>
+                <button
+                    class="icon-btn"
+                    onclick="location.href='/shoppingcart';"
+                >
+                    <img
+                        src="{{ url_for('serve_images', filename='cart.png') }}"
+                        alt="shoppingcart"
+                        class="icon-img"
+                    />
+                </button>
+            </div>
+        </div>
+
+        <div id="search-bar" class="search-bar">
+            <input
+                type="text"
+                placeholder="Search products..."
+                id="search-input"
+            />
+            <button onclick="searchProduct()">Search</button>
+            <button onclick="toggleSearchBar()">Close</button>
+        </div>
+
+        <script src="{{ url_for('serve_js', filename='script.js') }}"></script>
+
+        <!-- Page Header -->
+        <section class="hero">
+            <h1>Shipment History</h1>
+            <p>
+                View your Shipment history and edit/delete your shipment
+                details.
+            </p>
+        </section>
+
+        <main class="payment-history-container">
+            <h2>Recent Shipment Details</h2>
+            <table class="payment-methods-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Shipment Method</th>
+                        <th>Shipment Address</th>
+                        <th>Shipment Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="shipmentsTable"></tbody>
+            </table>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-newsletter">
+                <h2>Get the Latest in Tech News, Deals & Giveaways!</h2>
+                <div class="newsletter-form">
+                    <form>
+                        <input
+                            type="email"
+                            placeholder="Only an email away..."
+                            required
+                        />
+                        <button type="submit">Sign me up!</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-links">...</div>
+            <div class="footer-column">...</div>
+            <div class="footer-column">...</div>
+            <div class="footer-column">...</div>
+            <div class="footer-copyright">
+                <p>&copy; 2025 IoTBay. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <!-- JavaScript -->
+        <script>
+            async function editShipment(id) {
+                localStorage.setItem("edit_shipment_id", id);
+                window.location.href = "shipmentedit";
+            }
+
+            async function deleteShipment(id) {
+                console.log("Attempting to delete Shipment id:", id); // Debug log
+                const token = localStorage.getItem("token");
+                console.log("Using token:", token); // Debug log
+
+                if (!id || !token) {
+                    alert("Missing shipment ID or auth token.");
+                    return;
+                }
+
+                if (!confirm("Are you sure you want to delete this shipment details?"))
+                    return;
+
+                try {
+                    const res = await fetch(
+                        `http://localhost:3000/shipments/${id}`,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                Authorization: "Bearer " + token,
+                            },
+                        }
+                    );
+
+                    const result = await res.json();
+                    console.log("Server response:", result); // Debug log
+
+                    if (res.ok) {
+                        alert("Shipment deleted successfully.");
+                        location.reload();
+                    } else {
+                        alert(result.message || "Failed to delete Shipment.");
+                    }
+                } catch (err) {
+                    console.error("Delete error:", err);
+                    alert("Something went wrong.");
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", async () => {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+
+                try {
+                    const shipmentRes = await fetch(
+                        "http://localhost:3000/shipments",
+                        {
+                            method: "GET",
+                            headers: { Authorization: "Bearer " + token },
+                        }
+                    );
+
+                    const shipments = await shipmentRes.json();
+
+                    const savedTable =
+                        document.getElementById("shipmentsTable");
+                    savedTable.innerHTML = "";
+
+                    shipments.forEach((shipment) => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+          <td>${shipment.order_id}</td>
+          <td>${shipment.shipment_method}</td>
+          <td>${shipment.shipment_address}</td>
+          <td>${shipment.shipment_date}</td>
+          <td>
+            <button class="edit-btn" onclick="editShipment(${shipment.id})">Edit</button>
+            <button class="delete-btn" onclick="deleteShipment(${shipment.id})">Delete</button>
+          </td>
+        `;
+
+                        savedTable.appendChild(row);
+                    });
+                } catch (err) {
+                    console.error("Error loading shipment data:", err);
+                }
+            });
+        </script>
+    </body>
+</html>
