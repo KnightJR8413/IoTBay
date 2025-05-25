@@ -1,4 +1,3 @@
-// seed-products.js
 const db = require('./database');
 
 const products = [
